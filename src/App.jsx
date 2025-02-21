@@ -11,6 +11,8 @@ import Message from "./pages/Message";
 import Insurance from "./pages/Insurance";
 import Navbar from "./compoments/Navbar";
 import Footer from "./pages/Footer";
+import Signup from "./pages/Signin";
+import Error from "./pages/Error";
 
 function App() {
   return (
@@ -19,7 +21,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home/>} />
         <Route path="/login" element={<Login />} />
-        <Route path="/signin" element={<Signin/>} />
+        <Route path="/signup" element={<Signup/>} />
         <Route path="/verification" element={<Verfication/>} />
         <Route path="/AdminDashboard" element={<AdminDashboard/>} />
         <Route path="/rental" element={<Rental/>} />
@@ -27,8 +29,10 @@ function App() {
         <Route path="/ratings" element={<Ratings/>} />
         <Route path="/messaging" element={<Message/>} />
         <Route path="/insurance" element={<Insurance/>} />
+        <Route path="*" element={<Error/>}/>
       </Routes>
       <Footer/>
+
     
       </div>
   );
