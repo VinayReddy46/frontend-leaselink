@@ -11,7 +11,7 @@ import Message from "./pages/Message";
 import Insurance from "./pages/Insurance";
 import Navbar from "./compoments/Navbar";
 import Footer from "./pages/Footer";
-import Signup from "./pages/Signin";
+// import Signup from "./pages/Signin";
 import Error from "./pages/Error";
 
 function App() {
@@ -21,7 +21,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home/>} />
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup/>} />
+        <Route path="/signup" element={<Signin/>} />
         <Route path="/verification" element={<Verfication/>} />
         <Route path="/AdminDashboard" element={<AdminDashboard/>} />
         <Route path="/rental" element={<Rental/>} />
