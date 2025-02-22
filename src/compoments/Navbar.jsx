@@ -3,62 +3,111 @@ import { IoIosArrowDown } from "react-icons/io";
 import { FaUserCircle } from "react-icons/fa";
 
 const Navbar = () => {
-  const [dropdown, setDropdown] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
-        {/* Logo */}
-        <a href="#" className="bg-blue-500 w-50 h-full flex items-center px-6 py-4 rounded-tr-xl">
-          LEASE LINK
-        </a>
+    <nav className="bg-gray-800">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center">
+             
+            <img
+              className="h-8 w-auto"
+              src="https://tailwindui.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
+              alt="Logo"
+            />
+            <p className=" flex W-40 text-white ">
+              LEASE LINK
+            </p>
+          </div>
 
-        {/* Navigation Links */}
-        <div className="hidden lg:flex space-x-8">
-          {[
-            { label: "Home", links: ["Main Home", "Landing Page"] },
-            { label: "Services", links: ["Car Rentals", "Luxury Cars"] },
-            { label: "Pages", links: ["About Us", "FAQs", "Team"] },
-            { label: "Blog", links: ["Latest Posts", "Popular Posts"] },
-          ].map((item) => (
-            <div
-              key={item.label}
-              className="relative group"
-              onMouseEnter={() => setDropdown(item.label)}
-              onMouseLeave={() => setDropdown("")}
-            >
-              <button className="text-black px-4 py-2 flex items-center gap-2 font-semibold text-lg hover:text-blue-600">
-                {item.label}
-                <IoIosArrowDown
-                  className={`w-5 h-5 transition-transform duration-300 ${
-                    dropdown === item.label ? "rotate-180" : "rotate-0"
-                  }`}
+          {/* Desktop Menu */}
+          <div className="hidden sm:flex space-x-4">
+            <a href="#" className="text-white bg-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+              Home
+            </a>
+            <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+              About us
+            </a>
+            <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+              Favourites
+            </a>
+            <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+              Contact us
+            </a>
+          </div>
+
+          {/* User Profile & Notifications */}
+          <div className="flex items-center space-x-4">
+            <button className="text-gray-400 hover:text-white focus:outline-none">
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.5"
+                  d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
                 />
+              </svg>
+            </button>
+
+            {/* Profile Dropdown */}
+            <div className="relative">
+              <button onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center text-white focus:outline-none">
+                <FaUserCircle className="h-8 w-8" />
+                <IoIosArrowDown className="ml-1" />
               </button>
-              {dropdown === item.label && (
-                <div className="absolute left-0 mt-2 w-40 bg-white border border-gray-300 shadow-lg rounded-md z-10 transition-opacity duration-200 opacity-100">
-                  {item.links.map((link) => (
-                    <a key={link} href="#" className="block px-4 py-2 hover:bg-gray-100">
-                      {link}
-                    </a>
-                  ))}
+
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    Your Profile
+                  </a>
+                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    Settings
+                  </a>
+                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    Sign out
+                  </a>
                 </div>
               )}
             </div>
-          ))}
-          <a href="#" className="text-black px-4 py-2 font-semibold text-lg hover:text-blue-600">
-            Contact
-          </a>
-        </div>
+          </div>
 
-        {/* Right Section - Button & User Icon */}
-        <div className="flex items-center space-x-6">
-          <button className="bg-blue-500 text-white px-6 lg:px-8 py-2 rounded-md font-bold text-lg hover:bg-black">
-            Explore
+          {/* Mobile Menu Button */}
+          <button
+            className="sm:hidden text-gray-400 hover:text-white focus:outline-none"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {mobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              )}
+            </svg>
           </button>
-          <FaUserCircle className="w-8 h-8 text-gray-700 cursor-pointer" />
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="sm:hidden bg-gray-800 px-2 pt-2 pb-3 space-y-1">
+          <a href="#" className="block text-white bg-gray-900 px-3 py-2 rounded-md text-base font-medium">
+            Dashboard
+          </a>
+          <a href="#" className="block text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-base font-medium">
+            Team
+          </a>
+          <a href="#" className="block text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-base font-medium">
+            Projects
+          </a>
+          <a href="#" className="block text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-base font-medium">
+            Calendar
+          </a>
+        </div>
+      )}
     </nav>
   );
 };
