@@ -15,19 +15,14 @@ const Login = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        try {
+     
             toast.success("Login Successful! Welcome back!");
             navigate("/");
-        } catch (err) {
-            // console.log(err)
-            toast.error(" err message");
-        } finally {
             setIsLoading(false);
-        }
     };
 
     return (
-        <div className="min-h-screen w-full   flex items-center justify-center bg-gray-600">
+        <div className="min-h-screen w-full   flex items-center justify-center bg-gray-900">
             <div className="max-w-md w-full rounded-lg p-6  bg-white bg-opacity-10 backdrop-blur-md border border-white border-opacity-20  ">
                 <h1 className=" text-3xl font-semibold text-white text-center mb-6">
                     LogIn

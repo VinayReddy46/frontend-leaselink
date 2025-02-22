@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 const Register = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
+    const [role, setRole] = useState("Lender");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [show, setShow] = useState(false);
@@ -22,24 +23,14 @@ const Register = () => {
             toast.warning("Passwords do not match");
             return;
         }
-        
-        try {
+      
           
-                toast.success(res?.data?.message );
+                toast.success("OTP send to email");
                 navigate(`/verification?email=${email}`);
-                
-            
-        } catch (err) {
-            // console.log(err)
-            toast.error("err message");
-        }
-        finally {
-            setIsLoading(false);
-        }
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-gray-600">
+        <div className="min-h-screen w-full flex items-center justify-center bg-gray-900">
             <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md bg-opacity-10 backdrop-blur-md border border-white border-opacity-20">
                 <h2 className="text-2xl font-semibold mb-6 text-white text-center">
                     Register
@@ -77,6 +68,24 @@ const Register = () => {
                                     required
                                 />
                             </div>
+                        </label>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-white rounded">
+                        <div className="flex items-center  rounded-full mt-1 ">
+                        <span className="px-3">
+                                    <FaEnvelope />
+                                </span>
+                        <select
+                            value={role}
+                            onChange={(e) => setRole(e.target.value)}
+                            className="w-full rounded-full px-2   py-2 focus:outline-none text-gray-400"
+                            required
+                        >
+                            <option value="Lender">Lender</option>
+                            <option value="Renter">Renter</option>
+                        </select>
+                        </div>
                         </label>
                     </div>
                     <div className="mb-4">
