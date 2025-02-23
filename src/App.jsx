@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Signin from "./pages/Signin";
+import Signup from "./pages/Signup";
 import Verfication from "./pages/Verfication";
 import AdminDashboard from "./pages/AdminDashboard";
 import Rental from "./pages/Rental";
@@ -11,7 +11,7 @@ import Message from "./pages/Message";
 import Insurance from "./pages/Insurance";
 import Navbar from "./compoments/Navbar";
 import Footer from "./pages/Footer";
-import Signup from "./pages/Signin";
+
 import Error from "./pages/Error";
 
 function App() {
