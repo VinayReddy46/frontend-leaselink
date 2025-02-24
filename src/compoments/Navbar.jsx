@@ -1,115 +1,98 @@
 import React, { useState } from "react";
-import { IoIosArrowDown } from "react-icons/io";
 import { FaUserCircle } from "react-icons/fa";
+import { CiSearch } from "react-icons/ci";
+import { IoMdArrowDropdown, IoMdNotificationsOutline } from "react-icons/io";
+import { HiShoppingCart } from "react-icons/hi2";
+import { FiMenu } from "react-icons/fi";
 
-const Navbar = () => {
+const data = [
+  { name: "Home", link: "/" },
+  { name: "About Us", link: "/about" },
+  {
+    name: "Rent a Product",
+    link: "/product",
+    dropdown: [
+      { name: "Laptops", link: "/product/laptops" },
+      { name: "Printer & Scanner", link: "/product/printers" },
+      { name: "TV & Monitors", link: "/product/monitors" },
+      { name: "Kitchen Appliance", link: "/product/kitchen" },
+      { name: "Projector", link: "/product/projectors" },
+      { name: "Tablet", link: "/product/tablet" },
+      { name: "Audio & Karaoke", link: "/product/audio" },
+      { name: "Air Purifier", link: "/product/air" },
+      { name: "Playstation", link: "/product/playstation" },
+      { name: "Video Conferencing", link: "/product/video" },
+    ],
+  },
+  { name: "Contact Us", link: "/contact" },
+];
+
+function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-gray-800">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center">
-             
-            <img
-              className="h-8 w-auto"
-              src="https://tailwindui.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-              alt="Logo"
-            />
-            <p className=" flex W-40 text-white ">
-              LEASE LINK
-            </p>
-          </div>
-
-          {/* Desktop Menu */}
-          <div className="hidden sm:flex space-x-4">
-            <a href="#" className="text-white bg-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-              Home
-            </a>
-            <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-              About us
-            </a>
-            <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-              Favourites
-            </a>
-            <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-              Contact us
-            </a>
-          </div>
-
-          {/* User Profile & Notifications */}
-          <div className="flex items-center space-x-4">
-            <button className="text-gray-400 hover:text-white focus:outline-none">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-                />
-              </svg>
-            </button>
-
-            {/* Profile Dropdown */}
-            <div className="relative">
-              <button onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center text-white focus:outline-none">
-                <FaUserCircle className="h-8 w-8" />
-                <IoIosArrowDown className="ml-1" />
-              </button>
-
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                    Your Profile
-                  </a>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                    Settings
-                  </a>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                    Sign out
-                  </a>
+    <nav className="fixed bg-white top-0 left-0 w-full shadow-md z-50 flex items-center justify-between px-6 md:py-4">
+      <a href="#" className="flex items-center">
+        <img src="/leaselinklogo.png" alt="Logo" className="w-[150px] h-[65px]" />
+      </a>
+      <button className="md:hidden text-gray-700" onClick={() => setMenuOpen(!menuOpen)}>
+        <FiMenu className="w-6 h-6" />
+      </button>
+      <ul className={`md:flex md:items-center md:space-x-10 absolute md:static bg-white md:bg-transparent top-16 left-0 w-full md:w-auto md:flex-row flex-col space-y-4 md:space-y-0 px-6 md:px-0 shadow-md md:shadow-none transition-transform duration-300 ease-in-out ${menuOpen ? "block" : "hidden"}`}>
+        {data.map((val, index) => (
+          <li key={index} className="relative">
+            {val.dropdown ? (
+              <div
+                className="relative group cursor-pointer"
+                onMouseEnter={() => setDropdownOpen(true)}
+                onMouseLeave={() => setDropdownOpen(false)}
+              >
+                <div className="flex items-center text-gray-700 hover:text-blue-800 font-medium">
+                  {val.name}
+                  <IoMdArrowDropdown className="ml-1 text-lg" />
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="sm:hidden text-gray-400 hover:text-white focus:outline-none"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              {mobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-              )}
-            </svg>
+                {dropdownOpen && (
+                  <ul className="absolute left-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg">
+                    {val.dropdown.map((item, subIndex) => (
+                      <li key={subIndex} className="px-4 py-2 hover:bg-gray-100">
+                        <a href={item.link} className="text-gray-700">{item.name}</a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ) : (
+              <a href={val.link} className="text-gray-700 hover:text-blue-800 font-medium block md:inline">
+                {val.name}
+              </a>
+            )}
+          </li>
+        ))}
+      </ul>
+      <div className="hidden md:flex items-center space-x-4">
+        <div className="flex items-center border border-gray-200 shadow-md rounded-md w-60 overflow-hidden">
+          <input
+            type="text"
+            placeholder="Search here..."
+            className="w-full px-4 outline-none border-none"
+          />
+          <button className="px-4 py-2 text-black hover:bg-black hover:text-white transition">
+            <CiSearch className="w-4 h-4" />
           </button>
         </div>
+        <a href="#" className="text-blue-600 hover:bg-black hover:text-white p-2 rounded-full">
+          <IoMdNotificationsOutline className="w-6 h-6" />
+        </a>
+        <a href="#" className="text-blue-600 hover:bg-black hover:text-white p-2 rounded-full">
+          <HiShoppingCart className="w-6 h-6" />
+        </a>
+        <a href="#" className="hover:text-blue-800">
+          <FaUserCircle className="w-6 h-6" />
+        </a>
       </div>
-
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="sm:hidden bg-gray-800 px-2 pt-2 pb-3 space-y-1">
-          <a href="#" className="block text-white bg-gray-900 px-3 py-2 rounded-md text-base font-medium">
-            Dashboard
-          </a>
-          <a href="#" className="block text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-base font-medium">
-            Team
-          </a>
-          <a href="#" className="block text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-base font-medium">
-            Projects
-          </a>
-          <a href="#" className="block text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-base font-medium">
-            Calendar
-          </a>
-        </div>
-      )}
     </nav>
   );
-};
+}
 
 export default Navbar;
