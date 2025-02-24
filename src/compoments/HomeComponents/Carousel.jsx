@@ -25,7 +25,7 @@ function Carousel() {
   const slides = [
     {
       image: "http://getwallpapers.com/wallpaper/full/3/3/4/490956.jpg",
-      title: "Car Rental In Your",
+      title: "Camera Rental In Your",
       highlight: "Desired",
       subtitle: "Destination",
       discount: "50% OFF RESERVED NOW!",
@@ -34,7 +34,7 @@ function Carousel() {
     },
     {
       image: "http://getwallpapers.com/wallpaper/full/3/3/4/490956.jpg",
-      title: "Car Rental In Your",
+      title: "Phone Rental In Your",
       highlight: "Desired",
       subtitle: "Destination",
       discount: "50% OFF RESERVED NOW!",
@@ -43,7 +43,7 @@ function Carousel() {
     },
     {
       image: "http://getwallpapers.com/wallpaper/full/3/3/4/490956.jpg",
-      title: "Car Rental In Your",
+      title: "Property Rental In Your",
       highlight: "Desired",
       subtitle: "Destination",
       discount: "50% OFF RESERVED NOW!",
