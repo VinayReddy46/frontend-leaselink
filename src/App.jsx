@@ -13,7 +13,7 @@ import Navbar from "./compoments/Navbar";
 import Footer from "./pages/Footer";
 import Signup from "./pages/Signup";
 import Error from "./pages/Error";
-
+import ForgotPassword from "./pages/ForgotPassword";
 function App() {
   return (
      <div>
@@ -25,10 +25,12 @@ function App() {
         <Route path="/verification" element={<Verfication/>} />
         <Route path="/AdminDashboard" element={<AdminDashboard/>} />
         <Route path="/rental" element={<Rental/>} />
+        <Route path='/forgot-password' element={<ForgotPassword/>}/>
         <Route path="/booking-payment" element={<BookingPayment/>} />
         <Route path="/ratings" element={<Ratings/>} />
         <Route path="/messaging" element={<Message/>} />
         <Route path="/insurance" element={<Insurance/>} />
+        <Route path="/profile" element={<Insurance/>} />
         <Route path="*" element={<Error/>}/>
       </Routes>
       <Footer/>
