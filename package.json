@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "browser-router": "^0.2.0",
+    "framer-motion": "^12.4.7",
     "frontend-leaselink": "file:",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
