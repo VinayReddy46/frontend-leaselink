@@ -2,7 +2,7 @@ import React from 'react'
 
 const AdminDashboard = () => {
   return (
-    <div>
+    <div className='min-h-screen pt-32'>
       This is Admin dashboard
     </div>
   )

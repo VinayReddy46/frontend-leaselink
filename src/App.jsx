@@ -14,6 +14,9 @@ import Footer from "./pages/Footer";
 import Signup from "./pages/Signup";
 import Error from "./pages/Error";
 import ForgotPassword from "./pages/ForgotPassword";
+import AddProduct from "./pages/AddProduct";
+
+
 const Laptops = () => <h1>Laptops Page</h1>;
 const TVMonitors = () => <h1>TV & Monitors Page</h1>;
 const AirPurifiers = () => <h1>Air Purifiers Page</h1>;
@@ -43,6 +46,7 @@ function App() {
         <Route path="/ratings" element={<Ratings/>} />
         <Route path="/messaging" element={<Message/>} />
         <Route path="/insurance" element={<Insurance/>} />
+        <Route path="/addproduct" element={<AddProduct/>} />
         <Route path="/profile" element={<Insurance/>} />
         <Route path="*" element={<Error/>}/>
 

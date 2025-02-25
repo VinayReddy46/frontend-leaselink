@@ -71,24 +71,7 @@ const Register = () => {
               </div>
             </label>
           </div>
-          <div className="mb-4">
-            <label className="block rounded-md bg-white border border-gray-300">
-              <div className="flex items-center mt-1 ">
-                <span className="px-3 text-gray-700">
-                  <HiUsers />
-                </span>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="w-full rounded-full px-2   py-2 focus:outline-none text-gray-400"
-                  required
-                >
-                  <option value="Lender">Lender</option>
-                  <option value="Renter">Renter</option>
-                </select>
-              </div>
-            </label>
-          </div>
+          
           <div className="mb-4">
             <label className="block rounded-md bg-white border border-gray-300 ">
               <div className="flex items-center  rounded-full mt-1">

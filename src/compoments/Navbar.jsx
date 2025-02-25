@@ -4,15 +4,18 @@ import { CiSearch } from "react-icons/ci";
 import { IoMdArrowDropdown, IoMdNotificationsOutline } from "react-icons/io";
 import { HiShoppingCart } from "react-icons/hi2";
 import { FiMenu } from "react-icons/fi";
+import { useNavigate,Link } from "react-router-dom";
+
+const role = 'user';
 
 const data = [
   { name: "Home", link: "/" },
   { name: "About Us", link: "/about" },
   {
     name: "Rent a Product",
-    link: "/product",
+    link: `/rental/${name}`,
     dropdown: [
-      { name: "Laptops", link: "/product/laptops" },
+      { name: "laptops", link:"/product/laptops"},
       { name: "Printer & Scanner", link: "/product/printers" },
       { name: "TV & Monitors", link: "/product/monitors" },
       { name: "Kitchen Appliance", link: "/product/kitchen" },
@@ -25,15 +28,17 @@ const data = [
     ],
   },
   { name: "Contact Us", link: "/contact" },
+  (role === 'useqr' ? { name: "Add Product", link: "/addproduct" } : { name: "Dashboard", link: "/AdminDashboard"})
 ];
 
 function Navbar() {
+  
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <nav className="fixed bg-white top-0 left-0 w-full shadow-md z-50 flex items-center justify-between px-6 md:py-4">
-      <a href="#" className="flex items-center">
+      <a  style={{ cursor: "pointer" }}  className="flex items-center">
         <img src="/leaselinklogo.png" alt="Logo" className="w-[150px] h-[65px]" />
       </a>
       <button className="md:hidden text-gray-700" onClick={() => setMenuOpen(!menuOpen)}>
@@ -49,7 +54,7 @@ function Navbar() {
                 onMouseLeave={() => setDropdownOpen(false)}
               >
                 <div className="flex items-center text-gray-700 hover:text-blue-800 font-medium">
-                  {val.name}
+                <Link to='/addproduct' >{val.name}</Link>
                   <IoMdArrowDropdown className="ml-1 text-lg" />
                 </div>
                 {dropdownOpen && (
@@ -70,6 +75,7 @@ function Navbar() {
           </li>
         ))}
       </ul>
+      
       <div className="hidden md:flex items-center space-x-4">
         <div className="flex items-center border border-gray-200 shadow-md rounded-md w-60 overflow-hidden">
           <input
@@ -81,7 +87,7 @@ function Navbar() {
             <CiSearch className="w-4 h-4" />
           </button>
         </div>
-        <a href="#" className="text-blue-600 hover:bg-black hover:text-white p-2 rounded-full">
+        <a className="text-blue-600 hover:bg-black hover:text-white p-2 rounded-full">
           <IoMdNotificationsOutline className="w-6 h-6" />
         </a>
         <a href="#" className="text-blue-600 hover:bg-black hover:text-white p-2 rounded-full">
