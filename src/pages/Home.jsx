@@ -9,13 +9,14 @@ import WhyChooseUs from '../compoments/HomeComponents/WhyChooseUs.jsx'
 import FAQSection from '../compoments/HomeComponents/FAQs.jsx'
 import TestimonialsCarousel from '../compoments/HomeComponents/ScrollingTestimonials.jsx'
 import ProductList from '../compoments/HomeComponents/ProductList.jsx'
-
+import Navbar from '../compoments/Navbar'
 
 const Home = () => {
   return (
 
     <>
        <div className="relative z-0"> {/* Ensure Home doesn’t overlap Navbar */}
+        <Navbar/>
         <Carousel />
         <ProductList/>
         <FeaturedBuildings/>

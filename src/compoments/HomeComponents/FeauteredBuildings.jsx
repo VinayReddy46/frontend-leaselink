@@ -6,7 +6,7 @@ const buildings = [
     id: 1,
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2xTNDcIuwjdCmP00fk9Mr-qbWdpZZWcjBqw&s",
     title: "Modern Skyscraper",
-    details: "Model: 2022 | 50 Floors | Smart Building",
+    details: "Model: 2022 ` | 50 Floors | Smart Building",
     features: ["24/7 Security", "Energy Efficient"],
     price: "$390 / month",
   },
