@@ -8,7 +8,7 @@ import RentalProcess from '../compoments/HomeComponents/HowItsWork.jsx'
 import WhyChooseUs from '../compoments/HomeComponents/WhyChooseUs.jsx'
 import FAQSection from '../compoments/HomeComponents/FAQs.jsx'
 import TestimonialsCarousel from '../compoments/HomeComponents/ScrollingTestimonials.jsx'
-import ProductList from '../homecomponents/ProductList.jsx'
+import ProductList from '../compoments/HomeComponents/ProductList.jsx'
 
 
 const Home = () => {
@@ -19,7 +19,6 @@ const Home = () => {
         <Carousel />
         <ProductList/>
         <FeaturedBuildings/>
-        
         <BlogPage/>
         <TestimonialsCarousel/>
         <RentalProcess/>

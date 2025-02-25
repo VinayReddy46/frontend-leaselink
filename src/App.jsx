@@ -14,6 +14,19 @@ import Footer from "./pages/Footer";
 import Signup from "./pages/Signup";
 import Error from "./pages/Error";
 import ForgotPassword from "./pages/ForgotPassword";
+const Laptops = () => <h1>Laptops Page</h1>;
+const TVMonitors = () => <h1>TV & Monitors Page</h1>;
+const AirPurifiers = () => <h1>Air Purifiers Page</h1>;
+const Projectors = () => <h1>Projectors Page</h1>;
+const PS5 = () => <h1>Playstation 5 Page</h1>;
+const Tablets = () => <h1>Tablets Page</h1>;
+const Printers = () => <h1>Printers Page</h1>;
+const Audio = () => <h1>Audio & Karaoke Page</h1>;
+const Kitchen = () => <h1>Kitchen Products Page</h1>;
+const VideoConference = () => <h1>Video Conference Page</h1>;
+const Office = () => <h1>Office Equipment Page</h1>;
+const Security = () => <h1>Security Cameras Page</h1>;
+
 function App() {
   return (
      <div>
@@ -32,6 +45,20 @@ function App() {
         <Route path="/insurance" element={<Insurance/>} />
         <Route path="/profile" element={<Insurance/>} />
         <Route path="*" element={<Error/>}/>
+
+       
+        <Route path="/laptops" element={<Laptops />} />
+        <Route path="/tv-monitors" element={<TVMonitors />} />
+        <Route path="/air-purifiers" element={<AirPurifiers />} />
+        <Route path="/projectors" element={<Projectors />} />
+        <Route path="/ps5" element={<PS5 />} />
+        <Route path="/tablets" element={<Tablets />} />
+        <Route path="/printers" element={<Printers />} />
+        <Route path="/audio" element={<Audio />} />
+        <Route path="/kitchen" element={<Kitchen />} />
+        <Route path="/video-conference" element={<VideoConference />} />
+        <Route path="/office" element={<Office />} />
+        <Route path="/security" element={<Security />} />
       </Routes>
       <Footer/>
 
