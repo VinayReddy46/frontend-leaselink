@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 import { IoMdArrowDropdown, IoMdNotificationsOutline } from "react-icons/io";
@@ -10,27 +10,95 @@ const data = [
   { name: "About Us", link: "/about" },
   {
     name: "Rent a Product",
-    link: "/product",
+    link: "/rental",
     dropdown: [
-      { name: "Laptops", link: "/product/laptops" },
-      { name: "Printer & Scanner", link: "/product/printers" },
-      { name: "TV & Monitors", link: "/product/monitors" },
-      { name: "Kitchen Appliance", link: "/product/kitchen" },
-      { name: "Projector", link: "/product/projectors" },
-      { name: "Tablet", link: "/product/tablet" },
-      { name: "Audio & Karaoke", link: "/product/audio" },
-      { name: "Air Purifier", link: "/product/air" },
-      { name: "Playstation", link: "/product/playstation" },
-      { name: "Video Conferencing", link: "/product/video" },
+      { name: "Laptops", link: "/rental/laptops" },
+      { name: "Printer & Scanner", link: "/rental/printers" },
+      { name: "TV & Monitors", link: "/rental/monitors" },
+      { name: "Kitchen Appliance", link: "/rental/kitchen" },
+      { name: "Projector", link: "/rental/projectors" },
+      { name: "Tablet", link: "/rental/tablet" },
+      { name: "Audio & Karaoke", link: "/rental/audio" },
+      { name: "Air Purifier", link: "/rental/air" },
+      { name: "Playstation", link: "/rental/playstation" },
+      { name: "Video Conferencing", link: "/rental/video" },
     ],
   },
   { name: "Contact Us", link: "/contact" },
 ];
 
+// Extract all searchable items for suggestions
+const allCategories = data.flatMap(item => 
+  item.dropdown 
+    ? item.dropdown.map(subItem => ({ 
+        name: subItem.name, 
+        link: subItem.link,
+        category: item.name
+      })) 
+    : [{ 
+        name: item.name, 
+        link: item.link,
+        category: null
+      }]
+);
+
 function Navbar() {
   const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef(null);
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchInput(value);
+    
+    if (value.trim() === "") {
+      setSearchResults([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    // Filter categories based on input
+    const filtered = allCategories.filter(item => 
+      item.name.toLowerCase().includes(value.toLowerCase())
+    );
+    
+    setSearchResults(filtered);
+    setShowSuggestions(true);
+  };
+
+  // Handle clicking outside of search to close suggestions
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    }
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [searchRef]);
+
+  // Handle search submission
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchResults.length > 0) {
+      // Navigate to the first result
+      window.location.href = searchResults[0].link;
+    }
+  };
+
+  // Handle suggestion click
+  const handleSuggestionClick = (link) => {
+    window.location.href = link;
+    setShowSuggestions(false);
+  };
 
   return (
     <nav className="fixed bg-white top-0 left-0 w-full shadow-md z-50 flex items-center justify-between px-3 py-4">
@@ -110,16 +178,42 @@ function Navbar() {
 
       {/* Icons Section (Hidden in Mobile View) */}
       <div className="hidden md:flex items-center space-x-4">
-        {/* Search Bar */}
-        <div className="flex items-center border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-          <input
-            type="text"
-            placeholder="Search here..."
-            className="w-full px-4 py-2 outline-none border-none"
-          />
-          <button className="flex items-center justify-center px-4 py-3 text-gray-600 transition-colors duration-200 hover:bg-blue-800 hover:text-white">
-            <CiSearch className="w-5 h-5" />
-          </button>
+        {/* Search Bar with Suggestions */}
+        <div ref={searchRef} className="relative">
+          <form onSubmit={handleSearchSubmit} className="flex items-center border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <input
+              type="text"
+              placeholder="Search here..."
+              className="w-full px-4 py-2 outline-none border-none"
+              value={searchInput}
+              onChange={handleSearchChange}
+              onFocus={() => searchInput.trim() !== "" && setShowSuggestions(true)}
+            />
+            <button 
+              type="submit" 
+              className="flex items-center justify-center px-4 py-3 text-gray-600 transition-colors duration-200 hover:bg-blue-800 hover:text-white"
+            >
+              <CiSearch className="w-5 h-5" />
+            </button>
+          </form>
+
+          {/* Search Suggestions Dropdown */}
+          {showSuggestions && searchResults.length > 0 && (
+            <ul className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+              {searchResults.map((result, index) => (
+                <li 
+                  key={index} 
+                  className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
+                  onClick={() => handleSuggestionClick(result.link)}
+                >
+                  <div className="text-gray-700">{result.name}</div>
+                  {result.category && (
+                    <div className="text-xs text-gray-500">in {result.category}</div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* Notification and Shopping Cart Icons */}
@@ -165,6 +259,46 @@ function Navbar() {
           </ul>
         </div>
       </div>
+
+      {/* Mobile Search Bar (Visible when menu is open) */}
+      {menuOpen && (
+        <div ref={searchRef} className="absolute top-16 left-0 w-full px-4 py-2 bg-white md:hidden">
+          <form onSubmit={handleSearchSubmit} className="flex items-center border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <input
+              type="text"
+              placeholder="Search here..."
+              className="w-full px-4 py-2 outline-none border-none"
+              value={searchInput}
+              onChange={handleSearchChange}
+              onFocus={() => searchInput.trim() !== "" && setShowSuggestions(true)}
+            />
+            <button 
+              type="submit" 
+              className="flex items-center justify-center px-4 py-3 text-gray-600 transition-colors duration-200 hover:bg-blue-800 hover:text-white"
+            >
+              <CiSearch className="w-5 h-5" />
+            </button>
+          </form>
+
+          {/* Mobile Search Suggestions */}
+          {showSuggestions && searchResults.length > 0 && (
+            <ul className="bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto mt-1">
+              {searchResults.map((result, index) => (
+                <li 
+                  key={index} 
+                  className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
+                  onClick={() => handleSuggestionClick(result.link)}
+                >
+                  <div className="text-gray-700">{result.name}</div>
+                  {result.category && (
+                    <div className="text-xs text-gray-500">in {result.category}</div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       {/* User Dropdown for Mobile View */}
       {userDropdown && (
