@@ -40,7 +40,8 @@ function App() {
         <Route path="/signup" element={<Signup/>} />
         <Route path="/verification" element={<Verfication/>} />
         <Route path="/AdminDashboard" element={<AdminDashboard/>} />
-        <Route path="/rental" element={<Rental/>} />
+        <Route path="/rental" element={<Rental />} />
+        <Route path="/rental/:category" element={<Rental />} />
         <Route path='/forgot-password' element={<ForgotPassword/>}/>
         <Route path="/booking-payment" element={<BookingPayment/>} />
         <Route path="/ratings" element={<Ratings/>} />

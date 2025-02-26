@@ -1,14 +1,19 @@
-import React, { useEffect } from 'react'
+import React, { useEffect } from "react";
+import RentalPage from "../compoments/HomeComponents/RentalPage";
+import productsData from "../compoments/HomeComponents/Product";
 
 const Rental = () => {
-  useEffect(()=>{
-    window.scroll(0,0)
-  },[])
-  return (
-    <div className='min-h-screen pt-32'>
-    This is rental
-  </div>
-  )
-}
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
-export default Rental
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <productsData/>
+      <RentalPage />
+      
+    </div>
+  );
+};
+
+export default Rental;
