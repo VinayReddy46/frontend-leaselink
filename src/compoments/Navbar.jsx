@@ -6,7 +6,7 @@ import { IoMdArrowDropdown, IoMdNotificationsOutline } from "react-icons/io";
 import { HiShoppingCart } from "react-icons/hi2";
 import Home from "../pages/Home";
 
-import SearchResults from "./Searching/SearchResults";
+
 
 
 
@@ -87,25 +87,6 @@ function Navbar() {
 
 
 
-function SubApp(){
-  return(
-    <>
-      <Navbar/>
-      <SearchResults/>
-    </>
-  )
-}
+export default Navbar;
 
 
-function App(){
-  return(
-    <>
-        <Routes>
-          <Route path="/" element={<Home/>}/>
-          <Route path="/search" element={<SubApp />} />
-        </Routes>
-    </>
-  )
-}
-
-export default App;
