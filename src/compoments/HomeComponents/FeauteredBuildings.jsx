@@ -56,7 +56,7 @@ const BuildingCard = ({ building }) => {
   const navigate = useNavigate();
 
   const handleRentClick = () => {
-    navigate(`/rent/${building.id}`); // Navigate dynamically
+    navigate(`/rental/`); // Navigate dynamically
   };
 
   return (
