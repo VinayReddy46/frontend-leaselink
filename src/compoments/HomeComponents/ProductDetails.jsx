@@ -224,7 +224,7 @@ const ProductDetails = () => {
   // Handle Add to Cart action
   const handleSubmit = () => {
     alert(`✅ ${product.name} added to the cart!`);
-    navigate(-1); // Navigate back to the product list
+    navigate('/cart',{state:{product}}); // Navigate back to the product list
   };
 
   return (

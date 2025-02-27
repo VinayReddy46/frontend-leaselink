@@ -56,8 +56,11 @@ const BuildingCard = ({ building }) => {
   const navigate = useNavigate();
 
   const handleRentClick = () => {
-    navigate(`/rental`); // Navigate dynamically
+    navigate(`/rental`); 
   };
+  const handleChatClick =()=>{
+    navigate('/chat')
+  }
 
   return (
     <div className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col transform transition duration-300 hover:scale-105">
@@ -77,6 +80,12 @@ const BuildingCard = ({ building }) => {
             className="bg-white text-black px-4 py-2 rounded-lg hover:bg-blue-600 transition"
           >
             Rent Now
+          </button>
+          <button
+            onClick={handleChatClick}
+            className="bg-white text-black px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+          >
+            Chat Now
           </button>
         </div>
       </div>
