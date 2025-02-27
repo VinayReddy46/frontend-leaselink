@@ -5,6 +5,7 @@ import { IoMdArrowDropdown, IoMdNotificationsOutline } from "react-icons/io";
 import { HiShoppingCart } from "react-icons/hi2";
 import { FiMenu } from "react-icons/fi";
 
+const role = 'admin'
 const data = [
   { name: "Home", link: "/" },
   { name: "About Us", link: "/about" },
@@ -25,6 +26,7 @@ const data = [
     ],
   },
   { name: "Contact Us", link: "/contact" },
+  (role === 'admin' ? { name: "Add Product", link: "/addproduct" } : { name: "Dashboard", link: "/dashboard" })
 ];
 
 function Navbar() {
