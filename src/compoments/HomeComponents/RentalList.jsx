@@ -11,7 +11,7 @@ const categories = [
 const pricingOptions = ["Below $50", "$50 - $200", "$200 - $500", "$500 - $600", "Above $600"];
 
 const dummyListings = [
-  // Vehicles
+  
   { id: 1, name: "Sedan Car", category: "Car", price: "$200/day", image: "https://images.pexels.com/photos/12353734/pexels-photo-12353734.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" },
   { id: 2, name: "Sports Bike", category: "Bike", price: "$100/day", image: "https://images.pexels.com/photos/167676/pexels-photo-167676.jpeg?auto=compress&cs=tinysrgb&w=600" },
   { id: 3, name: "Luxury SUV", category: "Car", price: "$300/day", image: "https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg?auto=compress&cs=tinysrgb&w=600" },
@@ -22,7 +22,7 @@ const dummyListings = [
   { id: 8, name: "Luxury Yacht", category: "Boat", price: "$2000/day", image: "https://images.pexels.com/photos/358220/pexels-photo-358220.jpeg?auto=compress&cs=tinysrgb&w=600" },
   { id: 9, name: "Jet Ski", category: "Boat", price: "$300/day", image: "https://images.pexels.com/photos/2204807/pexels-photo-2204807.jpeg?auto=compress&cs=tinysrgb&w=600" },
 
-  // Apparel
+  
   { id: 10, name: "Formal Suit", category: "Clothing", price: "$90/day", image: "https://images.pexels.com/photos/428340/pexels-photo-428340.jpeg?auto=compress&cs=tinysrgb&w=600" },
   { id: 11, name: "Running Shoes", category: "Shoes", price: "$30/day", image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600" },
   { id: 12, name: "Leather Jacket", category: "Clothing", price: "$80/day", image: "https://images.pexels.com/photos/841129/pexels-photo-841129.jpeg?auto=compress&cs=tinysrgb&w=600" },

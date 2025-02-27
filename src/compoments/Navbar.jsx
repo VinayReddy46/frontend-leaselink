@@ -631,6 +631,7 @@ function Navbar() {
             />
             <button 
               type="submit" 
+             
               className="flex items-center justify-center px-4 py-3 text-gray-600 transition-colors duration-200 hover:bg-blue-800 hover:text-white"
             >
               <CiSearch className="w-5 h-5" />
@@ -665,7 +666,7 @@ function Navbar() {
             <IoMdNotificationsOutline className="w-6 h-6" />
           </a>
           <a
-            href="#"
+            href="/cart"
             className="text-gray-600 hover:bg-blue-800 hover:text-white p-3 rounded-full transition-colors duration-200"
           >
             <HiShoppingCart className="w-6 h-6" />

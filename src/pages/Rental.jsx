@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import RentalPage from "../compoments/HomeComponents/RentalPage";
 import productsData from "../compoments/HomeComponents/Product";
-// import ProductDetails from "../compoments/HomeComponents/ProductDetails";
+
 
 const Rental = () => {
   useEffect(() => {

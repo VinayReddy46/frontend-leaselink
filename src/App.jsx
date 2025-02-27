@@ -20,6 +20,8 @@ import ProductDetails from "./compoments/HomeComponents/ProductDetails";
 import Cart from "./compoments/HomeComponents/Cart";
 import ForgotPassword from "./pages/ForgotPassword";
 import AddProduct from "./pages/AddProduct";
+import Chatbot from "./pages/Chatbot";
+import CartPage from "./compoments/HomeComponents/CartPage";
  
 
 const Laptops = () => <h1>Laptops Page</h1>;
@@ -64,6 +66,8 @@ function App() {
         <Route path="/AdminDashboard" element={<AdminDashboard/>} />
         <Route path="/rental" element={<Rental />} />
         <Route path="/rental/:category" element={<Rental />} />
+        <Route path="/chat" element={<Chatbot/>}/>
+        <Route path="/cart" element={<CartPage/>}/>
          {/* added */}
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path='/forgot-password' element={<ForgotPassword/>}/>
