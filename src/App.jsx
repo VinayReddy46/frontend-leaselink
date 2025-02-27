@@ -1,4 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useState, useEffect } from "react"; // ✅ Add useState & useEffect
+
+
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 // import Signin from "./pages/Signin";
@@ -13,9 +16,11 @@ import Navbar from "./compoments/Navbar";
 import Footer from "./pages/Footer";
 import Signup from "./pages/Signup";
 import Error from "./pages/Error";
+import ProductDetails from "./compoments/HomeComponents/ProductDetails";
+import Cart from "./compoments/HomeComponents/Cart";
 import ForgotPassword from "./pages/ForgotPassword";
 import AddProduct from "./pages/AddProduct";
-
+ 
 
 const Laptops = () => <h1>Laptops Page</h1>;
 const TVMonitors = () => <h1>TV & Monitors Page</h1>;
@@ -31,9 +36,26 @@ const Office = () => <h1>Office Equipment Page</h1>;
 const Security = () => <h1>Security Cameras Page</h1>;
 
 function App() {
+  // 🛒 Cart State
+  const [cartItems, setCartItems] = useState([]);
+
+  // 💾 Load Cart from LocalStorage (Persistent Cart)
+  useEffect(() => {
+    const savedCart = localStorage.getItem("cartItems");
+    if (savedCart) {
+      setCartItems(JSON.parse(savedCart));
+    }
+  }, []);
+
+  // 💾 Save Cart to LocalStorage when cart updates
+  useEffect(() => {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems]);
+
   return (
      <div>
-      <Navbar/>
+      
+      <Navbar cartItems={cartItems} setCartItems={setCartItems} /> {/* ✅ Pass Cart to Navbar */}
       <Routes>
         <Route path="/" element={<Home/>} />
         <Route path="/login" element={<Login />} />
@@ -42,6 +64,8 @@ function App() {
         <Route path="/AdminDashboard" element={<AdminDashboard/>} />
         <Route path="/rental" element={<Rental />} />
         <Route path="/rental/:category" element={<Rental />} />
+         {/* added */}
+        <Route path="/product/:id" element={<ProductDetails />} />
         <Route path='/forgot-password' element={<ForgotPassword/>}/>
         <Route path="/booking-payment" element={<BookingPayment/>} />
         <Route path="/ratings" element={<Ratings/>} />
@@ -65,6 +89,9 @@ function App() {
         <Route path="/office" element={<Office />} />
         <Route path="/security" element={<Security />} />
       </Routes>
+
+      
+        
       <Footer/>
 
     

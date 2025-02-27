@@ -7,6 +7,7 @@ import BlogPage from '../compoments/HomeComponents/BlogPage.jsx'
 import RentalProcess from '../compoments/HomeComponents/HowItsWork.jsx'
 import WhyChooseUs from '../compoments/HomeComponents/WhyChooseUs.jsx'
 import FAQSection from '../compoments/HomeComponents/FAQs.jsx'
+// import ProductDetails from "./compoments/HomeComponents/ProductDetails";
 import TestimonialsCarousel from '../compoments/HomeComponents/ScrollingTestimonials.jsx'
 import ProductList from '../compoments/HomeComponents/ProductList.jsx'
 
