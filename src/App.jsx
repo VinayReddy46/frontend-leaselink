@@ -22,6 +22,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import AddProduct from "./pages/AddProduct";
 import Chatbot from "./pages/Chatbot";
 import CartPage from "./compoments/HomeComponents/CartPage";
+import PaymentForm from './compoments/HomeComponents/PaymentForm';
  
 
 const Laptops = () => <h1>Laptops Page</h1>;
@@ -67,8 +68,9 @@ function App() {
         <Route path="/rental" element={<Rental />} />
         <Route path="/rental/:category" element={<Rental />} />
         <Route path="/chat" element={<Chatbot/>}/>
-        <Route path="/cart" element={<CartPage/>}/>
-         {/* added */}
+        <Route path="/cart" element={<CartPage/>}/>{/* added */}
+        
+         {/* added */} <Route path="/payment" element={<PaymentForm />} />
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path='/forgot-password' element={<ForgotPassword/>}/>
         <Route path="/booking-payment" element={<BookingPayment/>} />
