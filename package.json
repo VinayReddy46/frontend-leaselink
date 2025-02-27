@@ -13,6 +13,7 @@
     "browser-router": "^0.2.0",
     "framer-motion": "^12.4.7",
     "frontend-leaselink": "file:",
+    "lucide-react": "^0.476.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",

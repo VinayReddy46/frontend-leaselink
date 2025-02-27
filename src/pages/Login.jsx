@@ -1,16 +1,21 @@
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import logo from "../assets/logoForPages.webp";
 
 const Login = () => {
+   useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [show, setShow] = useState(false);
 
   const navigate = useNavigate();
+  
+
 
   const submitHandler = async (e) => {
     e.preventDefault();

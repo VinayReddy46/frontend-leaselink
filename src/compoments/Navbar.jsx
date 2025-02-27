@@ -4,43 +4,7 @@ import { CiSearch } from "react-icons/ci";
 import { IoMdArrowDropdown, IoMdNotificationsOutline } from "react-icons/io";
 import { HiShoppingCart } from "react-icons/hi2";
 import { FiMenu, FiX } from "react-icons/fi";
-
-const data = [
-  { name: "Home", link: "/" },
-  { name: "About Us", link: "/about" },
-  {
-    name: "Rent a Product",
-    link: "/rental",
-    dropdown: [
-      { name: "Laptops", link: "/rental/laptops" },
-      { name: "Printer & Scanner", link: "/rental/printers" },
-      { name: "TV & Monitors", link: "/rental/monitors" },
-      { name: "Kitchen Appliance", link: "/rental/kitchen" },
-      { name: "Projector", link: "/rental/projectors" },
-      { name: "Tablet", link: "/rental/tablet" },
-      { name: "Audio & Karaoke", link: "/rental/audio" },
-      { name: "Air Purifier", link: "/rental/air" },
-      { name: "Playstation", link: "/rental/playstation" },
-      { name: "Video Conferencing", link: "/rental/video" },
-    ],
-  },
-  { name: "Contact Us", link: "/contact" },
-];
-
-// Extract all searchable items for suggestions
-const allCategories = data.flatMap(item => 
-  item.dropdown 
-    ? item.dropdown.map(subItem => ({ 
-        name: subItem.name, 
-        link: subItem.link,
-        category: item.name
-      })) 
-    : [{ 
-        name: item.name, 
-        link: item.link,
-        category: null
-      }]
-);
+import { useNavigate } from "react-router-dom";
 
 function Navbar() {
   const [hovered, setHovered] = useState(false);
@@ -49,7 +13,72 @@ function Navbar() {
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
   const searchRef = useRef(null);
+  const navigate = useNavigate();
+  const role = 'user1'; // This would normally come from your auth context/state
+
+  // Check if user is logged in on component mount
+  useEffect(() => {
+    // Replace this with your actual authentication check
+    const checkLoginStatus = () => {
+      // Example: Check localStorage or auth context
+      const token = localStorage.getItem('authToken');
+      setIsLoggedIn(!true);
+    };
+    
+    checkLoginStatus();
+  }, []);
+
+  const data = [
+    { name: "Home", link: "/" },
+    { name: "About Us", link: "#about" }, // link within same page
+    {
+      name: "Rent a Product",
+      link: "/rental",
+      dropdown: [
+        { name: "Laptops", link: "/rental/laptops" },
+        { name: "Printer & Scanner", link: "/rental/printers" },
+        { name: "TV & Monitors", link: "/rental/monitors" },
+        { name: "Kitchen Appliance", link: "/rental/kitchen" },
+        { name: "Projector", link: "/rental/projectors" },
+        { name: "Tablet", link: "/rental/tablet" },
+        { name: "Audio & Karaoke", link: "/rental/audio" },
+        { name: "Air Purifier", link: "/rental/air" },
+        { name: "Playstation", link: "/rental/playstation" },
+        { name: "Video Conferencing", link: "/rental/video" },
+      ],
+    },
+    role === 'user' ? { name: "Add Product", link: "/addproduct" } : { name: "Dashboard", link: "/AdminDashboard" }
+  ];
+
+  // Extract all searchable items for suggestions
+  const allCategories = data.flatMap(item => 
+    item.dropdown 
+      ? item.dropdown.map(subItem => ({ 
+          name: subItem.name, 
+          link: subItem.link,
+          category: item.name
+        })) 
+      : [{ 
+          name: item.name, 
+          link: item.link,
+          category: null
+        }]
+  );
+
+  // Handle login button click
+  const handleLoginClick = () => {
+    navigate('/login', { state: { returnUrl: '/home' } });
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    // Clear auth token or perform other logout actions
+    localStorage.removeItem('authToken');
+    setIsLoggedIn(false);
+    navigate('/home');
+  };
 
   // Handle search input change
   const handleSearchChange = (e) => {
@@ -89,14 +118,14 @@ function Navbar() {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchResults.length > 0) {
-      // Navigate to the first result
-      window.location.href = searchResults[0].link;
+      // Navigate using React Router instead of direct window.location
+      navigate(searchResults[0].link);
     }
   };
 
   // Handle suggestion click
   const handleSuggestionClick = (link) => {
-    window.location.href = link;
+    navigate(link);
     setShowSuggestions(false);
   };
 
@@ -117,13 +146,22 @@ function Navbar() {
           {menuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
         </button>
 
-        {/* User Icon */}
-        <button
-          className="p-2 bg-blue-50 rounded-lg text-gray-700 hover:bg-blue-100 transition-colors duration-200"
-          onClick={() => setUserDropdown(!userDropdown)}
-        >
-          <FaUserCircle className="w-6 h-6" />
-        </button>
+        {/* User Icon or Login Button for Mobile */}
+        {isLoggedIn ? (
+          <button
+            className="p-2 bg-blue-50 rounded-lg text-gray-700 hover:bg-blue-100 transition-colors duration-200"
+            onClick={() => setUserDropdown(!userDropdown)}
+          >
+            <FaUserCircle className="w-6 h-6" />
+          </button>
+        ) : (
+          <button
+            className="p-2 bg-blue-500 rounded-lg text-white hover:bg-blue-600 transition-colors duration-200"
+            onClick={handleLoginClick}
+          >
+            Login
+          </button>
+        )}
       </div>
 
       {/* Navigation Links */}
@@ -216,48 +254,59 @@ function Navbar() {
           )}
         </div>
 
-        {/* Notification and Shopping Cart Icons */}
-        <div className="flex items-center space-x-4">
-          <a
-            href="#"
-            className="text-gray-600 hover:bg-blue-800 hover:text-white p-3 rounded-full transition-colors duration-200"
-          >
-            <IoMdNotificationsOutline className="w-6 h-6" />
-          </a>
-          <a
-            href="#"
-            className="text-gray-600 hover:bg-blue-800 hover:text-white p-3 rounded-full transition-colors duration-200"
-          >
-            <HiShoppingCart className="w-6 h-6" />
-          </a>
-        </div>
+        {/* Notification and Shopping Cart Icons - Only show when logged in */}
+        {isLoggedIn && (
+          <div className="flex items-center space-x-4">
+            <a
+              href="#"
+              className="text-gray-600 hover:bg-blue-800 hover:text-white p-3 rounded-full transition-colors duration-200"
+            >
+              <IoMdNotificationsOutline className="w-6 h-6" />
+            </a>
+            <a
+              href="#"
+              className="text-gray-600 hover:bg-blue-800 hover:text-white p-3 rounded-full transition-colors duration-200"
+            >
+              <HiShoppingCart className="w-6 h-6" />
+            </a>
+          </div>
+        )}
 
-        {/* User Profile Icon */}
-        <div
-          className="relative"
-          onMouseEnter={() => setUserDropdown(true)}
-          onMouseLeave={() => setUserDropdown(false)}
-        >
-          <button className="text-gray-600 hover:text-blue-800 transition-colors duration-200">
-            <FaUserCircle className="w-7 h-7" />
+        {/* User Profile Icon or Login Button based on auth status */}
+        {isLoggedIn ? (
+          <div
+            className="relative"
+            onMouseEnter={() => setUserDropdown(true)}
+            onMouseLeave={() => setUserDropdown(false)}
+          >
+            <button className="text-gray-600 hover:text-blue-800 transition-colors duration-200">
+              <FaUserCircle className="w-7 h-7" />
+            </button>
+
+            {/* Dropdown Menu */}
+            <ul
+              className={`absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg transition-all duration-300 ease-in-out overflow-hidden ${userDropdown ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-2"
+                }`}
+            >
+              <li className="px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200">
+                <a href="/profile">Profile</a>
+              </li>
+              <li className="px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200">
+                <a href="/settings">Settings</a>
+              </li>
+              <li className="px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200">
+                <button onClick={handleLogout} className="w-full text-left">Logout</button>
+              </li>
+            </ul>
+          </div>
+        ) : (
+          <button
+            onClick={handleLoginClick}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
+          >
+            Login
           </button>
-
-          {/* Dropdown Menu */}
-          <ul
-            className={`absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg transition-all duration-300 ease-in-out overflow-hidden ${userDropdown ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-2"
-              }`}
-          >
-            <li className="px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200">
-              <a href="/profile">Profile</a>
-            </li>
-            <li className="px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200">
-              <a href="/settings">Settings</a>
-            </li>
-            <li className="px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200">
-              <a href="/logout">Logout</a>
-            </li>
-          </ul>
-        </div>
+        )}
       </div>
 
       {/* Mobile Search Bar (Visible when menu is open) */}
@@ -301,7 +350,7 @@ function Navbar() {
       )}
 
       {/* User Dropdown for Mobile View */}
-      {userDropdown && (
+      {isLoggedIn && userDropdown && (
         <ul className="absolute top-16 right-4 w-48 bg-white border border-gray-200 rounded-lg shadow-lg md:hidden">
           <li className="px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200">
             <a href="/profile">Profile</a>
@@ -310,10 +359,7 @@ function Navbar() {
             <a href="/settings">Settings</a>
           </li>
           <li className="px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200">
-            <a href="/favourites">Favourites</a>
-          </li>
-          <li className="px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200">
-            <a href="/logout">Logout</a>
+            <button onClick={handleLogout} className="w-full text-left">Logout</button>
           </li>
         </ul>
       )}
