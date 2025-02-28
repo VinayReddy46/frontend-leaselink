@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
+import PaymentForm from "./PaymentForm";
+
+
+
 
 const CartPage = () => {
      useEffect(() => {
             window.scrollTo(0, 0);
           }, []);
+
+          const handlePaymentSuccess = (values) => {
+            console.log("PaymentSuccessful",values)
+          }
+
   const location = useLocation();
   const newProduct = location.state?.product;
 
+const [showPaymentForm , setShowPaymentForm] = useState(false);
+//  const 
   const [cartItems, setCartItems] = useState(() => {
     const savedCart = localStorage.getItem("cartItems");
     return savedCart ? JSON.parse(savedCart) : [];
@@ -139,14 +150,28 @@ const CartPage = () => {
             </span>
           </p>
           <motion.div
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.5, type: "spring" }}
+         initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+         transition={{ duration: 0.5, type: "spring" }}
+         > 
+
+        {!showPaymentForm ? (
+          <motion.button whileHover={{scale:1.02}}
+          whileTap={{scale:0.98}}
+          type="button" className="w-full py-3 mt-4 bg-yellow-500 text-white text-lg font-bold rounded-lg" 
+          onClick ={() => setShowPaymentForm (true)}
+
           >
-            <button className="w-full py-3 mt-4 bg-yellow-500 text-white text-lg font-bold rounded-lg">
-              Proceed to Buy
-            </button>
-          </motion.div>
+            Proceed to Buy
+            
+          </motion.button>
+        ):(<PaymentForm orderTotal={calculateSubtotal ()}
+        onSuccess={handlePaymentSuccess()}/>)
+
+       }
+         
+     </motion.div>
+
         </div>
       </div>
     </div>

@@ -28,6 +28,7 @@ import Settings from "./compoments/admin/Settings";
 import FAQManager from "./compoments/admin/contentmangement/FAQsList";
 import CategoryList from "./compoments/admin/contentmangement/Categories";
 import UserManagement from "./compoments/admin/UserMangement";
+import PaymentForm from "./compoments/HomeComponents/PaymentForm";
  
 
 const Laptops = () => <h1>Laptops Page</h1>;
@@ -79,7 +80,7 @@ function App() {
          {/* added */}
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path='/forgot-password' element={<ForgotPassword/>}/>
-        <Route path="/booking-payment" element={<BookingPayment/>} />
+        <Route path="/payment" element={<PaymentForm/>} />
         <Route path="/ratings" element={<Ratings/>} />
         <Route path="/messaging" element={<Message/>} />
         <Route path="/insurance" element={<Insurance/>} />
