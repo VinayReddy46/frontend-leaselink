@@ -3,6 +3,8 @@ import { X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from "react-router-dom";  // useNavigate
 
+
+
 const Cart = ({ items, onClose, setCartItems }) => {
   const [showCheckout, setShowCheckout] = useState(false);
   const [formData, setFormData] = useState({
