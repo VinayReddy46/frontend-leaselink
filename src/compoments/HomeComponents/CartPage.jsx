@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useLocation } from "react-router-dom";
+import { useLocation ,useNavigate} from "react-router-dom";
 import PaymentForm from "./PaymentForm";
 
 
@@ -17,13 +17,16 @@ const CartPage = () => {
 
   const location = useLocation();
   const newProduct = location.state?.product;
-
+ const navigate=useNavigate();
 const [showPaymentForm , setShowPaymentForm] = useState(false);
 //  const 
   const [cartItems, setCartItems] = useState(() => {
     const savedCart = localStorage.getItem("cartItems");
     return savedCart ? JSON.parse(savedCart) : [];
   });
+  const handlesubmit=()=>{
+    navigate("/rental")
+  }
 
   useEffect(() => {
     if (newProduct) {
@@ -72,13 +75,22 @@ const [showPaymentForm , setShowPaymentForm] = useState(false);
       (total, product) => total + product.price * product.quantity,
       0
     );
-
-  if (cartItems.length === 0) {
-    return <h2 className="text-center text-red-500">⚠ Your Cart is Empty</h2>;
-  }
-  
+    if (cartItems.length === 0) {
+      return (
+        <div className="p-8 bg-gray-100 min-h-screen flex flex-col items-center justify-center text-center">
+          <img 
+            src="https://cdn3.iconfinder.com/data/icons/shopping-and-ecommerce-28/90/empty_cart-512.png" 
+            alt="Empty Cart" 
+            className="w-60 h-60 mb-4 object-contain"
+          />
+          <h2 className="text-3xl font-bold text-gray-700 mb-2">Your Cart is Empty</h2>
+          <p className="text-gray-500 mb-6">Looks like you haven't added anything to your cart yet.</p>
+          <button onClick={handlesubmit} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Shop Now</button>
+        </div>
+      );
+    }
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
+    <div className="p-8 bg-gray-100 min-h-screen mt-20">
       <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
         <h1 className="text-3xl font-bold mb-6">Shopping Cart</h1>
 

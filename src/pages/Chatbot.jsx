@@ -42,7 +42,7 @@ const Chatbot = () => {
     if (lowerMsg.includes("favorite color")) return "I love all colors, but blue seems pretty cool! 🎨";
     if (lowerMsg.includes("can you sing")) return "I would, but I might break your speakers! 🎶😆";
     if (lowerMsg.includes("tell me something interesting")) return "Did you know that honey never spoils? Archaeologists found pots of honey in ancient Egyptian tombs that are over 3,000 years old and still edible! 🍯";
-    
+    if (lowerMsg.includes("favorite ipl team")) return "SunRisers Hyderabad & Chennai🎶😆";
     return "I'm not sure how to respond to that. Can you rephrase? 🤔";
   };
   

@@ -222,9 +222,36 @@ const ProductDetails = () => {
   };
 
   // Handle Add to Cart action
+  // const handleSubmit = () => {
+  //   alert(`✅ ${product.name} added to the cart!`);
+  //   navigate('/cart',{state:{product}}); // Navigate back to the product list
+  // };
+
+
   const handleSubmit = () => {
-    alert(`✅ ${product.name} added to the cart!`);
-    navigate('/cart',{state:{product}}); // Navigate back to the product list
+    const rentalDetails = {
+      startDate,
+      endDate,
+      totalHours: calculateTotalHours(),
+      totalAmount: calculateTotal(),
+      selectedInsurance,
+      product,
+    };
+  
+    navigate('/cart', { state: { rentalDetails,product } });
+  };
+  
+  const handleBuyNow = () => {
+    const rentalDetails = {
+      startDate,
+      endDate,
+      totalHours: calculateTotalHours(),
+      totalAmount: calculateTotal(),
+      selectedInsurance,
+      product,
+    };
+  
+    navigate('/payment', { state: { rentalDetails,product } });
   };
 
   return (
@@ -342,6 +369,16 @@ const ProductDetails = () => {
             className="w-full mt-6 bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 disabled:bg-gray-400"
           >
             Add to Cart
+          </motion.button>
+          {/* Add to Cart Button */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleBuyNow}
+            disabled={!startDate || !endDate}
+            className="w-full mt-6 bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 disabled:bg-gray-400"
+          >
+           RentNow
           </motion.button>
         </motion.div>
       </div>

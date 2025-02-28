@@ -19,7 +19,7 @@ const ProductCard = ({ product }) => {
 
 <Link
   to={`/product/${product.id}`}
-  state={{ product }} // ✅ Pass product as state
+  state={{ product }}
 >
   <button className="mt-4 w-full bg-pink-600 text-white py-2 rounded-md hover:bg-indigo-700 transition">
     View Details

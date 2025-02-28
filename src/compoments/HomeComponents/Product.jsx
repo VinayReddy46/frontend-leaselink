@@ -32,7 +32,7 @@ const productsData = [
       imageUrl: "https://sathya.in/media/91677/catalog/LLOYD%20LED%2032HS550%20HD%20SMART.jpg",
     },
     {
-      id: 2,
+      id:2,
       name: "TV & Monitors",
       category: "tv-monitors",
       processor: "4K UHD",
