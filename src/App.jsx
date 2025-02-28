@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route,useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react"; // ✅ Add useState & useEffect
 
 
@@ -22,6 +22,12 @@ import ForgotPassword from "./pages/ForgotPassword";
 import AddProduct from "./pages/AddProduct";
 import Chatbot from "./pages/Chatbot";
 import CartPage from "./compoments/HomeComponents/CartPage";
+import Dashboard from "./compoments/admin/Dashboard";
+import CustomerService from "./compoments/admin/CustomerService";
+import Settings from "./compoments/admin/Settings";
+import FAQManager from "./compoments/admin/contentmangement/FAQsList";
+import CategoryList from "./compoments/admin/contentmangement/Categories";
+import UserManagement from "./compoments/admin/UserMangement";
  
 
 const Laptops = () => <h1>Laptops Page</h1>;
@@ -38,6 +44,9 @@ const Office = () => <h1>Office Equipment Page</h1>;
 const Security = () => <h1>Security Cameras Page</h1>;
 
 function App() {
+  const location = useLocation();
+   // Check if the path starts with "/admin"
+   const isAdminRoute = location.pathname.startsWith("/admin");
   // 🛒 Cart State
   const [cartItems, setCartItems] = useState([]);
 
@@ -57,13 +66,12 @@ function App() {
   return (
      <div>
       
-      <Navbar cartItems={cartItems} setCartItems={setCartItems} /> {/* ✅ Pass Cart to Navbar */}
+      {!isAdminRoute && <Navbar />} {/* Show Navbar only for non-admin routes */}
       <Routes>
         <Route path="/" element={<Home/>} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup/>} />
         <Route path="/verification" element={<Verfication/>} />
-        <Route path="/AdminDashboard" element={<AdminDashboard/>} />
         <Route path="/rental" element={<Rental />} />
         <Route path="/rental/:category" element={<Rental />} />
         <Route path="/chat" element={<Chatbot/>}/>
@@ -91,12 +99,22 @@ function App() {
         <Route path="/kitchen" element={<Kitchen />} />
         <Route path="/video-conference" element={<VideoConference />} />
         <Route path="/office" element={<Office />} />
-        <Route path="/security" element={<Security />} />
+        <Route path="/security" element={<Security/>}/>
+         {/* Admin Routes */}
+         <Route path="/admin" element={<AdminDashboard />}>
+          <Route index element={<Dashboard/>} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="customer-service" element={<CustomerService/>} />
+          <Route path="settings" element={<Settings/>} />
+          <Route path="faqs" element={<FAQManager/>} />
+          <Route path="categories" element={<CategoryList/>} />
+          <Route path="users-management" element={<UserManagement />} />
+        </Route>
       </Routes>
 
       
         
-      <Footer/>
+      {!isAdminRoute && <Footer />} {/* Show Footer only for non-admin routes */}
 
     
       </div>

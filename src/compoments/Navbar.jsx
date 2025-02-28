@@ -16,7 +16,7 @@ function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
   const searchRef = useRef(null);
   const navigate = useNavigate();
-  const role = 'user'; // This would normally come from your auth context/state
+  const role = 'user1'; // This would normally come from your auth context/state
 
   // Check if user is logged in on component mount
   useEffect(() => {
@@ -24,7 +24,7 @@ function Navbar() {
     const checkLoginStatus = () => {
       // Example: Check localStorage or auth context
       const token = localStorage.getItem('authToken');
-      setIsLoggedIn(!true);
+      setIsLoggedIn(!token);
     };
     
     checkLoginStatus();
@@ -49,7 +49,7 @@ function Navbar() {
         { name: "Video Conferencing", link: "/rental/video" },
       ],
     },
-    role === 'user' ? { name: "Add Product", link: "/addproduct" } : { name: "Dashboard", link: "/AdminDashboard" }
+    role === 'user' ? { name: "Add Product", link: "/addproduct" } : { name: "Dashboard", link: "/admin" }
   ];
 
   // Extract all searchable items for suggestions
@@ -77,7 +77,7 @@ function Navbar() {
     // Clear auth token or perform other logout actions
     localStorage.removeItem('authToken');
     setIsLoggedIn(false);
-    navigate('/home');
+    navigate('/login');
   };
 
   // Handle search input change
