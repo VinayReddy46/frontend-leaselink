@@ -15,7 +15,6 @@ import Insurance from "./pages/Insurance";
 import Navbar from "./compoments/Navbar";
 import Footer from "./pages/Footer";
 import Signup from "./pages/Signup";
-import Error from "./pages/Error";
 import ProductDetails from "./compoments/HomeComponents/ProductDetails";
 import Cart from "./compoments/HomeComponents/Cart";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -29,6 +28,7 @@ import FAQManager from "./compoments/admin/contentmangement/FAQsList";
 import CategoryList from "./compoments/admin/contentmangement/Categories";
 import UserManagement from "./compoments/admin/UserMangement";
 import PaymentForm from "./compoments/HomeComponents/PaymentForm";
+import TrustSystem from "./pages/Ratings";
  
 
 const Laptops = () => <h1>Laptops Page</h1>;
@@ -110,6 +110,7 @@ function App() {
           <Route path="faqs" element={<FAQManager/>} />
           <Route path="categories" element={<CategoryList/>} />
           <Route path="users-management" element={<UserManagement />} />
+          <Route path="/Rating" element={<TrustSystem />} />
         </Route>
       </Routes>
 
