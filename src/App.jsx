@@ -21,7 +21,6 @@ import Cart from "./compoments/CartComponents/Cart";
 import ForgotPassword from "./pages/ForgotPassword";
 import AddProduct from "./pages/AddProduct";
 import Chatbot from "./pages/Chatbot";
-import CartPage from "./compoments/HomeComponents/CartPage";
 import Dashboard from "./compoments/admin/Dashboard";
 import CustomerService from "./compoments/admin/CustomerService";
 import Settings from "./compoments/admin/Settings";
@@ -81,7 +80,7 @@ function App() {
         <Route path="/rental" element={<Rental />} />
         <Route path="/rental/:category" element={<Rental />} />
         <Route path="/chat" element={<Chatbot/>}/>
-        <Route path="/cart" element={<CartPage/>}/>
+        <Route path="/cart" element={<Cart/>}/>
         <Route path="/about" element={<AboutUs/>}/>
         <Route path="/notification/:id" element={<NotificationDetails/>}/>
          {/* added */}

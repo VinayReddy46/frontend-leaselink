@@ -1,27 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Shield, X } from 'lucide-react';
-import { Button } from 'primereact/button';
-import { AiOutlinePlus, AiOutlineMinus, AiOutlineDelete } from "react-icons/ai";
-import productsData from './product';
-import { useSelector, useDispatch } from 'react-redux';
-import { addToCart, removeFromCart, increaseQuantity, decreaseQuantity } from '../../redux/cartSlice';
-
+import { addToCart } from '../../redux/cartSlice';
+import { useSelector,useDispatch } from 'react-redux';
 const ProductDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch =useDispatch()
   const product = location.state?.product;
 
   if (!product) {
     return <h2 className="text-center text-red-500">⚠️ No Product Found</h2>;
   }
-  const cartItem = useSelector((state) =>
-         state?.cart?.cartItems?.find((item) => item?.id === productsData?.id)
-    
-    );
-    console.log(cartItem);
-    
-    
 
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -60,26 +50,15 @@ const ProductDetails = () => {
       id: product.id,
       name: product.name,
       price: product.price,
+      image:product.image,
       startDate,
       endDate,
       rentalAmount,
       insurance: selectedInsurance || null,
-      total: calculateTotal(),
+      subTotal: calculateTotal(),
     };
-  
-    // Get existing cart items from localStorage
-    const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
-  
-    // Add new item to cart
-    existingCart.push(cartItem);
-  
-    // Save updated cart to localStorage
-    localStorage.setItem("cart", JSON.stringify(existingCart));
-  
-    alert(`✅ ${product.name} added to the cart!`);
-  
-    // Redirect to cart page (optional)
-    console.log("Navigating to cart page...");
+
+    dispatch(addToCart(cartItem))
     navigate("/cart"); // Use lowercase if the route is "/cart"
   };
   
@@ -183,22 +162,13 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          <div className="w-1/5 flex justify-center items-center gap-2">
-                  <Button
-                    icon={<AiOutlineMinus className="text-lg" />}
-                    className="p-button-text p-2"
-                    onClick={() => dispatch(decreaseQuantity())}
-                    disabled={item.quantity === 1}
-                  />
-                  <span className="text-gray-700 font-medium">
-                    {item.quantity}
-                  </span>
-                  <Button
-                    icon={<AiOutlinePlus className="text-lg" />}
-                    className="p-button-text p-2"
-                    onClick={() => dispatch(increaseQuantity())}
-                  />
-                </div>
+          <button 
+            onClick={handleSubmit} 
+            disabled={!startDate || !endDate || calculateTotalHours() === 0} 
+            className="w-full mt-6 bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 disabled:bg-gray-400"
+          >
+            Add to Cart
+          </button>
         </div>
       </div>
     </div>
