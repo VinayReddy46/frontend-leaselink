@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import RentalPage from "../compoments/HomeComponents/RentalPage";
-import productsData from "../compoments/HomeComponents/Product";
+import productsData from "../compoments/CartComponents/product";
 
 
 const Rental = () => {
