@@ -5,7 +5,6 @@ import PaymentForm from "./PaymentForm";
 
 
 
-
 const CartPage = () => {
      useEffect(() => {
             window.scrollTo(0, 0);

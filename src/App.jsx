@@ -16,8 +16,8 @@ import Navbar from "./compoments/Navbar";
 import Footer from "./pages/Footer";
 import Signup from "./pages/Signup";
 import Error from "./pages/Error";
-import ProductDetails from "./compoments/HomeComponents/ProductDetails";
-import Cart from "./compoments/HomeComponents/Cart";
+import ProductDetails from "./compoments/CartComponents/ProductDetails";
+import Cart from "./compoments/CartComponents/Cart";
 import ForgotPassword from "./pages/ForgotPassword";
 import AddProduct from "./pages/AddProduct";
 import Chatbot from "./pages/Chatbot";
@@ -29,6 +29,11 @@ import FAQManager from "./compoments/admin/contentmangement/FAQsList";
 import CategoryList from "./compoments/admin/contentmangement/Categories";
 import UserManagement from "./compoments/admin/UserMangement";
 import PaymentForm from "./compoments/HomeComponents/PaymentForm";
+import AboutUs from "./pages/About";
+import Profile from "./pages/Profile";
+import ProfileSettings from "./compoments/profileComponents/ProfileSettings";
+import MyOrders from "./compoments/profileComponents/MyOrders";
+import NotificationDetails from "./compoments/navbarComponents/NotificationDetails";
  
 
 const Laptops = () => <h1>Laptops Page</h1>;
@@ -77,6 +82,8 @@ function App() {
         <Route path="/rental/:category" element={<Rental />} />
         <Route path="/chat" element={<Chatbot/>}/>
         <Route path="/cart" element={<CartPage/>}/>
+        <Route path="/about" element={<AboutUs/>}/>
+        <Route path="/notification/:id" element={<NotificationDetails/>}/>
          {/* added */}
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path='/forgot-password' element={<ForgotPassword/>}/>
@@ -85,7 +92,9 @@ function App() {
         <Route path="/messaging" element={<Message/>} />
         <Route path="/insurance" element={<Insurance/>} />
         <Route path="/addproduct" element={<AddProduct/>} />
-        <Route path="/profile" element={<Insurance/>} />
+        <Route path="/profile" element={<Profile/>} />
+        <Route path="/settings" element={<ProfileSettings/>} />
+        <Route path="/myorders" element={<MyOrders/>} />
         <Route path="*" element={<Error/>}/>
 
        
