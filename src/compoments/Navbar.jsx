@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaUserCircle, FaShoppingCart } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
-import { IoMdArrowDropdown, IoMdNotificationsOutline } from "react-icons/io";
+import { IoMdArrowDropdown } from "react-icons/io";
 import { FiMenu, FiX } from "react-icons/fi";
 import { FiUser, FiSettings } from "react-icons/fi";
 import { HiOutlineLogout } from "react-icons/hi";
@@ -169,8 +169,7 @@ function Navbar() {
                 {item.dropdown ? (
                   <div 
                     className="group"
-                    onMouseEnter={() => setHovered(item.name)}
-                    onMouseLeave={() => setHovered(null)}
+                    onClick={() => setHovered(hovered === item.name ? null : item.name)}
                   >
                     <button className={`flex items-center space-x-1.5 px-2 py-1 rounded-md text-base font-medium transition-colors duration-200
                       ${isActive(item.link) 
@@ -185,15 +184,15 @@ function Navbar() {
 
                     {/* Dropdown Panel */}
                     <div className={`absolute left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-xl z-20 transition-all duration-200 ease-in-out transform origin-top-left
-                      ${hovered === item.name ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}
+                    ${hovered === item.name ? "max-h-72 opacity-100 overflow-y-auto" : "max-h-0 opacity-0"}`}
                     >
-                      <div className="p-2 max-h-96 overflow-y-auto divide-y divide-gray-100">
+                      <div className="p-2 max-h-96  divide-y divide-gray-100">
                         {item.dropdown.map((subItem, subIndex) => (
                           <Link 
                             key={subIndex}
                             to={subItem.link}
                             className={`block px-4 py-3 text-sm rounded-md hover:bg-blue-50 transition-colors duration-150
-                              ${isActive(subItem.link) ? "text-blue-600 bg-blue-50" : "text-gray-700"}`}
+                              text-gray-700`}
                           >
                             {subItem.name}
                           </Link>
@@ -280,10 +279,11 @@ function Navbar() {
               {isLoggedIn ? (
                 <div
                   className="relative"
-                  onMouseEnter={() => setUserDropdown(true)}
-                  onMouseLeave={() => setUserDropdown(false)}
+                  // onMouseEnter={() => setUserDropdown(true)}
+                  // onMouseLeave={() => setUserDropdown(false)}
                 >
-                  <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100">
+                  <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100"
+                  onClick={()=>setUserDropdown(!userDropdown)}>
                     <FaUserCircle className="w-7 h-7" />
                   </button>
 
@@ -297,15 +297,19 @@ function Navbar() {
                       <p className="text-xs text-gray-500">Manage your account</p>
                     </div>
                     <div className="py-1">
-                      <Link to="/profile" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors">
+                      <Link to="/profile" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                      onClick={()=>setUserDropdown(!userDropdown)}
+                      >
                         <FiUser className="w-4 h-4 mr-3 text-gray-500" />
                         My Profile
                       </Link>
-                      <Link to="/settings" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors">
+                      <Link to="/settings" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                      onClick={()=>setUserDropdown(!userDropdown)}>
                         <FiSettings className="w-4 h-4 mr-3 text-gray-500" />
                         Settings
                       </Link>
-                      <Link to="/myorders" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors">
+                      <Link to="/myorders" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                      onClick={()=>setUserDropdown(!userDropdown)}>
                         <FaShoppingCart className="w-4 h-4 mr-3 text-gray-500" />
                         My Orders
                       </Link>
