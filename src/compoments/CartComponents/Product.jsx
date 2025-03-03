@@ -1,6 +1,6 @@
 
 
-const productsData = [
+const ProductsData = [
     // Laptops
     {
       id: 1,
@@ -539,4 +539,4 @@ const productsData = [
     }
   ];
   
-  export default productsData;
+  export default ProductsData;

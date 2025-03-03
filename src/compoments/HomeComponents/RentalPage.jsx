@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ProductCard from "../CartComponents/ProductCard";
 import SearchFilter from "./SearchFilter";
-import productsData from "../CartComponents/product";  
+import productsData from "../CartComponents/Product";  
 
 const RentalPage = () => {
   const { category } = useParams(); 

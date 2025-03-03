@@ -64,25 +64,25 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
        
         {menuItems.map((item, index) => (
-          <div key={index} className={`relative ${
+          <div key={index} className={`relative my-2 ${
             location.pathname.includes(item.path) ? "border-r-4 border-indigo-600" : ""
           }`}>
-            <div
+            <NavLink to={item?.path}
               className={`flex items-center justify-between py-3 px-3 rounded-lg  cursor-pointer hover:bg-indigo-200 transition-all  ${
                 location.pathname.includes(item.path) ? "font-semibold bg-indigo-200 " : ""
               }`}
               onClick={() => item.children && toggleMenu(item.name)}
             >
-              <NavLink to={item?.path} className="flex items-center gap-3">
+              <div  className="flex items-center gap-3">
                 <span className="text-xl">{item.icon}</span>
                 {(isOpen || isHovered) && <span className="text-md font-medium">{item.name}</span>}
-              </NavLink>
+              </div>
               {item.children && (isOpen || isHovered) && (
                 <span>
                   {openMenus[item.name] ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
                 </span>
               )}
-            </div>
+            </NavLink>
 
             {item.children && openMenus[item.name] && (
               <div className={`${isOpen || isHovered ?"ml-3":""} mt-1 space-y-2`}>
