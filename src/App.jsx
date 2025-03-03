@@ -29,7 +29,11 @@ import FAQManager from "./compoments/admin/contentmangement/FAQsList";
 import CategoryList from "./compoments/admin/contentmangement/Categories";
 import UserManagement from "./compoments/admin/UserMangement";
 import PaymentForm from "./compoments/HomeComponents/PaymentForm";
- 
+import NotificationDetails from "./compoments/navbarComponents/NotificationDetails";
+import ViewProduct from "./compoments/HomeComponents/ViewProduct";
+import AboutUs from "./pages/AboutUs";
+import Profile from "./pages/Profile";
+import ProfileSettings from "./compoments/profileComponents/ProfileSettings";
 
 const Laptops = () => <h1>Laptops Page</h1>;
 const TVMonitors = () => <h1>TV & Monitors Page</h1>;
@@ -77,6 +81,12 @@ function App() {
         <Route path="/rental/:category" element={<Rental />} />
         <Route path="/chat" element={<Chatbot/>}/>
         <Route path="/cart" element={<CartPage/>}/>
+        {/* Srinu */}
+        <Route path="/notification/:id" element={<NotificationDetails/>}/>
+        <Route path="/viewProduct/:id" element={<ViewProduct />} />
+        <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/settings" element={<ProfileSettings/>} />
+
          {/* added */}
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path='/forgot-password' element={<ForgotPassword/>}/>
@@ -85,7 +95,7 @@ function App() {
         <Route path="/messaging" element={<Message/>} />
         <Route path="/insurance" element={<Insurance/>} />
         <Route path="/addproduct" element={<AddProduct/>} />
-        <Route path="/profile" element={<Insurance/>} />
+        <Route path="/profile" element={<Profile/>} />
         <Route path="*" element={<Error/>}/>
 
        

@@ -16,7 +16,7 @@ const Home = () => {
   return (
 
     <>
-       <div className="relative z-0"> {/* Ensure Home doesn’t overlap Navbar */}
+       <div className="relative z-0 mt-20"> {/* Ensure Home doesn’t overlap Navbar */}
         <Carousel />
         <ProductList/>
         <FeaturedBuildings/>

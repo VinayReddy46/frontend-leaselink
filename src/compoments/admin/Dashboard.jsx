@@ -45,7 +45,7 @@ const Dashboard = () => {
   // Dynamic stats based on time period
   const statsData = {
     day: {
-      revenue: "$5K",
+      revenue: "₹5K",
       createdAccounts: "100",
       totalAccounts: "15,000",
       activeAccounts: "12,000",
@@ -53,7 +53,7 @@ const Dashboard = () => {
       addedProducts: "50",
     },
     week: {
-      revenue: "$35K",
+      revenue: "₹35K",
       createdAccounts: "700",
       totalAccounts: "15,500",
       activeAccounts: "12,200",
@@ -61,7 +61,7 @@ const Dashboard = () => {
       addedProducts: "350",
     },
     month: {
-      revenue: "$120K",
+      revenue: "₹120K",
       createdAccounts: "3,000",
       totalAccounts: "16,000",
       activeAccounts: "12,500",
@@ -69,7 +69,7 @@ const Dashboard = () => {
       addedProducts: "1,500",
     },
     year: {
-      revenue: "$1.5M",
+      revenue: "₹1.5M",
       createdAccounts: "30,000",
       totalAccounts: "45,000",
       activeAccounts: "35,000",
@@ -115,7 +115,7 @@ const Dashboard = () => {
     labels: chartLabels[timePeriod],
     datasets: [
       {
-        label: "Revenue (in $K)",
+        label: "Revenue (in ₹K)",
         data: chartDataPoints[timePeriod],
         borderColor: "#4F46E5",
         backgroundColor: "rgba(79, 70, 229, 0.2)",
