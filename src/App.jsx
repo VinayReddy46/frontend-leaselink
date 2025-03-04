@@ -33,6 +33,7 @@ import Profile from "./pages/Profile";
 import ProfileSettings from "./compoments/profileComponents/ProfileSettings";
 import MyOrders from "./compoments/profileComponents/MyOrders";
 import NotificationDetails from "./compoments/navbarComponents/NotificationDetails";
+import Checkout from "./compoments/HomeComponents/Checkout";
  
 
 const Laptops = () => <h1>Laptops Page</h1>;
@@ -94,6 +95,7 @@ function App() {
         <Route path="/profile" element={<Profile/>} />
         <Route path="/settings" element={<ProfileSettings/>} />
         <Route path="/myorders" element={<MyOrders/>} />
+        <Route path="/checkout" element={<Checkout/>} />
         <Route path="*" element={<Error/>}/>
 
        
