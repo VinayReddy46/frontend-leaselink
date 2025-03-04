@@ -5,6 +5,10 @@ import { FaArrowLeft, FaBox, FaCheck, FaTruck, FaSpinner } from 'react-icons/fa'
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   
+useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
   useEffect(() => {
     try {
       const storedOrders = JSON.parse(localStorage.getItem('orders')) || [];

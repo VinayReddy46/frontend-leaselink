@@ -228,10 +228,10 @@ const Checkout = () => {
       
       setOrderPlaced(true);
       
-      // Redirect to my orders page after a delay
-      setTimeout(() => {
-        navigate('/my-orders');
-      }, 2000);
+      // // Redirect to my orders page after a delay
+      // setTimeout(() => {
+      //   navigate('/myorders');
+      // }, 2000);
     }
   };
   
@@ -644,7 +644,7 @@ const Checkout = () => {
         <h2 className="text-2xl font-bold mb-2">Order Placed Successfully!</h2>
         <p className="text-gray-600 mb-6">Thank you for your order. We'll send you a confirmation email shortly.</p>
         <div className="flex justify-center space-x-4">
-          <Link to="/my-orders" className="bg-indigo-600 text-white py-2 px-4 rounded-lg">
+          <Link to="/myorders" className="bg-indigo-600 text-white py-2 px-4 rounded-lg">
             View My Orders
           </Link>
           <Link to="/" className="border border-indigo-600 text-indigo-600 py-2 px-4 rounded-lg">

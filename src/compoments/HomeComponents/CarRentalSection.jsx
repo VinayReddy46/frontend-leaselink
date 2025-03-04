@@ -3,7 +3,7 @@ import React from "react";
 
 const CarRentalSection = () => {
   return (
-    <section id="/about" className="flex flex-col md:flex-row items-center justify-between px-6 md:px-16 py-12 bg-white">
+    <section id="/aboutus" className="flex flex-col md:flex-row items-center justify-between px-6 md:px-16 py-12 bg-white">
       {/* Image Section */}
       <div className="relative flex-shrink-0">
         <img

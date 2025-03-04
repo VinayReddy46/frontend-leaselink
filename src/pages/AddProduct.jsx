@@ -9,6 +9,10 @@ const AddProduct = () => {
   const [productDescription, setProductDescription] = useState("");
   const [productPrice, setProductPrice] = useState("");
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const handleImageUpload = (index, e) => {
     if (e.target.files.length > 0) {
       const file = e.target.files[0];
