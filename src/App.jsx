@@ -96,6 +96,7 @@ function App() {
         <Route path="/settings" element={<ProfileSettings/>} />
         <Route path="/myorders" element={<MyOrders/>} />
         <Route path="/checkout" element={<Checkout/>} />
+
         <Route path="*" element={<Error/>}/>
 
        

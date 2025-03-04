@@ -56,7 +56,9 @@ const MyOrders = () => {
           <FaArrowLeft className="mr-2" />
           Back to Home
         </Link>
+        <Link to="/myorders">
         <h1 className="text-2xl font-bold ml-auto">My Orders</h1>
+        </Link>
       </div>
       
       {orders.length === 0 ? (
