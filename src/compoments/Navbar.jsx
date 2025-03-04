@@ -1,28 +1,31 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaShoppingCart } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
-import { IoMdArrowDropdown, IoMdNotificationsOutline } from "react-icons/io";
-import { HiShoppingCart } from "react-icons/hi2";
+import { IoMdArrowDropdown } from "react-icons/io";
 import { FiMenu, FiX } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { FiUser, FiSettings } from "react-icons/fi";
+import { HiOutlineLogout } from "react-icons/hi";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import Notifications from "./navbarComponents/Notifications";
 
 function Navbar() {
-  const [hovered, setHovered] = useState(false);
+  const { totalQuantity } = useSelector((state) => state.cart);
+  const [hovered, setHovered] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const searchRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const role = 'user1'; // This would normally come from your auth context/state
 
   // Check if user is logged in on component mount
   useEffect(() => {
-    // Replace this with your actual authentication check
     const checkLoginStatus = () => {
-      // Example: Check localStorage or auth context
       const token = localStorage.getItem('authToken');
       setIsLoggedIn(!token);
     };
@@ -30,12 +33,22 @@ function Navbar() {
     checkLoginStatus();
   }, []);
 
+  // Navigation data with icons
   const data = [
-    { name: "Home", link: "/" },
-    { name: "About Us", link: "#about" }, // link within same page
+    { 
+      name: "Home", 
+      link: "/", 
+      
+    },
+    { 
+      name: "About Us", 
+      link: "/about-us", 
+      
+    },
     {
       name: "Rent a Product",
       link: "/rental",
+      
       dropdown: [
         { name: "Laptops", link: "/rental/laptops" },
         { name: "Printer & Scanner", link: "/rental/printers" },
@@ -49,7 +62,9 @@ function Navbar() {
         { name: "Video Conferencing", link: "/rental/video" },
       ],
     },
-    role === 'user1' ? { name: "Add Product", link: "/addproduct" } : { name: "Dashboard", link: "/admin" }
+    role === 'user1' ? 
+      { name: "Add Product", link: "/addproduct" } 
+      : { name: "Dashboard", link: "/admin"}
   ];
 
   // Extract all searchable items for suggestions
@@ -74,7 +89,6 @@ function Navbar() {
 
   // Handle logout
   const handleLogout = () => {
-    // Clear auth token or perform other logout actions
     localStorage.removeItem('authToken');
     setIsLoggedIn(false);
     navigate('/login');
@@ -118,251 +132,379 @@ function Navbar() {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchResults.length > 0) {
-      // Navigate using React Router instead of direct window.location
       navigate(searchResults[0].link);
+      setSearchInput("");
+      setShowSuggestions(false);
     }
   };
 
   // Handle suggestion click
   const handleSuggestionClick = (link) => {
     navigate(link);
+    setSearchInput("");
     setShowSuggestions(false);
   };
 
+  // Check if current path matches a menu item
+  const isActive = (path) => {
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+
   return (
-    <nav className="fixed bg-white top-0 left-0 w-full shadow-md z-50 flex items-center justify-between px-3 py-4">
-      {/* Logo */}
-      <a href="#" className="flex items-center">
-        <img src="/leaselinklogo.png" alt="Logo" className="w-[150px] h-[65px]" />
-      </a>
+    <header className="w-screen bg-white shadow-md fixed top-0 left-0 right-0 z-50">
+      {/* Main Navigation */}
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-20">
+          {/* Logo and brand */}
+          <div className="flex items-center">
+            <Link to="/" className="flex-shrink-0 flex items-center">
+              <img src="/leaselinklogo.png" alt="Logo" className="w-auto h-12" />
+            </Link>
+          </div>
 
-      {/* Mobile Menu Button and User Icon */}
-      <div className="flex items-center space-x-4 md:hidden">
-        {/* Toggle Button */}
-        <button
-          className="p-2 bg-blue-50 rounded-lg text-gray-700 hover:bg-blue-100 transition-colors duration-200"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
-        </button>
+          {/* Desktop Navigation Links - Hidden on Mobile */}
+          <div className="hidden lg:flex items-center justify-center">
+            {data.map((item, index) => (
+              <div key={index} className="relative">
+                {item.dropdown ? (
+                  <div 
+                    className="group"
+                    onClick={() => setHovered(hovered === item.name ? null : item.name)}
+                  >
+                    <button className={`flex items-center space-x-1.5 px-2 py-1 rounded-md text-base font-medium transition-colors duration-200
+                      ${isActive(item.link) 
+                        ? "text-blue-600" 
+                        : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
+                    >
+                      <span className="flex items-center">
+                        <span className="ml-1.5">{item.name}</span>
+                      </span>
+                      <IoMdArrowDropdown className="text-xl" />
+                    </button>
 
-        {/* User Icon or Login Button for Mobile */}
-        {isLoggedIn ? (
-          <button
-            className="p-2 bg-blue-50 rounded-lg text-gray-700 hover:bg-blue-100 transition-colors duration-200"
-            onClick={() => setUserDropdown(!userDropdown)}
-          >
-            <FaUserCircle className="w-6 h-6" />
-          </button>
-        ) : (
-          <button
-            className="p-2 bg-blue-500 rounded-lg text-white hover:bg-blue-600 transition-colors duration-200"
-            onClick={handleLoginClick}
-          >
-            Login
-          </button>
-        )}
-      </div>
+                    {/* Dropdown Panel */}
+                    <div className={`absolute left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-xl z-20 transition-all duration-200 ease-in-out transform origin-top-left
+                    ${hovered === item.name ? "max-h-72 opacity-100 overflow-y-auto" : "max-h-0 opacity-0"}`}
+                    >
+                      <div className="p-2 max-h-96  divide-y divide-gray-100">
+                        {item.dropdown.map((subItem, subIndex) => (
+                          <Link 
+                            key={subIndex}
+                            to={subItem.link}
+                            className={`block px-4 py-3 text-sm rounded-md hover:bg-blue-50 transition-colors duration-150
+                              text-gray-700`}
+                          >
+                            {subItem.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <Link 
+                    to={item.link} 
+                    className={`flex items-center space-x-1.5 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200
+                      ${isActive(item.link) 
+                        ? "text-blue-600" 
+                        : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
+                  >
+                    {item.icon}
+                    <span>{item.name}</span>
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
 
-      {/* Navigation Links */}
-      <ul
-        className={`md:flex md:items-center md:space-x-10 absolute md:static bg-white md:bg-transparent top-16 left-0 w-full md:w-auto shadow-md md:shadow-none transition-all duration-300 ease-in-out ${menuOpen ? "block" : "hidden"
-          } md:flex`}
-      >
-        {data.map((val, index) => (
-          <li key={index} className="relative group px-6 md:px-0 py-2 md:py-0">
-            {val.dropdown ? (
-              <div
-                className="relative cursor-pointer"
-                onMouseEnter={() => setHovered(true)}
-                onMouseLeave={() => setHovered(false)}
+          {/* Right side elements: Search, notifications, cart, user */}
+          <div className="flex items-center space-x-5">
+            {/* Desktop Search */}
+            <div ref={searchRef} className="hidden md:block relative">
+              <form 
+                onSubmit={handleSearchSubmit} 
+                className="flex items-center"
               >
-                <div className="flex items-center text-gray-700 hover:text-blue-800 font-medium text-lg transition-colors duration-200">
-                  {val.name}
-                  <IoMdArrowDropdown className="ml-1 text-xl" />
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="w-60 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    value={searchInput}
+                    onChange={handleSearchChange}
+                    onFocus={() => searchInput.trim() !== "" && setShowSuggestions(true)}
+                  />
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                    <CiSearch className="w-5 h-5" />
+                  </span>
                 </div>
+              </form>
 
-                {/* Dropdown Menu */}
-                <ul
-                  className={`absolute left-0 mt-2 w-60 bg-white border border-gray-200 rounded-lg shadow-lg transition-all duration-300 ease-in-out overflow-hidden ${hovered ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-2"
-                    }`}
-                  style={{
-                    maxHeight: "250px",
-                    overflowY: "auto",
-                    scrollbarWidth: "none",
-                    msOverflowStyle: "none",
-                  }}
-                  onMouseEnter={() => setHovered(true)}
-                  onMouseLeave={() => setHovered(false)}
+              {/* Search Suggestions */}
+              {showSuggestions && searchResults.length > 0 && (
+                <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <ul className="py-1 max-h-64 overflow-y-auto">
+                    {searchResults.map((result, index) => (
+                      <li 
+                        key={index} 
+                        className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
+                        onClick={() => handleSuggestionClick(result.link)}
+                      >
+                        <div className="text-gray-700">{result.name}</div>
+                        {result.category && (
+                          <div className="text-xs text-gray-500">in {result.category}</div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Notification and Cart Icons */}
+            <div className="flex items-center space-x-2">
+              <Notifications />
+              
+              <Link to="/cart" className="p-2.5 text-gray-600 rounded-full hover:bg-gray-100 hover:text-blue-600 transition-colors relative">
+                <FaShoppingCart className="w-5 h-5" />
+                {totalQuantity > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold px-1.5 min-w-[18px] h-[18px] rounded-full flex items-center justify-center">
+                    {totalQuantity}
+                  </span>
+                )}
+              </Link>
+            </div>
+
+            {/* User Profile or Login Button */}
+            <div className="hidden md:block">
+              {isLoggedIn ? (
+                <div
+                  className="relative"
+                  // onMouseEnter={() => setUserDropdown(true)}
+                  // onMouseLeave={() => setUserDropdown(false)}
                 >
-                  {val.dropdown.map((item, subIndex) => (
-                    <li key={subIndex} className="px-5 py-3 text-gray-700 hover:bg-blue-50 transition-all duration-200">
-                      <a href={item.link} className="w-full block">{item.name}</a>
+                  <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100"
+                  onClick={()=>setUserDropdown(!userDropdown)}>
+                    <FaUserCircle className="w-7 h-7" />
+                  </button>
+
+                  {/* User Dropdown */}
+                  <div 
+                    className={`absolute right-0 mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-xl z-50 transition-all duration-200 ease-in-out transform origin-top-right
+                      ${userDropdown ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}
+                  >
+                    <div className="border-b border-gray-100 p-4">
+                      <p className="text-sm font-medium text-gray-700">Welcome back!</p>
+                      <p className="text-xs text-gray-500">Manage your account</p>
+                    </div>
+                    <div className="py-1">
+                      <Link to="/profile" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                      onClick={()=>setUserDropdown(!userDropdown)}
+                      >
+                        <FiUser className="w-4 h-4 mr-3 text-gray-500" />
+                        My Profile
+                      </Link>
+                      <Link to="/settings" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                      onClick={()=>setUserDropdown(!userDropdown)}>
+                        <FiSettings className="w-4 h-4 mr-3 text-gray-500" />
+                        Settings
+                      </Link>
+                      <Link to="/myorders" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                      onClick={()=>setUserDropdown(!userDropdown)}>
+                        <FaShoppingCart className="w-4 h-4 mr-3 text-gray-500" />
+                        My Orders
+                      </Link>
+                      <button 
+                        onClick={handleLogout} 
+                        className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                      >
+                        <HiOutlineLogout className="w-4 h-4 mr-3 text-gray-500" />
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={handleLoginClick}
+                  className="px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                  Login
+                </button>
+              )}
+            </div>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              className="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100 transition-colors focus:outline-none"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Menu - Only visible when menu is open */}
+      <div 
+        className={`md:hidden bg-white border-t border-gray-200 transition-all duration-300 ease-in-out overflow-hidden
+          ${menuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"}`}
+      >
+        <div className="px-4 pt-2 pb-3 space-y-1">
+          {/* Mobile Search */}
+          <div className="py-2">
+            <form 
+              onSubmit={handleSearchSubmit} 
+              className="flex items-center rounded-lg overflow-hidden border border-gray-300"
+            >
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-full pl-4 pr-2 py-2.5 focus:outline-none"
+                value={searchInput}
+                onChange={handleSearchChange}
+                onFocus={() => searchInput.trim() !== "" && setShowSuggestions(true)}
+              />
+              <button type="submit" className="px-4 py-2.5 bg-gray-100 text-gray-700">
+                <CiSearch className="w-5 h-5" />
+              </button>
+            </form>
+
+            {/* Mobile Search Results */}
+            {showSuggestions && searchResults.length > 0 && (
+              <div className="mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                <ul className="py-1 max-h-64 overflow-y-auto">
+                  {searchResults.map((result, index) => (
+                    <li 
+                      key={index} 
+                      className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
+                      onClick={() => handleSuggestionClick(result.link)}
+                    >
+                      <div className="text-gray-700">{result.name}</div>
+                      {result.category && (
+                        <div className="text-xs text-gray-500">in {result.category}</div>
+                      )}
                     </li>
                   ))}
                 </ul>
               </div>
-            ) : (
-              <a
-                href={val.link}
-                className="text-gray-700 hover:text-blue-800 font-medium block md:inline text-lg transition-colors duration-200"
-              >
-                {val.name}
-              </a>
             )}
-          </li>
-        ))}
-      </ul>
-
-      {/* Icons Section (Hidden in Mobile View) */}
-      <div className="hidden md:flex items-center space-x-4">
-        {/* Search Bar with Suggestions */}
-        <div ref={searchRef} className="relative">
-          <form onSubmit={handleSearchSubmit} className="flex items-center border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-            <input
-              type="text"
-              placeholder="Search here..."
-              className="w-full px-4 py-2 outline-none border-none"
-              value={searchInput}
-              onChange={handleSearchChange}
-              onFocus={() => searchInput.trim() !== "" && setShowSuggestions(true)}
-            />
-            <button 
-              type="submit" 
-             
-              className="flex items-center justify-center px-4 py-3 text-gray-600 transition-colors duration-200 hover:bg-blue-800 hover:text-white"
-            >
-              <CiSearch className="w-5 h-5" />
-            </button>
-          </form>
-
-          {/* Search Suggestions Dropdown */}
-          {showSuggestions && searchResults.length > 0 && (
-            <ul className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
-              {searchResults.map((result, index) => (
-                <li 
-                  key={index} 
-                  className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
-                  onClick={() => handleSuggestionClick(result.link)}
-                >
-                  <div className="text-gray-700">{result.name}</div>
-                  {result.category && (
-                    <div className="text-xs text-gray-500">in {result.category}</div>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        {/* Notification and Shopping Cart Icons */}
-        <div className="flex items-center space-x-4">
-          <a
-            href="#"
-            className="text-gray-600 hover:bg-blue-800 hover:text-white p-3 rounded-full transition-colors duration-200"
-          >
-            <IoMdNotificationsOutline className="w-6 h-6" />
-          </a>
-          <a
-            href="/cart"
-            className="text-gray-600 hover:bg-blue-800 hover:text-white p-3 rounded-full transition-colors duration-200"
-          >
-            <HiShoppingCart className="w-6 h-6" />
-          </a>
-        </div>
-
-        {/* User Profile Icon or Login Button based on auth status */}
-        {isLoggedIn ? (
-          <div
-            className="relative"
-            onMouseEnter={() => setUserDropdown(true)}
-            onMouseLeave={() => setUserDropdown(false)}
-          >
-            <button className="text-gray-600 hover:text-blue-800 transition-colors duration-200">
-              <FaUserCircle className="w-7 h-7" />
-            </button>
-
-            {/* Dropdown Menu */}
-            <ul
-              className={`absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg transition-all duration-300 ease-in-out overflow-hidden ${userDropdown ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-2"
-                }`}
-            >
-              <li className="px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200">
-                <a href="/profile">Profile</a>
-              </li>
-              <li className="px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200">
-                <a href="/settings">Settings</a>
-              </li>
-              <li className="px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200">
-                <button onClick={handleLogout} className="w-full text-left">Logout</button>
-              </li>
-            </ul>
           </div>
-        ) : (
-          <button
-            onClick={handleLoginClick}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
-          >
-            Login
-          </button>
-        )}
-      </div>
 
-      {/* Mobile Search Bar (Visible when menu is open) */}
-      {menuOpen && (
-        <div ref={searchRef} className="absolute top-16 left-0 w-full px-4 py-2 bg-white md:hidden">
-          <form onSubmit={handleSearchSubmit} className="flex items-center border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-            <input
-              type="text"
-              placeholder="Search here..."
-              className="w-full px-4 py-2 outline-none border-none"
-              value={searchInput}
-              onChange={handleSearchChange}
-              onFocus={() => searchInput.trim() !== "" && setShowSuggestions(true)}
-            />
-            <button 
-              type="submit" 
-              className="flex items-center justify-center px-4 py-3 text-gray-600 transition-colors duration-200 hover:bg-blue-800 hover:text-white"
-            >
-              <CiSearch className="w-5 h-5" />
-            </button>
-          </form>
+          {/* Mobile Navigation Links */}
+          {data.map((item, index) => (
+            <div key={index}>
+              {item.dropdown ? (
+                <div className="space-y-1  ">
+                  {/* Dropdown Title */}
+                  <button 
+                    onClick={() => setHovered(hovered === item.name ? null : item.name)}
+                    className={`flex justify-between items-center w-full px-3 py-2.5 rounded-md text-left 
+                      ${isActive(item.link) 
+                        ? "bg-blue-50 text-blue-600" 
+                        : "text-gray-700 hover:bg-gray-50"}`}
+                  >
+                    <span className="flex items-center">
+                      {item.icon}
+                      <span className="ml-2">{item.name}</span>
+                    </span>
+                    <IoMdArrowDropdown className={`text-xl transition-transform duration-200 ${hovered === item.name ? "transform rotate-180" : ""}`} />
+                  </button>
 
-          {/* Mobile Search Suggestions */}
-          {showSuggestions && searchResults.length > 0 && (
-            <ul className="bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto mt-1">
-              {searchResults.map((result, index) => (
-                <li 
-                  key={index} 
-                  className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
-                  onClick={() => handleSuggestionClick(result.link)}
+                  {/* Dropdown Items */}
+                  <div 
+                    className={`transition-all duration-200 ease-in-out overflow-hidden
+                      ${hovered === item.name ? "max-h-72 opacity-100 overflow-y-auto" : "max-h-0 opacity-0"}`}
+                  >
+                    <div className="pl-5 pr-3  space-y-1 border-l-2 border-gray-100 ml-3">
+                      {item.dropdown.map((subItem, subIndex) => (
+                        <Link 
+                          key={subIndex}
+                          to={subItem.link}
+                          className={`block px-3 py-2 rounded-md text-sm
+                            ${isActive(subItem.link) 
+                              ? "bg-blue-50 text-blue-600" 
+                              : "text-gray-600 hover:bg-gray-50"}`}
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          {subItem.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <Link 
+                  to={item.link} 
+                  className={`flex items-center px-3 py-2.5 rounded-md text-base
+                    ${isActive(item.link) 
+                      ? "bg-blue-50 text-blue-600" 
+                      : "text-gray-700 hover:bg-gray-50"}`}
+                  onClick={() => setMenuOpen(false)}
                 >
-                  <div className="text-gray-700">{result.name}</div>
-                  {result.category && (
-                    <div className="text-xs text-gray-500">in {result.category}</div>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
+                  {item.icon}
+                  <span className="ml-2">{item.name}</span>
+                </Link>
+              )}
+            </div>
+          ))}
 
-      {/* User Dropdown for Mobile View */}
-      {isLoggedIn && userDropdown && (
-        <ul className="absolute top-16 right-4 w-48 bg-white border border-gray-200 rounded-lg shadow-lg md:hidden">
-          <li className="px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200">
-            <a href="/profile">Profile</a>
-          </li>
-          <li className="px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200">
-            <a href="/settings">Settings</a>
-          </li>
-          <li className="px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200">
-            <button onClick={handleLogout} className="w-full text-left">Logout</button>
-          </li>
-        </ul>
-      )}
-    </nav>
+          {/* Mobile User Controls */}
+          <div className="pt-2 pb-3 border-t border-gray-200">
+            {isLoggedIn ? (
+              <div className="space-y-1">
+                <div className="px-3 py-2">
+                  <p className="text-sm font-medium text-gray-700">Account</p>
+                </div>
+                <Link 
+                  to="/profile" 
+                  className="flex items-center px-3 py-2.5 rounded-md text-gray-700 hover:bg-gray-50"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <FiUser className="w-5 h-5 mr-2" />
+                  <span>Profile</span>
+                </Link>
+                <Link 
+                  to="/settings" 
+                  className="flex items-center px-3 py-2.5 rounded-md text-gray-700 hover:bg-gray-50"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <FiSettings className="w-5 h-5 mr-2" />
+                  <span>Settings</span>
+                </Link>
+                <Link 
+                  to="/myorders" 
+                  className="flex items-center px-3 py-2.5 rounded-md text-gray-700 hover:bg-gray-50"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <FaShoppingCart className="w-5 h-5 mr-2" />
+                  <span>My Orders</span>
+                </Link>
+                <button 
+                  onClick={() => {
+                    handleLogout();
+                    setMenuOpen(false);
+                  }} 
+                  className="flex items-center w-full px-3 py-2.5 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  <HiOutlineLogout className="w-5 h-5 mr-2" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  handleLoginClick();
+                  setMenuOpen(false);
+                }}
+                className="w-full px-3 py-2.5 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
+              >
+                Login
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </header>
   );
 }
 

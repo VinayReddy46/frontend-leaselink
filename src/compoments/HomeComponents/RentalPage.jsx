@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import ProductCard from "./ProductCard";
+import ProductCard from "../CartComponents/ProductCard";
 import SearchFilter from "./SearchFilter";
-import productsData from "./Product";  
+import productsData from "../CartComponents/Product";  
 
 const RentalPage = () => {
   const { category } = useParams(); 

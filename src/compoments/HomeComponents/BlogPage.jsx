@@ -3,6 +3,7 @@ import LogoCarousel from "./LogoCarousel";
 import { useState, useEffect } from "react";
 import { FaUser, FaRegCalendarAlt, FaArrowRight } from "react-icons/fa";
 import AnimationScroller from "../../utils/AnimationScroller"
+
 const BlogPage = () => {
   
     const blogPosts = [

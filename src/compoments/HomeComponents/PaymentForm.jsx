@@ -8,7 +8,7 @@ import Lottie from 'lottie-react';
 import CreditCardForm from "./payment-methods/CreditCardForm";
 import DebitCardForm from "./payment-methods/DebitCardForm";
 import UPIForm from "./payment-methods/UPIForm";
-import PersonalInfoForm from "./PersonalInfoForm";
+import PersonalInfoForm from "./PersonalInfoFOrm";
 import successAnimation from "../../assets/success.json";
 
 

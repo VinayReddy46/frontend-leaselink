@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.6.0",
     "browser-router": "^0.2.0",
     "chart.js": "^4.4.8",
     "chartjs": "^0.3.24",
@@ -24,8 +25,14 @@
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.2.0",
+<<<<<<< HEAD
     "react-toastify": "^11.0.5",
+=======
+    "react-toastify": "^11.0.3",
+    "redux-persist": "^6.0.0",
+>>>>>>> 60b638ea1f44ed79664005508a5fe75453862131
     "yup": "^1.6.1"
   },
   "devDependencies": {

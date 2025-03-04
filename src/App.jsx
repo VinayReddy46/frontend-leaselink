@@ -15,12 +15,17 @@ import Insurance from "./pages/Insurance";
 import Navbar from "./compoments/Navbar";
 import Footer from "./pages/Footer";
 import Signup from "./pages/Signup";
+<<<<<<< HEAD
 import ProductDetails from "./compoments/HomeComponents/ProductDetails";
 import Cart from "./compoments/HomeComponents/Cart";
+=======
+import Error from "./pages/Error";
+import ProductDetails from "./compoments/CartComponents/ProductDetails";
+import Cart from "./compoments/CartComponents/Cart";
+>>>>>>> 60b638ea1f44ed79664005508a5fe75453862131
 import ForgotPassword from "./pages/ForgotPassword";
 import AddProduct from "./pages/AddProduct";
 import Chatbot from "./pages/Chatbot";
-import CartPage from "./compoments/HomeComponents/CartPage";
 import Dashboard from "./compoments/admin/Dashboard";
 import CustomerService from "./compoments/admin/CustomerService";
 import Settings from "./compoments/admin/Settings";
@@ -28,7 +33,16 @@ import FAQManager from "./compoments/admin/contentmangement/FAQsList";
 import CategoryList from "./compoments/admin/contentmangement/Categories";
 import UserManagement from "./compoments/admin/UserMangement";
 import PaymentForm from "./compoments/HomeComponents/PaymentForm";
+<<<<<<< HEAD
 import TrustSystem from "./pages/Ratings";
+=======
+import AboutUs from "./pages/About";
+import Profile from "./pages/Profile";
+import ProfileSettings from "./compoments/profileComponents/ProfileSettings";
+import MyOrders from "./compoments/profileComponents/MyOrders";
+import NotificationDetails from "./compoments/navbarComponents/NotificationDetails";
+import Checkout from "./compoments/HomeComponents/Checkout";
+>>>>>>> 60b638ea1f44ed79664005508a5fe75453862131
  
 
 const Laptops = () => <h1>Laptops Page</h1>;
@@ -76,7 +90,9 @@ function App() {
         <Route path="/rental" element={<Rental />} />
         <Route path="/rental/:category" element={<Rental />} />
         <Route path="/chat" element={<Chatbot/>}/>
-        <Route path="/cart" element={<CartPage/>}/>
+        <Route path="/cart" element={<Cart/>}/>
+        <Route path="/about" element={<AboutUs/>}/>
+        <Route path="/notification/:id" element={<NotificationDetails/>}/>
          {/* added */}
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path='/forgot-password' element={<ForgotPassword/>}/>
@@ -85,7 +101,10 @@ function App() {
         <Route path="/messaging" element={<Message/>} />
         <Route path="/insurance" element={<Insurance/>} />
         <Route path="/addproduct" element={<AddProduct/>} />
-        <Route path="/profile" element={<Insurance/>} />
+        <Route path="/profile" element={<Profile/>} />
+        <Route path="/settings" element={<ProfileSettings/>} />
+        <Route path="/myorders" element={<MyOrders/>} />
+        <Route path="/checkout" element={<Checkout/>} />
         <Route path="*" element={<Error/>}/>
 
        
