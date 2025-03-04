@@ -1,0 +1,107 @@
+
+
+
+
+
+.message-container {
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.notification-icon {
+  position: relative;
+  cursor: pointer;
+}
+
+.notification-icon .badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  padding: 3px 7px;
+  border-radius: 50%;
+}
+
+.message-box {
+  height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.message {
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.lender {
+  background: #f1f1f1;
+}
+
+.renter {
+  background: #d1e7fd;
+  text-align: right;
+}
+
+.message-input {
+  display: flex;
+  margin-top: 10px;
+}
+
+.message-input input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.message-input button {
+  padding: 10px;
+  margin-left: 5px;
+  border: none;
+  background: blue;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.notification-options {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.email-btn, .sms-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+}
+
+.email-btn {
+  background: green;
+}
+
+.sms-btn {
+  background: orange;
+}
+
