@@ -53,7 +53,7 @@ function Carousel() {
   ];
 
   return (
-    <div className="relative  z-0 w-full h-[500px] md:h-screen overflow-hidden">
+    <div className="relative  z-0 w-full h-[500px] md:h-screen overflow-hidden mt-16">
       <div
         className="flex transition-transform duration-500 ease-in-out"
         style={{ transform: `translateX(-${current * 100}%)` }}

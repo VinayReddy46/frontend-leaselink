@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import {FaRegUser, FaRegSave } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { MdOutlineEmail, MdOutlineLock } from "react-icons/md";
@@ -15,6 +15,10 @@ const Profile = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

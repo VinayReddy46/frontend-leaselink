@@ -42,7 +42,7 @@ function Navbar() {
     },
     { 
       name: "About Us", 
-      link: "/about-us", 
+      link: "/aboutus", 
       
     },
     {
@@ -152,7 +152,7 @@ function Navbar() {
 
   // Check if current path matches a menu item
   const isActive = (path) => {
-    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+    return location.pathname.startsWith(path);
   };
 
   return (
@@ -170,54 +170,55 @@ function Navbar() {
           {/* Desktop Navigation Links - Hidden on Mobile */}
           <div className="hidden lg:flex items-center justify-center">
             {data.map((item, index) => (
-              <div key={index} className="relative">
-                {item.dropdown ? (
-                  <div 
-                    className="group"
-                    onClick={() => setHovered(hovered === item.name ? null : item.name)}
-                  >
-                    <button className={`flex items-center space-x-1.5 px-2 py-1 rounded-md text-base font-medium transition-colors duration-200
-                      ${isActive(item.link) 
-                        ? "text-blue-600" 
-                        : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
-                    >
-                      <span className="flex items-center">
-                        <span className="ml-1.5">{item.name}</span>
-                      </span>
-                      <IoMdArrowDropdown className="text-xl" />
-                    </button>
-
-                    {/* Dropdown Panel */}
-                    <div className={`absolute left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-xl z-20 transition-all duration-200 ease-in-out transform origin-top-left
-                    ${hovered === item.name ? "max-h-72 opacity-100 overflow-y-auto" : "max-h-0 opacity-0"}`}
-                    >
-                      <div className="p-2 max-h-96  divide-y divide-gray-100">
-                        {item.dropdown.map((subItem, subIndex) => (
-                          <Link 
-                            key={subIndex}
-                            to={subItem.link}
-                            className={`block px-4 py-3 text-sm rounded-md hover:bg-blue-50 transition-colors duration-150
-                              text-gray-700`}
-                          >
-                            {subItem.name}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <Link 
-                    to={item.link} 
-                    className={`flex items-center space-x-1.5 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200
-                      ${isActive(item.link) 
-                        ? "text-blue-600" 
-                        : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
-                  >
-                    {item.icon}
-                    <span>{item.name}</span>
-                  </Link>
-                )}
-              </div>
+             <div key={index} className="relative">
+             {item.dropdown ? (
+               <div
+                 className="relative group"
+                 onMouseEnter={() => setHovered(item.name)}
+                 onMouseLeave={() => setHovered(null)}
+               >
+                 <button
+                   onClick={(e) => {
+                     e.preventDefault(); 
+                     setHovered(hovered === item.name ? null : item.name);
+                   }}
+                   className={`flex items-center space-x-1.5 px-2 py-1 rounded-md text-base font-medium transition-colors duration-200 
+                     ${isActive(item.link) ? "text-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
+                 >
+                   <span className="ml-1.5">{item.name}</span>
+                   <IoMdArrowDropdown className="text-xl" />
+                 </button>
+           
+                 {/* Dropdown Panel */}
+                 <div
+                   className={`absolute left-0 mt-2 w-96 bg-white border border-gray-200 rounded-lg shadow-xl z-20 transition-all duration-200 ease-in-out transform origin-top-left
+                   ${hovered === item.name ? "opacity-100 max-h-72 overflow-y-auto visible" : "opacity-0 max-h-0 invisible"}`}
+                 >
+                   <div className="p-2 max-h-96 grid grid-cols-2 gap-2">
+                     {item.dropdown.map((subItem, subIndex) => (
+                       <Link
+                         key={subIndex}
+                         to={subItem.link}
+                         className={`block px-4 py-3 text-sm rounded-md hover:bg-blue-50 transition-colors duration-150 text-gray-700`}
+                       >
+                         {subItem.name}
+                       </Link>
+                     ))}
+                   </div>
+                 </div>
+               </div>
+             ) : (
+               <Link
+                 to={item.link}
+                 className={`flex items-center space-x-1.5 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 
+                   ${isActive(item.link) ? "text-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
+               >
+                 {item.icon}
+                 <span>{item.name}</span>
+               </Link>
+             )}
+           </div>
+           
             ))}
           </div>
 

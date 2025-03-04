@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 import { Link } from "react-router-dom";
 import { FaEnvelope } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -6,6 +6,10 @@ import { toast } from "react-toastify";
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const submitHandler = async (e) => {
     e.preventDefault();
