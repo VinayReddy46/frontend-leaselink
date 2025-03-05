@@ -10,7 +10,7 @@ const Rental = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <productsData/>
+      {/* <productsData/> */}
       <RentalPage products={ProductsData} />
 
       

@@ -91,7 +91,7 @@ function App() {
         <Route path="/rental/:category" element={<Rental />} />
         <Route path="/chat" element={<Chatbot/>}/>
         <Route path="/cart" element={<Cart/>}/>
-        <Route path="/about" element={<AboutUs/>}/>
+        <Route path="/aboutus" element={<AboutUs/>}/>
         <Route path="/notification/:id" element={<NotificationDetails/>}/>
          {/* added */}
         <Route path="/product/:id" element={<ProductDetails />} />
@@ -105,6 +105,7 @@ function App() {
         <Route path="/settings" element={<ProfileSettings/>} />
         <Route path="/myorders" element={<MyOrders/>} />
         <Route path="/checkout" element={<Checkout/>} />
+
         <Route path="*" element={<Error/>}/>
 
        

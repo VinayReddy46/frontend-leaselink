@@ -1,8 +1,12 @@
+import { useEffect } from "react";
 import { FaBuilding, FaHandshake, FaHome } from "react-icons/fa";
 
 const AboutUs = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
-    <div className="container min-h-screen mx-auto px-4 mt-24">
+    <div className="container min-h-[60vh] mx-auto px-4 mt-32">
       <div className="">
         <h2 className="text-3xl font-bold text-gray-800 text-center mb-6">
           About Us

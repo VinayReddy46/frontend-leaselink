@@ -1,6 +1,9 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 
 const Error = () => {
+   useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-purple-50 to-blue-50">
       {/* Animated 404 Illustration */}
@@ -8,7 +11,7 @@ const Error = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full animate-pulse"></div>
         <div className="absolute inset-4 bg-white rounded-full shadow-lg flex items-center justify-center">
           <img
-            src="/web.png" // Path relative to the public folder
+            src="https://cdn-icons-png.flaticon.com/512/1886/1886495.png" // Path relative to the public folder
             alt="404 Not Found"
             className="w-40 h-40 object-contain" // Adjust size as needed
           />
