@@ -1,83 +1,170 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { FaPaperPlane, FaTimes, FaPhone, FaMicrophone, FaFileUpload } from "react-icons/fa";
 
 const Chatbot = () => {
-    useEffect(() => {
-        window.scrollTo(0, 0);
-      }, []);
-  const [messages, setMessages] = useState([
-    { text: "Hello! How can I assist you today?", sender: "bot" },
-  ]);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const product = location.state?.product;
+
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [recording, setRecording] = useState(false);
+  const mediaRecorder = useRef(null);
+  const [audioURL, setAudioURL] = useState("");
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    if (product) {
+      setMessages([
+        { text: `Hello! I'm interested in ${product.name}. Can you provide more details?`, sender: "user" },
+        { 
+          text: `Sure! Here are some details about ${product.name}:\nBrand: ${product.brand}\nModel: ${product.model}\nProcessor: ${product.processor}\nPrice: ${product.price}`,
+          sender: "bot" 
+        },
+      ]);
+
+      setSuggestions([
+        "Is this available?",
+        "What are the payment options?",
+        "Can I see more images?",
+        "What is the warranty?",
+      ]);
+    } else {
+      setMessages([{ text: "Hello! How can I assist you today?", sender: "bot" }]);
+      setSuggestions([
+        "Show me your latest products",
+        "What are your delivery options?",
+        "Do you offer discounts?",
+        "How can I contact support?",
+      ]);
+    }
+  }, [product]);
 
   const handleSend = () => {
     if (input.trim() === "") return;
 
-    const userMessage = { text: input, sender: "user" };
-    setMessages([...messages, userMessage]);
+    setMessages([...messages, { text: input, sender: "user" }]);
 
     setTimeout(() => {
-      const botReply = getBotResponse(input);
-      setMessages((prev) => [...prev, { text: botReply, sender: "bot" }]);
+      setMessages((prev) => [...prev, { text: "I'll get back to you shortly!", sender: "bot" }]);
     }, 800);
 
     setInput("");
   };
 
-  const getBotResponse = (message) => {
-    const lowerMsg = message.toLowerCase();
-  
-    if (lowerMsg.includes("hello") || lowerMsg.includes("hi")) return "Hi there! 😊";
-    if (lowerMsg.includes("how are you")) return "I'm just a bot, but I'm doing great! Thanks for asking. 🤖";
-    if (lowerMsg.includes("help")) return "Sure! What do you need help with? 🛠️";
-    if (lowerMsg.includes("who are you")) return "I'm your friendly chatbot! Here to assist you. 🤖";
-    if (lowerMsg.includes("what's your name") || lowerMsg.includes("your name")) return "I'm ChatBot! You can call me Bot. 🤖";
-    if (lowerMsg.includes("bye")) return "Goodbye! Have a great day! 👋";
-    if (lowerMsg.includes("thank you") || lowerMsg.includes("thanks")) return "You're very welcome! 😊";
-    if (lowerMsg.includes("what can you do")) return "I can chat with you, answer questions, and provide basic assistance. Try asking me something!";
-    if (lowerMsg.includes("tell me a joke")) return "Why don't programmers like nature? Too many bugs! 🐛😂";
-    if (lowerMsg.includes("do you like humans")) return "Of course! You created me. 😊";
-    if (lowerMsg.includes("what is the meaning of life")) return "42! Or maybe it's just about being happy. 🌍";
-    if (lowerMsg.includes("are you real")) return "I'm as real as your imagination lets me be! 😆";
-    if (lowerMsg.includes("where are you from")) return "I'm from the internet! 🌍";
-    if (lowerMsg.includes("favorite color")) return "I love all colors, but blue seems pretty cool! 🎨";
-    if (lowerMsg.includes("can you sing")) return "I would, but I might break your speakers! 🎶😆";
-    if (lowerMsg.includes("tell me something interesting")) return "Did you know that honey never spoils? Archaeologists found pots of honey in ancient Egyptian tombs that are over 3,000 years old and still edible! 🍯";
-    
-    return "I'm not sure how to respond to that. Can you rephrase? 🤔";
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setMessages([...messages, { text: `📁 ${file.name}`, sender: "user", fileURL: URL.createObjectURL(file) }]);
+    }
   };
-  
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      mediaRecorder.current = recorder;
+
+      const audioChunks = [];
+      recorder.ondataavailable = (event) => {
+        audioChunks.push(event.data);
+      };
+
+      recorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: "audio/mp3" });
+        const url = URL.createObjectURL(audioBlob);
+        setAudioURL(url);
+        setMessages([...messages, { text: "🎤 Voice Message", sender: "user", audio: url }]);
+      };
+
+      recorder.start();
+      setRecording(true);
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder.current) {
+      mediaRecorder.current.stop();
+      setRecording(false);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setInput(suggestion);
+    setSuggestions([]); // Remove suggestions after clicking one
+  };
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-5 bg-white-900 text-white rounded-lg shadow-2xl border border-white-700">
-      <h2 className="text-2xl font-bold mb-4 text-center text-blue-400">Chatbot</h2>
-      <div className="h-72 overflow-y-auto p-4 bg-white-800 rounded-lg border border-white-600 shadow-inner">
+    <div className="max-w-lg mx-auto mt-20 bg-gray-100 rounded-lg shadow-lg overflow-hidden">
+      {/* Header with Product Details */}
+      <div className="bg-gray-800 text-white px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {product && <img src={product.image} alt="Product" className="w-10 h-10 rounded-md" />}
+          <h2 className="text-lg font-semibold">{product ? product.name : "Chat Support"}</h2>
+        </div>
+        <div className="flex gap-3">
+          <FaPhone className="cursor-pointer text-xl hover:text-green-400" title="Call" />
+          <FaTimes className="cursor-pointer text-xl hover:text-red-400" title="Close" onClick={() => navigate(-1)} />
+        </div>
+      </div>
+
+      {/* Chat Messages */}
+      <div className="h-96 overflow-y-auto p-4 bg-white">
         {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`mb-2 p-3 rounded-xl max-w-[75%] shadow-md ${
-              msg.sender === "user"
-                ? "ml-auto bg-white-500 text-black text-right"
-                : "bg-white-700 text-black text-left"
-            }`}
-          >
-            {msg.text}
+          <div key={index} className={`flex my-2 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
+            <div className={`p-3 rounded-lg max-w-[75%] text-sm shadow-md ${msg.sender === "user" ? "bg-blue-500 text-white" : "bg-gray-300 text-black"}`}>
+              {msg.text}
+              {msg.fileURL && (
+                <a href={msg.fileURL} download className="block text-xs text-white underline">
+                  Download File
+                </a>
+              )}
+              {msg.audio && (
+                <audio controls className="mt-2">
+                  <source src={msg.audio} type="audio/mp3" />
+                  Your browser does not support audio playback.
+                </audio>
+              )}
+            </div>
           </div>
         ))}
       </div>
-      <div className="flex mt-4 gap-2">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && handleSend()}
-          className="flex-grow p-3 rounded-md bg-white-700 text-black outline-none border border-gray-100 focus:ring-2 focus:ring-gray-100"
-        />
-        <button
-          onClick={handleSend}
-          className="bg-green-500 px-5 py-3 rounded-md hover:bg-green-800 transition duration-300 shadow-lg"
-        >
-          Send
+
+      {/* Suggested Messages - Disappear After Click */}
+      {suggestions.length > 0 && (
+        <div className="p-2 bg-gray-200 flex gap-2 overflow-x-auto">
+          {suggestions.map((suggestion, index) => (
+            <button key={index} onClick={() => handleSuggestionClick(suggestion)} className="bg-blue-400 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600">
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Chat Input & Buttons */}
+      <div className="flex items-center p-3 border-t border-gray-300">
+        <label htmlFor="file-upload" className="cursor-pointer mr-2">
+          <FaFileUpload className="text-xl text-blue-500 hover:text-blue-700" title="Upload File" />
+        </label>
+        <input id="file-upload" type="file" className="hidden" onChange={handleFileUpload} />
+
+        {recording ? (
+          <button onClick={stopRecording} className="ml-2 text-red-500">
+            ⏹ Stop Recording
+          </button>
+        ) : (
+          <FaMicrophone className="cursor-pointer text-xl text-blue-500 hover:text-blue-700" title="Record Voice" onClick={startRecording} />
+        )}
+
+        <input type="text" placeholder="Type a message..." value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === "Enter" && handleSend()} className="flex-grow p-2 rounded-lg border border-gray-400 focus:outline-none ml-2" />
+
+        <button onClick={handleSend} className="ml-2 bg-blue-500 p-3 rounded-full text-white hover:bg-blue-700">
+          <FaPaperPlane />
         </button>
       </div>
     </div>
