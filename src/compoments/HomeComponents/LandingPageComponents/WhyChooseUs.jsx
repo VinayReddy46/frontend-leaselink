@@ -31,7 +31,7 @@ const WhyChooseUs = () => {
           {!showVideo ? (
             <>
               <img
-                src="https://applecarrentals.com/public/cars/61f27ea7d0c6e20220127164447.png"
+                src="https://media.istockphoto.com/id/1466353453/photo/management-responsible-for-quality-control-iso-certification-product-quality-guarantee.jpg?s=612x612&w=0&k=20&c=kiRDWnLJBlAsSG_emYyZcqb8WEYrm82nlWx72emHGH0="
                 alt="Luxury Car"
                 className="w-full h-full object-cover"
               />

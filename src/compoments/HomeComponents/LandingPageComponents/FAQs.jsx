@@ -67,7 +67,7 @@ const FAQSection = () => {
 
           <div className="rounded-2xl overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-[1.02]">
             <img 
-              src="https://live.themewild.com/carway/assets/img/faq/01.jpg"
+              src="https://media.istockphoto.com/id/638960674/vector/faq-web-page-banner-concept-with-thin-line-flat-design.jpg?s=612x612&w=0&k=20&c=EqSgbAfqxfzZCi0RO-Dn13QdYEMz4Vkf7xQeWXK_FCk="
               alt="Luxury Car"
               className="w-full h-[300px] object-cover"
             />

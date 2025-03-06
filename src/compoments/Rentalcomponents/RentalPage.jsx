@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ProductCard from "../CartComponents/ProductCard";
@@ -10,7 +8,6 @@ const RentalPage = () => {
   const { category } = useParams(); 
   const [filteredProducts, setFilteredProducts] = useState([]);
 
-
   useEffect(() => {
     let updatedProducts = category
       ? productsData.filter((product) => product.category === category)
@@ -18,7 +15,6 @@ const RentalPage = () => {
     setFilteredProducts(updatedProducts);
   }, [category]);
 
- 
   const handleFilterChange = (filters) => {
     let filtered = category
       ? productsData.filter((product) => product.category === category)
@@ -38,7 +34,7 @@ const RentalPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 flex">
+    <div className="container mx-auto px-4 py-8 flex mt-16">
     
       <div className="w-1/4">
         <SearchFilter onFilterChange={handleFilterChange} />
