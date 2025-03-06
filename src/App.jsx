@@ -41,6 +41,8 @@ import ContactSupport from "./compoments/HelpDesk/ContactSupport";
 import DisputaAndFile from "./compoments/Helpdesk/DisputeAndFile";
 import { SearchProvider } from "./compoments/contexts/SearchContext";
 import Myrentedproducts from "./compoments/profileComponents/MyRentedProducts";
+import { WishlistProvider } from "./compoments/contexts/WishlistContext";
+import WishlistPage from "./compoments/HomeComponents/LandingPageComponents/WishlistPage";
  
 
 const Laptops = () => <h1>Laptops Page</h1>;
@@ -78,6 +80,7 @@ function App() {
 
   return (
     <SearchProvider>
+            <WishlistProvider>
      <div>
       
       {!isAdminRoute && <Navbar />} {/* Show Navbar only for non-admin routes */}
@@ -102,6 +105,7 @@ function App() {
         <Route path="/addproduct" element={<AddProduct/>} />
         <Route path="/profile" element={<Profile/>} />
         <Route path="/settings" element={<ProfileSettings/>} />
+        <Route path="/wishlist" element={<WishlistPage/>} />
         <Route path="/myorders" element={<MyOrders/>} />
         <Route path="/myrentedproducts" element={<Myrentedproducts/>} />
         <Route path="/checkout" element={<Checkout/>} />
@@ -144,6 +148,7 @@ function App() {
 
     
       </div>
+      </WishlistProvider>
       </SearchProvider>
   );
 }

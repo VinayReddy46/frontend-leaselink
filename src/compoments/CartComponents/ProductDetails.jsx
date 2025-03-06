@@ -6,16 +6,16 @@ import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { addToCart } from '../../redux/cartSlice';
-import { useSelector ,useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 const ProductDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch =useDispatch()
+  const dispatch = useDispatch();
   const product = location.state?.product;
 
   if (!product) {
-    return <h2 className="text-center text-red-500">⚠️ No Product Found</h2>;
+    return <h2 className="text-center text-red-500 font-semibold text-xl py-12">⚠️ No Product Found</h2>;
   }
 
   const [startDate, setStartDate] = useState('');
@@ -36,7 +36,7 @@ const ProductDetails = () => {
           const fullStar = index + 1 <= rating;
           const halfStar = index + 0.5 === rating;
           return (
-            <span key={index}>
+            <span key={index} className="mr-0.5">
               {fullStar ? <FaStar /> : halfStar ? <FaStarHalfAlt /> : <FaRegStar />}
             </span>
           );
@@ -89,7 +89,6 @@ const ProductDetails = () => {
     navigate("/cart");
   };
   
-
   // Enhanced carousel navigation functions with smooth transitions
   const goToNextSlide = () => {
     if (isTransitioning || productImages.length <= 1) return;
@@ -158,210 +157,281 @@ const ProductDetails = () => {
   }, [isTransitioning, currentSlide]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="container mx-auto py-8 px-4 md:px-12">
-      <button onClick={() => navigate(-1)} className="text-gray-600 flex items-center mb-6 hover:text-gray-800">
-        <ArrowLeft className="h-5 w-5 mr-2" /> Back to Products
-      </button>
+    <div className="bg-slate-50 min-h-screen">
+      <div className="container mx-auto py-12 px-4 md:px-6 lg:px-8 max-w-7xl">
+        <button 
+          onClick={() => navigate(-1)} 
+          className="inline-flex items-center text-slate-600 mb-8 hover:text-blue-600 transition-colors duration-200 group font-medium"
+        >
+          <ArrowLeft className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform duration-200" /> 
+          <span>Back to Products</span>
+        </button>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-lg shadow-lg">
-        <div>
-          {/* Enhanced Image Carousel */}
-          <div className="w-full h-80 relative mb-6 bg-gray-100 rounded-lg overflow-hidden">
-            {productImages.length > 0 ? (
-              <>
-                {/* Carousel slides with improved transitions */}
-                <div className="w-full h-full relative">
-                  {productImages.map((image, index) => (
-                    <div 
-                      key={index} 
-                      className={`absolute top-0 left-0 w-full h-full transition-opacity duration-300 ease-in-out ${
-                        index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                      }`}
-                      aria-hidden={index !== currentSlide}
-                    >
-                      <img 
-                        src={image} 
-                        alt={`${product.name} - image ${index + 1}`} 
-                        className="object-contain w-full h-full"
-                      />
-                    </div>
-                  ))}
-                </div>
-                
-                {/* Navigation arrows - only show if multiple images */}
-                {productImages.length > 1 && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Product Images & Details - 7 columns on large screens */}
+          <div className="lg:col-span-7 space-y-8">
+            {/* Enhanced Image Carousel */}
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
+              <div className="w-full aspect-square md:aspect-auto md:h-96 lg:h-[480px] relative">
+                {productImages.length > 0 ? (
                   <>
-                    <button 
-                      onClick={goToPrevSlide}
-                      className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 rounded-full p-2 shadow-md z-20 hover:bg-opacity-100 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      aria-label="Previous image"
-                      disabled={isTransitioning}
-                    >
-                      <ChevronLeft className="h-6 w-6 text-gray-700" />
-                    </button>
-                    
-                    <button 
-                      onClick={goToNextSlide}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 rounded-full p-2 shadow-md z-20 hover:bg-opacity-100 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      aria-label="Next image"
-                      disabled={isTransitioning}
-                    >
-                      <ChevronRight className="h-6 w-6 text-gray-700" />
-                    </button>
-                    
-                    {/* Improved Indicators */}
-                    <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-20">
-                      {productImages.map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => goToSlide(index)}
-                          className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                            index === currentSlide 
-                              ? 'bg-blue-500 w-6' 
-                              : 'bg-gray-300 hover:bg-gray-400'
+                    {/* Carousel slides with improved transitions */}
+                    <div className="w-full h-full relative">
+                      {productImages.map((image, index) => (
+                        <div 
+                          key={index} 
+                          className={`absolute top-0 left-0 w-full h-full transition-opacity duration-300 ease-in-out ${
+                            index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
                           }`}
-                          aria-label={`Go to slide ${index + 1}`}
-                          aria-current={index === currentSlide ? 'true' : 'false'}
-                          disabled={isTransitioning}
-                        />
+                          aria-hidden={index !== currentSlide}
+                        >
+                          <img 
+                            src={image} 
+                            alt={`${product.name} - image ${index + 1}`} 
+                            className="object-contain w-full h-full p-6"
+                          />
+                        </div>
                       ))}
                     </div>
                     
-                    {/* Image counter */}
-                    <div className="absolute top-4 right-4 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded-md z-20">
-                      {currentSlide + 1} / {productImages.length}
-                    </div>
+                    {/* Navigation arrows - only show if multiple images */}
+                    {productImages.length > 1 && (
+                      <>
+                        <button 
+                          onClick={goToPrevSlide}
+                          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 text-slate-700 rounded-full p-3 shadow-lg z-20 hover:bg-blue-600 hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+                          aria-label="Previous image"
+                          disabled={isTransitioning}
+                        >
+                          <ChevronLeft className="h-5 w-5" />
+                        </button>
+                        
+                        <button 
+                          onClick={goToNextSlide}
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 text-slate-700 rounded-full p-3 shadow-lg z-20 hover:bg-blue-600 hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+                          aria-label="Next image"
+                          disabled={isTransitioning}
+                        >
+                          <ChevronRight className="h-5 w-5" />
+                        </button>
+                        
+                        {/* Improved Indicators */}
+                        <div className="absolute bottom-6 left-0 right-0 flex justify-center space-x-2 z-20">
+                          {productImages.map((_, index) => (
+                            <button
+                              key={index}
+                              onClick={() => goToSlide(index)}
+                              className={`h-2 rounded-full transition-all duration-300 ${
+                                index === currentSlide 
+                                  ? 'bg-blue-600 w-8' 
+                                  : 'bg-slate-300 hover:bg-blue-300 w-2'
+                              }`}
+                              aria-label={`Go to slide ${index + 1}`}
+                              aria-current={index === currentSlide ? 'true' : 'false'}
+                              disabled={isTransitioning}
+                            />
+                          ))}
+                        </div>
+                        
+                        {/* Image counter */}
+                        <div className="absolute top-4 right-4 bg-slate-900/70 text-white text-xs px-3 py-1.5 rounded-full z-20 font-medium">
+                          {currentSlide + 1} / {productImages.length}
+                        </div>
+                      </>
+                    )}
                   </>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-slate-400">
+                    No image available
+                  </div>
                 )}
-              </>
-            ) : (
-              <div className="flex items-center justify-center h-full text-gray-400">No image available</div>
-            )}
-          </div>
+              </div>
 
-          {/* Thumbnail navigation for larger screens */}
-          {productImages.length > 1 && (
-            <div className="hidden md:flex space-x-2 mb-6 overflow-x-auto pb-2">
-              {productImages.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToSlide(index)}
-                  className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${
-                    index === currentSlide ? 'border-blue-500 opacity-100' : 'border-transparent opacity-70 hover:opacity-100'
-                  }`}
-                  aria-label={`View image ${index + 1}`}
-                  aria-current={index === currentSlide ? 'true' : 'false'}
-                >
-                  <img 
-                    src={image} 
-                    alt={`Thumbnail ${index + 1}`} 
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
+              {/* Thumbnail navigation for larger screens */}
+              {productImages.length > 1 && (
+                <div className="hidden md:grid grid-cols-6 gap-3 p-4 border-t border-slate-100 bg-slate-50/50">
+                  {productImages.map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToSlide(index)}
+                      className={`flex-shrink-0 aspect-square rounded-lg overflow-hidden transition-all duration-200 ${
+                        index === currentSlide 
+                          ? 'ring-2 ring-blue-500 shadow-md' 
+                          : 'ring-1 ring-slate-200 opacity-70 hover:opacity-100 hover:ring-blue-200'
+                      }`}
+                      aria-label={`View image ${index + 1}`}
+                      aria-current={index === currentSlide ? 'true' : 'false'}
+                    >
+                      <img 
+                        src={image} 
+                        alt={`Thumbnail ${index + 1}`} 
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
 
-          {/* Product details below image */}
-          <div className="space-y-3">
-            <h2 className="text-2xl font-bold text-gray-800">{product.name}</h2>
-            <p className="text-gray-600">{product.processor !== "N/A" ? product.processor + " | " : ""}{product.brand}</p>
-            <p className="text-blue-500 font-bold text-xl">₹{product.price}/day</p>
-            <RatingStars rating={product.rating} />
-            <div className="mt-4 bg-gray-50 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold mb-2">Product Specifications</h3>
-              <ul className="space-y-2 text-sm text-gray-700">
-                <li><span className="font-medium">Brand:</span> {product.brand}</li>
-                <li><span className="font-medium">Model:</span> {product.model}</li>
-                {product.processor !== "N/A" && (
-                  <li><span className="font-medium">Processor:</span> {product.processor}</li>
-                )}
-                <li><span className="font-medium">Category:</span> {product.category}</li>
-                <li><span className="font-medium">Daily Rate:</span> ₹{product.price}</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <h3 className="text-xl font-semibold mb-4">Rental Details</h3>
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700">Start Date & Time</label>
-            <DatePicker
-              selected={startDate}
-              onChange={(date) => setStartDate(date)}
-              showTimeSelect
-              dateFormat="Pp"
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 p-2 border"
-              minDate={new Date()} 
-            />
-
-            <label className="block text-sm font-medium text-gray-700">End Date & Time</label>
-            <DatePicker
-              selected={endDate}
-              onChange={(date) => setEndDate(date)}
-              showTimeSelect
-              dateFormat="Pp"
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 p-2 border"
-              minDate={startDate} 
-            />
-          </div>
-
-          <h3 className="text-lg font-semibold mt-6">Insurance Plans</h3>
-          <div className="mt-3 space-y-3">
-            {product.insurancePlans && product.insurancePlans.map((plan) => (
-              <div 
-                key={plan.id} 
-                className={`border rounded-lg p-4 cursor-pointer ${selectedInsurance?.id === plan.id ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300'}`} 
-                onClick={() => setSelectedInsurance(plan)}
-              >
-                <div className="flex items-center">
-                  <Shield className="h-5 w-5 text-indigo-600 mr-2" />
-                  <div>
-                    <h4 className="font-medium">{plan.name}</h4>
-                    <p className="text-sm text-gray-600">{plan.description}</p>
-                    <p className="text-indigo-600 font-medium mt-1">₹{plan.price}</p>
+            {/* Product details below image */}
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 space-y-6">
+              <div>
+                <h1 className="text-3xl font-bold text-slate-900 mb-2">{product.name}</h1>
+                <p className="text-slate-500 text-lg">{product.processor !== "N/A" ? product.processor + " | " : ""}{product.brand}</p>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <p className="text-blue-600 font-bold text-2xl">₹{product.price}<span className="text-slate-500 text-lg font-normal">/day</span></p>
+                <div className="flex items-center space-x-2">
+                  <RatingStars rating={product.rating} />
+                  <span className="text-slate-600 font-medium">{product.rating}/5</span>
+                </div>
+              </div>
+              
+              <div className="mt-6 pt-6 border-t border-slate-100">
+                <h3 className="text-lg font-bold mb-4 text-slate-800">Product Specifications</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
+                  <div className="flex justify-between py-2 border-b border-slate-100">
+                    <span className="font-medium text-slate-500">Brand</span> 
+                    <span className="font-semibold text-slate-900">{product.brand}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-slate-100">
+                    <span className="font-medium text-slate-500">Model</span> 
+                    <span className="font-semibold text-slate-900">{product.model}</span>
+                  </div>
+                  {product.processor !== "N/A" && (
+                    <div className="flex justify-between py-2 border-b border-slate-100">
+                      <span className="font-medium text-slate-500">Processor</span> 
+                      <span className="font-semibold text-slate-900">{product.processor}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between py-2 border-b border-slate-100">
+                    <span className="font-medium text-slate-500">Category</span> 
+                    <span className="font-semibold text-slate-900">{product.category}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-slate-100">
+                    <span className="font-medium text-slate-500">Daily Rate</span> 
+                    <span className="font-semibold text-blue-600">₹{product.price}</span>
                   </div>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
 
-          {selectedInsurance && (
-            <div className="mt-4 flex justify-between items-center border p-3 rounded-lg text-sm text-gray-600">
-              <span>Selected Insurance: {selectedInsurance.name} - ₹{selectedInsurance.price}</span>
-              <button onClick={() => setSelectedInsurance(null)} className="text-red-500 flex items-center">
-                <X className="h-4 w-4 mr-1" /> Remove
+          {/* Rental Details - 5 columns on large screens */}
+          <div className="lg:col-span-5">
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 sticky top-6">
+              <h3 className="text-2xl font-bold mb-6 text-slate-900">Rental Details</h3>
+              
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Start Date & Time</label>
+                  <DatePicker
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
+                    showTimeSelect
+                    dateFormat="Pp"
+                    className="block w-full rounded-lg border-slate-200 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3.5 border bg-white text-slate-900"
+                    minDate={new Date()} 
+                    placeholderText="Select start date and time"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">End Date & Time</label>
+                  <DatePicker
+                    selected={endDate}
+                    onChange={(date) => setEndDate(date)}
+                    showTimeSelect
+                    dateFormat="Pp"
+                    className="block w-full rounded-lg border-slate-200 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3.5 border bg-white text-slate-900"
+                    minDate={startDate}
+                    placeholderText="Select end date and time"
+                    disabled={!startDate}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-8 mb-2">
+                <h3 className="text-xl font-bold mb-4 text-slate-900">Insurance Plans</h3>
+                <div className="space-y-3">
+                  {product.insurancePlans && product.insurancePlans.map((plan) => (
+                    <div 
+                      key={plan.id} 
+                      className={`border rounded-xl p-4 cursor-pointer transition-all duration-200 ${
+                        selectedInsurance?.id === plan.id 
+                          ? 'border-blue-500 bg-blue-50 shadow-sm' 
+                          : 'border-slate-200 hover:border-blue-200 hover:bg-slate-50'
+                      }`} 
+                      onClick={() => setSelectedInsurance(plan)}
+                    >
+                      <div className="flex items-start">
+                        <Shield className={`h-6 w-6 mt-0.5 mr-3 flex-shrink-0 ${
+                          selectedInsurance?.id === plan.id 
+                            ? 'text-blue-600' 
+                            : 'text-slate-400'
+                        }`} />
+                        <div>
+                          <h4 className="font-semibold text-slate-900">{plan.name}</h4>
+                          <p className="text-sm text-slate-600 mt-1">{plan.description}</p>
+                          <p className="text-blue-600 font-semibold mt-2">₹{plan.price}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {selectedInsurance && (
+                <div className="mt-4 flex justify-between items-center border border-slate-200 p-3.5 rounded-lg text-sm bg-slate-50">
+                  <span className="text-slate-700">Selected: <span className="font-medium">{selectedInsurance.name}</span> - ₹{selectedInsurance.price}</span>
+                  <button 
+                    onClick={() => setSelectedInsurance(null)} 
+                    className="text-red-500 hover:text-red-600 flex items-center p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    <X className="h-4 w-4 mr-1" /> Remove
+                  </button>
+                </div>
+              )}
+
+              <div className="mt-8 pt-6 border-t border-slate-100">
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm text-slate-600">
+                    <span>Rental Duration</span>
+                    <span className="font-medium text-slate-900">{calculateTotalHours()} hours</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-slate-600">
+                    <span>Rental Amount</span>
+                    <span className="font-medium text-slate-900">₹{rentalAmount.toFixed(2)}</span>
+                  </div>
+                  <div className="text-xs text-slate-500 ml-4">
+                    ₹{(product.price / 24).toFixed(2)}/hour × {calculateTotalHours()} hours
+                  </div>
+                  <div className="flex justify-between text-sm text-slate-600">
+                    <span>Insurance</span>
+                    <span className="font-medium text-slate-900">₹{selectedInsurance ? selectedInsurance.price : 0}</span>
+                  </div>
+                </div>
+                
+                <div className="flex justify-between font-bold text-lg mt-6 pt-4 border-t border-slate-200">
+                  <span className="text-slate-900">Total Amount</span>
+                  <span className="text-blue-600">₹{calculateTotal().toFixed(2)}</span>
+                </div>
+              </div>
+
+              <button 
+                onClick={handleSubmit} 
+                disabled={!startDate || !endDate || calculateTotalHours() === 0} 
+                className="w-full mt-8 bg-blue-600 text-white py-4 rounded-xl font-medium hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-all duration-200 shadow-md disabled:shadow-none flex items-center justify-center text-base"
+              >
+                {(!startDate || !endDate) ? 'Select Dates to Continue' : 'Add to Cart'}
               </button>
-            </div>
-          )}
-
-          <div className="mt-6 border-t pt-6">
-            <div className="flex justify-between text-sm mb-2">
-              <span>Rental Duration:</span>
-              <span>{calculateTotalHours()} hours</span>
-            </div>
-            <div className="flex justify-between text-sm mb-2">
-              <span>Rental Amount (₹{(product.price / 24).toFixed(2)}/hour × {calculateTotalHours()} hours)</span>
-              <span>₹{rentalAmount.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm mb-2">
-              <span>Insurance Amount</span>
-              <span>₹{selectedInsurance ? selectedInsurance.price : 0}</span>
-            </div>
-            <div className="flex justify-between font-semibold text-lg mt-4">
-              <span>Total Amount</span>
-              <span>₹{calculateTotal().toFixed(2)}</span>
+              
+              <p className="text-center text-xs text-slate-500 mt-3">
+                Your rental will be processed immediately after adding to cart
+              </p>
             </div>
           </div>
-
-          <button 
-            onClick={handleSubmit} 
-            disabled={!startDate || !endDate || calculateTotalHours() === 0} 
-            className="w-full mt-6 bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 disabled:bg-gray-400 transition-colors"
-          >
-            Add to Cart
-          </button>
         </div>
       </div>
     </div>
