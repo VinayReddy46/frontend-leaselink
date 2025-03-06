@@ -34,6 +34,12 @@ import ProfileSettings from "./compoments/profileComponents/ProfileSettings";
 import MyOrders from "./compoments/profileComponents/MyOrders";
 import NotificationDetails from "./compoments/navbarComponents/NotificationDetails";
 import Checkout from "./compoments/HomeComponents/Checkout";
+import HelpDesk from "./compoments/Helpdesk/HelpDesk";
+import HelpTopic from "./compoments/Helpdesk/HelpTopic";
+import Article from "./compoments/Helpdesk/Article";
+import ContactSupport from "./compoments/Helpdesk/ContactSupport";
+import DisputaAndFile from "./compoments/Helpdesk/DisputeAndFile";
+import { SearchProvider } from "./compoments/contexts/SearchContext";
  
 
 const Laptops = () => <h1>Laptops Page</h1>;
@@ -70,6 +76,7 @@ function App() {
   }, [cartItems]);
 
   return (
+    <SearchProvider>
      <div>
       
       {!isAdminRoute && <Navbar />} {/* Show Navbar only for non-admin routes */}
@@ -96,8 +103,12 @@ function App() {
         <Route path="/settings" element={<ProfileSettings/>} />
         <Route path="/myorders" element={<MyOrders/>} />
         <Route path="/checkout" element={<Checkout/>} />
-
         <Route path="*" element={<Error/>}/>
+        <Route path="/Helpdesk" element={<HelpDesk/>} />
+          <Route path="/help-topic/:topicId" element={<HelpTopic />} />
+          <Route path="/article/:articleId" element={<Article />} />
+          <Route path="/contact-support" element={<ContactSupport />} />
+          <Route path="/disputeandfile" element={<DisputaAndFile/>} />
 
        
         <Route path="/laptops" element={<Laptops />} />
@@ -130,6 +141,7 @@ function App() {
 
     
       </div>
+      </SearchProvider>
   );
 }
 
