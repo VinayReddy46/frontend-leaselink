@@ -1,17 +1,19 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  increaseQuantity,
-  decreaseQuantity,
-  removeFromCart,
-} from "../../redux/cartSlice";
+import { increaseQuantity, decreaseQuantity, removeFromCart } from "../../redux/cartSlice";
 import { AiOutlinePlus, AiOutlineMinus, AiOutlineDelete } from "react-icons/ai";
 import { Link } from "react-router-dom";
 
 const Cart = () => {
-  const { cartItems, totalPrice } = useSelector((state) => state.cart);
-  console.log(cartItems,totalPrice)
+  const { cartItems } = useSelector((state) => state.cart);
+  
   const dispatch = useDispatch();
+
+  // Calculate total price dynamically
+  const totalPrice = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
 
   return (
     <div className="max-w-5xl min-h-[70vh] mx-auto px-6 mt-24">
@@ -20,7 +22,6 @@ const Cart = () => {
         <p className="text-gray-600 text-lg">Your cart is empty.</p>
       ) : (
         <div className="w-full border border-gray-300 rounded-lg overflow-hidden shadow-lg">
-          {/* Table Header */}
           <div className="bg-gray-100 p-3 font-semibold flex justify-between text-gray-800 text-sm md:text-base">
             <span className="w-2/5">Product</span>
             <span className="w-1/5 text-center">Price</span>
@@ -28,11 +29,9 @@ const Cart = () => {
             <span className="w-1/5 text-center">Total</span>
           </div>
 
-          {/* Cart Items */}
           <div className="divide-y divide-gray-200">
             {cartItems.map((item) => (
               <div key={item.id} className="flex flex-col md:flex-row items-center p-4 gap-4 md:gap-0">
-                {/* Product Info */}
                 <div className="w-full md:w-2/5 flex items-center gap-4">
                   <img
                     src={item.image}
@@ -42,12 +41,10 @@ const Cart = () => {
                   <span className="text-gray-800 font-medium">{item.name}</span>
                 </div>
 
-                {/* Price */}
                 <span className="w-full md:w-1/5 text-center text-gray-700 text-sm md:text-base">
-                  ₹{item.subTotal.toLocaleString()}
+                  ₹{item.price.toLocaleString()}
                 </span>
 
-                {/* Quantity Controls */}
                 <div className="w-full md:w-1/5 flex justify-center items-center gap-2">
                   {item.quantity > 1 ? (
                     <button
@@ -75,15 +72,13 @@ const Cart = () => {
                   </button>
                 </div>
 
-                {/* Total Price */}
                 <span className="w-full md:w-1/5 text-center text-gray-700 text-sm md:text-base">
-                  ₹{item.totalPrice.toLocaleString()}
+                  ₹{(item.price * item.quantity).toLocaleString()}
                 </span>
               </div>
             ))}
           </div>
 
-          {/* Cart Footer */}
           <div className="bg-gray-100 p-4 flex justify-between font-semibold text-gray-800 text-lg">
             <span>Total Price:</span>
             <span>₹{totalPrice.toLocaleString()}</span>
@@ -91,7 +86,6 @@ const Cart = () => {
         </div>
       )}
 
-      {/* Checkout Button */}
       {cartItems.length > 0 && (
         <div className="mt-6 text-center">
           <Link to="/checkout">
