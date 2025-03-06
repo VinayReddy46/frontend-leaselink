@@ -52,6 +52,26 @@ export default function RentalList() {
   const [selectedCategory, setSelectedCategory] = useState("");  
   const [selectedPrice, setSelectedPrice] = useState("");
 
+  // const [dummyListings, setdummyListings]=useState([])
+  // const [loading, setLoading] = useState(true)
+
+  // useEffect(() => {
+  //   axios
+  //     .get("http://localhost:5000/dummyListings") // Replace with your API URL
+  //     .then((response) => {
+  //       setdummyListings(response.data);
+  //       setLoading(false);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching data:", error);
+  //       setLoading(false);
+  //     });
+  // }, []);
+  
+  // if (loading) {
+  //   return <p>Loading dummyListings...</p>;
+  // }
+
   const filteredListings = dummyListings.filter((listing) =>
     listing.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
     (selectedCategory ? listing.category === selectedCategory : true)

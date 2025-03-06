@@ -3,6 +3,24 @@ import { FaChevronDown } from 'react-icons/fa';
 import { FaQuestion } from "react-icons/fa6";
 const FAQSection = () => {
   const [openIndex, setOpenIndex] = useState(null);
+   // const [faqs, setfaqs] = useState([]);
+  // const [loading, setLoading] = useState(true)
+
+  // useEffect(() => {
+  //   axios
+  //     .get("http://localhost:5000/faqs") // Replace with your API URL
+  //     .then((response) => {
+  //       setfaqs(response.data);
+  //       setLoading(false);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching data:", error);
+  //       setLoading(false);
+  //     });
+  // }, []);
+  // if (loading) {
+  //   return <p>Loading faqs...</p>;
+  // }
 
   const faqs = [
     {

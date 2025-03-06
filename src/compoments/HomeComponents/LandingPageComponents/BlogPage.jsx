@@ -1,10 +1,29 @@
 import React from "react";
-import LogoCarousel from "./LogoCarousel";
+import LogoCarousel from "../LandingPageComponents/LogoCarousel";
 import { useState, useEffect } from "react";
 import { FaUser, FaRegCalendarAlt, FaArrowRight } from "react-icons/fa";
-import AnimationScroller from "../../utils/AnimationScroller"
+import AnimationScroller from "../../../utils/AnimationScroller"
 
 const BlogPage = () => {
+  // const [blogPosts, setblogPosts]=useState([])
+  // const [loading, setLoading] = useState(true)
+
+  // useEffect(() => {
+  //   axios
+  //     .get("http://localhost:5000/blogPosts") // Replace with your API URL
+  //     .then((response) => {
+  //       setblogPosts(response.data);
+  //       setLoading(false);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching data:", error);
+  //       setLoading(false);
+  //     });
+  // }, []);
+  
+  // if (loading) {
+  //   return <p>Loading blogPosts...</p>;
+  // }
   
     const blogPosts = [
       {

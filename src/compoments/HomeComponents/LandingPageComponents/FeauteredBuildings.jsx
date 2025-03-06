@@ -55,6 +55,25 @@ const buildings = [
 const BuildingCard = ({ building }) => {
   const navigate = useNavigate();
 
+  // const [buildings, setbuildings] = useState([]);
+  // const [loading, setLoading] = useState(true)
+
+  // useEffect(() => {
+  //   axios
+  //     .get("http://localhost:5000/buildings") // Replace with your API URL
+  //     .then((response) => {
+  //       setbuildings(response.data);
+  //       setLoading(false);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching data:", error);
+  //       setLoading(false);
+  //     });
+  // }, []);
+  // if (loading) {
+  //   return <p>Loading buildings...</p>;
+  // }
+
   const handleRentClick = () => {
     navigate(`/rental`); 
   };

@@ -97,6 +97,9 @@ const ReviewSection = ({ reviews, onSubmitReview }) => {
     });
   };
 
+  // Emojis for rating
+  const ratingEmojis = ['😠', '😞', '😐', '😊', '😍'];
+
   return (
     <div className="bg-gradient-to-br from-blue-50 to-purple-50 shadow-xl rounded-lg p-6 border border-gray-200">
       <h2 className="text-lg sm:text-xl font-bold mb-4 text-gray-800">Ratings & Reviews</h2>
@@ -115,19 +118,23 @@ const ReviewSection = ({ reviews, onSubmitReview }) => {
           {/* Rating */}
           <div className="bg-gradient-to-r from-blue-100 to-purple-100 p-4 rounded-lg shadow-sm">
             <label className="block mb-2 font-medium text-gray-700">Rating</label>
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  className={`text-xl sm:text-2xl ${
-                    star <= newReview.rating ? 'text-yellow-400' : 'text-gray-300'
-                  } cursor-pointer hover:scale-110 transition-transform`}
-                  onClick={() => setNewReview((prev) => ({ ...prev, rating: star }))}
-                >
-                  ★
-                </button>
-              ))}
+            <div className="flex items-center justify-center gap-4">
+              <div className="flex items-center gap-2">
+                {ratingEmojis.map((emoji, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    className={`text-3xl ${
+                      index + 1 <= newReview.rating
+                        ? 'opacity-100 transform scale-110'
+                        : 'opacity-50'
+                    } cursor-pointer transition-all duration-200 hover:scale-125`}
+                    onClick={() => setNewReview((prev) => ({ ...prev, rating: index + 1 }))}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -147,7 +154,7 @@ const ReviewSection = ({ reviews, onSubmitReview }) => {
           </div>
 
           {/* Reviewer Name */}
-          <div className="bg-gradient-to-r from-blue-100 to-purple-100 p-4  shadow-sm">
+          <div className="bg-gradient-to-r from-blue-100 to-purple-100 p-4 rounded-lg shadow-sm">
             <label className="block mb-2 font-medium text-gray-700">Your Name</label>
             <input
               type="text"
@@ -238,11 +245,11 @@ const ReviewSection = ({ reviews, onSubmitReview }) => {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
+                {ratingEmojis.map((emoji, index) => (
                   <span
-                    key={star}
-                    className={`text-xl sm:text-2xl ${
-                      star <= review.rating ? 'text-yellow-400' : 'text-gray-300'
+                    key={index}
+                    className={`text-2xl ${
+                      index + 1 <= review.rating ?  'text-yellow-400' : 'text-gray-300'
                     }`}
                   >
                     ★

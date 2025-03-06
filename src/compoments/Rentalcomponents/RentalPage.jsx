@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ProductCard from "../CartComponents/ProductCard";
-import SearchFilter from "./SearchFilter";
+import SearchFilter from "../Rentalcomponents/SearchFilter";
 import productsData from "../CartComponents/Product";  
 
 const RentalPage = () => {

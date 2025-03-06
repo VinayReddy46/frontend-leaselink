@@ -28,6 +28,25 @@ const ProductList = () => {
 
   const [selected,setSelected] = useState('');
 
+  // const [productData, setproductData] = useState([]);
+  // const [loading, setLoading] = useState(true)
+
+  // useEffect(() => {
+  //   axios
+  //     .get("http://localhost:5000/productData") // Replace with your API URL
+  //     .then((response) => {
+  //       setproductData(response.data);
+  //       setLoading(false);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching data:", error);
+  //       setLoading(false);
+  //     });
+  // }, []);
+  // if (loading) {
+  //   return <p>Loading productData...</p>;
+  // }
+
   const handleSetCategory = (category) =>{
     setSelected(category)
   }

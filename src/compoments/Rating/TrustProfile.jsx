@@ -17,7 +17,7 @@ const TrustProfile = ({ userProfile }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-4xl mx-auto border border-gray-100">
+    <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-4xl mx-auto border border-gray-100 mt-[70px]">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg sm:text-xl font-bold text-gray-900">Trust Profile</h2>
         {userProfile.verificationLevel === 'verified' && (
