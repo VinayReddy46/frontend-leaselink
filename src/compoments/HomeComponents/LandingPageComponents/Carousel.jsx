@@ -194,7 +194,7 @@ function ResponsiveCarousel() {
   return (
     <div
       ref={carouselRef}
-      className="relative w-full max-w-full h-[60vh] sm:h-[70vh] md:h-[80vh] lg:h-[90vh] xl:h-[100vh] overflow-hidden rounded-xl shadow-xl group bg-gray-900"
+      className="relative w-full max-w-full h-[60vh] sm:h-[70vh] md:h-[80vh] lg:h-[90vh] xl:h-[90vh] overflow-hidden rounded-xl shadow-xl group bg-gray-900 mt-20"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => {
         if (isAutoScrollEnabled) {

@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import Notifications from "./navbarComponents/Notifications";
 import { AiOutlineProduct } from "react-icons/ai";
 import { IoCartOutline } from "react-icons/io5";
+import Wallet from "./navbarComponents/Wallet";
 
 function Navbar() {
   const { totalQuantity } = useSelector((state) => state.cart);
@@ -265,16 +266,20 @@ function Navbar() {
 
             {/* Notification and Cart Icons */}
             <div className="flex items-center space-x-2">
+             
               <Notifications />
 
               <Link to="/cart" className="p-2.5 text-gray-600 rounded-full hover:bg-gray-100 hover:text-blue-600 transition-colors relative">
                 <FaShoppingCart className="w-5 h-5" />
+                
+
                 {totalQuantity > 0 && (
                   <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold px-1.5 min-w-[18px] h-[18px] rounded-full flex items-center justify-center">
                     {totalQuantity}
                   </span>
                 )}
               </Link>
+               <Wallet/>
             </div>
 
             {/* User Profile or Login Button */}
