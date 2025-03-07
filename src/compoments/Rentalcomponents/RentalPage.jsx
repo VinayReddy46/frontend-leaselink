@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ProductCard from "../CartComponents/ProductCard";
-import SearchFilter from "../Rentalcomponents/SearchFilter";
-import productsData from "../CartComponents/Product";  
+import SearchFilter from "./SearchFilter";
+import productsData from "../CartComponents/Product";
 
 const RentalPage = () => {
-  const { category } = useParams(); 
+  const { category } = useParams();
   const [filteredProducts, setFilteredProducts] = useState([]);
 
   useEffect(() => {
@@ -34,21 +34,21 @@ const RentalPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 flex mt-16">
-    
-      <div className="w-1/4">
+    <div className="container mx-auto px-4 py-8 flex flex-col lg:flex-row mt-10">
+      {/* Filters Section */}
+      <div className="w-full lg:w-1/4 mb-8 lg:mb-0 lg:pr-4">
         <SearchFilter onFilterChange={handleFilterChange} />
       </div>
 
-     
-      <div className="w-3/4">
+      {/* Products Section */}
+      <div className="w-full lg:w-3/4">
         <h2 className="text-2xl font-bold mb-6">
           {category ? `Products in ${category}` : "All Products"}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />  
+              <ProductCard key={product.id} product={product} />
             ))
           ) : (
             <p className="text-gray-500 text-center col-span-full">
