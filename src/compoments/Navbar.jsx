@@ -23,7 +23,7 @@ function Navbar() {
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const role = 'userr1'; // This would normally come from your auth context/state
+  const role = 'user'; // This would normally come from your auth context/state
 
   // Check if user is logged in on component mount
   useEffect(() => {
@@ -64,7 +64,7 @@ function Navbar() {
         { name: "Video Conferencing", link: "/rental/video" },
       ],
     },
-    role === 'user1' ?
+    role === 'user' ?
       { name: "Add Product", link: "/addproduct" }
       : { name: "Dashboard", link: "/admin" }
   ];
@@ -528,3 +528,4 @@ function Navbar() {
 }
 
 export default Navbar;
+

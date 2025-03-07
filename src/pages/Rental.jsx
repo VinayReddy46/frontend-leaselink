@@ -13,8 +13,6 @@ const Rental = () => {
       {/* <productsData/> */}
       <RentalPage products={ProductsData} />
 
-      
-      
     </div>
   );
 };

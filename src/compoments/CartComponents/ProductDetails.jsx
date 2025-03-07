@@ -158,12 +158,11 @@ const ProductDetails = () => {
   }, [isTransitioning, currentSlide]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="container mx-auto py-8 px-4 md:px-12">
+    <div className="mx-auto my-4 py-8 px-4 md:px-12">
       <button onClick={() => navigate(-1)} className="text-gray-600 flex items-center mb-6 hover:text-gray-800">
         <ArrowLeft className="h-5 w-5 mr-2" /> Back to Products
       </button>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-lg shadow-lg">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-lg shadow-lg bg-[#2973B2]">
         <div>
           {/* Enhanced Image Carousel */}
           <div className="w-full h-80 relative mb-6 bg-gray-100 rounded-lg overflow-hidden">
@@ -182,7 +181,7 @@ const ProductDetails = () => {
                       <img 
                         src={image} 
                         alt={`${product.name} - image ${index + 1}`} 
-                        className="object-contain w-full h-full"
+                        className="object-fit w-full h-full"
                       />
                     </div>
                   ))}
@@ -235,7 +234,7 @@ const ProductDetails = () => {
                 )}
               </>
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-400">No image available</div>
+              <div className="flex items-center bg-[#C4D7FF] justify-center h-full text-gray-400">No image available</div>
             )}
           </div>
 
@@ -283,10 +282,10 @@ const ProductDetails = () => {
           </div>
         </div>
 
-        <div className="bg-gray-50 p-6 rounded-lg">
+        <div className="bg-[#142850] text-white p-6 rounded-lg">
           <h3 className="text-xl font-semibold mb-4">Rental Details</h3>
           <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700">Start Date & Time</label>
+            <label className="block text-sm font-medium">Start Date & Time</label>
             <DatePicker
               selected={startDate}
               onChange={(date) => setStartDate(date)}
@@ -296,7 +295,7 @@ const ProductDetails = () => {
               minDate={new Date()} 
             />
 
-            <label className="block text-sm font-medium text-gray-700">End Date & Time</label>
+            <label className="block text-sm font-medium">End Date & Time</label>
             <DatePicker
               selected={endDate}
               onChange={(date) => setEndDate(date)}
@@ -316,11 +315,11 @@ const ProductDetails = () => {
                 onClick={() => setSelectedInsurance(plan)}
               >
                 <div className="flex items-center">
-                  <Shield className="h-5 w-5 text-indigo-600 mr-2" />
+                  <Shield className="h-5 w-5 text-[#FF7F3E] mr-2" />
                   <div>
                     <h4 className="font-medium">{plan.name}</h4>
-                    <p className="text-sm text-gray-600">{plan.description}</p>
-                    <p className="text-indigo-600 font-medium mt-1">₹{plan.price}</p>
+                    <p className="text-sm text-gray-600 text-[#80C4E9]">{plan.description}</p>
+                    <p className="tex font-medium mt-1">₹{plan.price}</p>
                   </div>
                 </div>
               </div>
@@ -358,7 +357,7 @@ const ProductDetails = () => {
           <button 
             onClick={handleSubmit} 
             disabled={!startDate || !endDate || calculateTotalHours() === 0} 
-            className="w-full mt-6 bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 disabled:bg-gray-400 transition-colors"
+            className="w-full mt-6 text-white py-3 rounded-lg font-medium disabled:bg-[#FF6500] hover:bg-indigo-700  transition-colors"
           >
             Add to Cart
           </button>
