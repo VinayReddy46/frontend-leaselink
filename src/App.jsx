@@ -31,6 +31,7 @@ import UserManagement from "./compoments/admin/UserMangement";
 import TrustSystem from "./pages/Ratings";
 import AboutUs from "./pages/About"
 import NotificationDetails from "./compoments/navbarComponents/NotificationDetails"
+import WalletDetails from "./compoments/navbarComponents/WalletDetails"
 import Profile from "./pages/Profile";
 import MyOrders from "./compoments/profileComponents/MyOrders";
 import Checkout from "./compoments/CartComponents/Checkout";
@@ -92,6 +93,7 @@ function App() {
         <Route path="/cart" element={<Cart/>}/>
         <Route path="/aboutus" element={<AboutUs/>}/>
         <Route path="/notification/:id" element={<NotificationDetails/>}/>
+        <Route path="/wallet"element={<WalletDetails/>}/>
          {/* added */}
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path='/forgot-password' element={<ForgotPassword/>}/>
