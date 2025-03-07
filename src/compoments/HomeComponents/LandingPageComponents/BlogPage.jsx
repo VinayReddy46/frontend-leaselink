@@ -111,20 +111,6 @@ const BlogPage = () => {
         </div>
       ))}
     </div>       
-
-    
-        <div className="mt-12 flex justify-center">
-          <nav className="inline-flex rounded-md shadow">
-            <a href="#" className="px-4 py-2 bg-gray-200 text-gray-700 rounded-l-md hover:bg-gray-300">Previous</a>
-            <a href="#" className="px-4 py-2 bg-indigo-500 text-white">1</a>
-            <a href="#" className="px-4 py-2 bg-gray-200 text-gray-700 hover:bg-gray-300">2</a>
-            <a href="#" className="px-4 py-2 bg-gray-200 text-gray-700 hover:bg-gray-300">3</a>
-            <a href="#" className="px-4 py-2 bg-gray-200 text-gray-700 rounded-r-md hover:bg-gray-300">Next</a>
-          </nav>
-        </div>
-        
-
-
       </div>
     );
   };
