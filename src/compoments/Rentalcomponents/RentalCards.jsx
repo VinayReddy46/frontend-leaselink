@@ -1,47 +1,64 @@
-import { FaHandsHelping, FaGlobe, FaMoneyBillWave } from "react-icons/fa";
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import ProductCard from "../CartComponents/ProductCard";
+import SearchFilter from "./SearchFilter";
+import productsData from "../CartComponents/Product";
 
-const services = [
-  {
-    icon: <motion.div className="flex justify-center" whileHover={{ scaleX: -1 }} transition={{ duration: 0.3 }}><FaHandsHelping className="text-blue-500 text-5xl mb-4" /></motion.div>, 
-    title: "Quality Service",
-    description: "There are many variations of passages available but the majority have suffered alteration in some form."
-  },
-  {
-    icon: <motion.div className="flex justify-center" whileHover={{ scaleX: -1 }} transition={{ duration: 0.3}}><FaGlobe className="text-blue-500 text-5xl mb-4" /></motion.div>, 
-    title: "Online Booking",
-    description: "There are many variations of passages available but the majority have suffered alteration in some form."
-  },
-  {
-    icon: <motion.div className="flex justify-center" whileHover={{ scaleX: -1 }} transition={{ duration: 0.5 }}><FaMoneyBillWave className="text-blue-500 text-5xl mb-4" /></motion.div>, 
-    title: "Affordable Pricing",
-    description: "There are many variations of passages available but the majority have suffered alteration in some form."
-  }
-];
+const RentalPage = () => {
+  const { category } = useParams();
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
-export default function RentalCards() {
+  useEffect(() => {
+    let updatedProducts = category
+      ? productsData.filter((product) => product.category === category)
+      : productsData;
+    setFilteredProducts(updatedProducts);
+  }, [category]);
+
+  const handleFilterChange = (filters) => {
+    let filtered = category
+      ? productsData.filter((product) => product.category === category)
+      : productsData;
+
+    if (filters.price) {
+      filtered = filtered.filter((product) => product.price <= parseInt(filters.price));
+    }
+    if (filters.processor) {
+      filtered = filtered.filter((product) => product.processor === filters.processor);
+    }
+    if (filters.brand) {
+      filtered = filtered.filter((product) => product.brand === filters.brand);
+    }
+
+    setFilteredProducts(filtered);
+  };
+
   return (
-    <div className="container mx-auto px-6 py-12 flex justify-center items-center min-h-screen flex-col">
-      <motion.div 
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center"
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2 }}
-        
-      >
-        {services.map((service, index) => (
-          <motion.div 
-            key={index} 
-            className="bg-white p-4 rounded-lg shadow-lg shadow-gray-400 text-center w-64 sm:w-72 md:w-80 mx-auto"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.3 }}
-          >
-            {service.icon}
-            <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
-            <p className="text-gray-600">{service.description}</p>
-          </motion.div>
-        ))}
-      </motion.div>
+    <div className="px-4 py-8 flex flex-col lg:flex-row mt-10">
+      {/* Filters Section */}
+      <div className="w-full lg:w-1/4 mb-8 lg:mb-0 lg:pr-4">
+        <SearchFilter onFilterChange={handleFilterChange} />
+      </div>
+
+      {/* Products Section */}
+      <div className="w-full lg:w-3/4">
+        <h2 className="text-2xl font-bold mb-6">
+          {category ? `Products in ${category}` : "All Products"}
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))
+          ) : (
+            <p className="text-gray-500 text-center col-span-full">
+              No products found matching the filters.
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default RentalPage;
