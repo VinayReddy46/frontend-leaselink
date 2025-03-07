@@ -155,7 +155,7 @@ function Navbar() {
   return (
     <header className="w-screen bg-white shadow-md fixed top-0 left-0 right-0 z-50">
       {/* Main Navigation */}
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20">
           {/* Logo and brand */}
           <div className="flex items-center">
