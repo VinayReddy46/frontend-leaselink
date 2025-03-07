@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import logo from "../assets/logoForPages.webp";
-
+import { useLoginMutation,useForgotPasswordMutation } from "../redux/services/authSlice";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,13 +12,28 @@ const Login = () => {
 
   const navigate = useNavigate();
 
+  const [login, { isLoading: isLoggingIn }] = useLoginMutation();
+  const [forgot, { isLoading: isForgotLoading }] = useLoginMutation();
+
   const submitHandler = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    try {
+      const res=await login({email,password});
+      // console.log("login response",res.cookie)
+      // localStorage.setItem("accessToken", res.data.accessToken);
+      // localStorage.setItem("refreshToken", res.data.refreshToken);
+console.log("res.data.accessToken",res.data.accessToken)
+      if(res.data.status==="success"){
+        toast.success( res?.data?.message ||"Login successful.");
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error?.data?.message || "Login Failed")
+    }
 
-    toast.success("Login Successful! Welcome back!");
-    navigate("/");
-    setIsLoading(false);
+   
+    
   };
 
   return (
@@ -92,9 +107,9 @@ const Login = () => {
             <button
               type="submit"
               className="bg-blue-500 w-full text-white px-4 py-2 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
-              disabled={isLoading}
+              disabled={isLoggingIn}
             >
-              {isLoading ? "Loading..." : "Login"}
+              {isLoggingIn ? "Loading..." : "Login"}
             </button>
           </div>
         </form>
