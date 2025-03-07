@@ -5,12 +5,13 @@ import { AiOutlinePlus, AiOutlineMinus, AiOutlineDelete } from "react-icons/ai";
 import { Link } from "react-router-dom";
 
 const Cart = () => {
-  const { cartItems } = useSelector((state) => state.cart);
+  const { cartItems ,totalPrice} = useSelector((state) => state.cart);
+  console.log(cartItems, totalPrice)
   
   const dispatch = useDispatch();
 
-  // Calculate total price dynamically
-  const totalPrice = cartItems.reduce(
+  // // Calculate total price dynamically
+  const settotalPrice = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
   );
@@ -81,7 +82,7 @@ const Cart = () => {
 
           <div className="bg-gray-100 p-4 flex justify-between font-semibold text-gray-800 text-lg">
             <span>Total Price:</span>
-            <span>₹{totalPrice.toLocaleString()}</span>
+            <span>₹{settotalPrice.toLocaleString()}</span>
           </div>
         </div>
       )}
