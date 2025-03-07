@@ -10,7 +10,9 @@ import {
   FaWallet, 
   FaStore, 
   FaEdit, 
-  FaSave 
+  FaSave,
+  FaShieldAlt,
+  FaCalendarAlt 
 } from 'react-icons/fa';
 
 const Checkout = () => {
@@ -28,6 +30,9 @@ const Checkout = () => {
     city: '',
     state: '',
     zipCode: '',
+    ukIdType: '', // New field for UK ID type
+    ukIdNumber: '', // New field for UK ID number
+    ukIdPhoto: null // New field for UK ID photo
   });
   
   const [deliveryOption, setDeliveryOption] = useState('standard');
@@ -42,14 +47,46 @@ const Checkout = () => {
   // Error states
   const [errors, setErrors] = useState({});
   const [billingEditable, setBillingEditable] = useState(true);
+
+  // Handle ID photo upload
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5000000) { // 5MB limit
+        setErrors({...errors, ukIdPhoto: 'File size should be less than 5MB'});
+        return;
+      }
+      setBillingDetails({...billingDetails, ukIdPhoto: file});
+      setErrors({...errors, ukIdPhoto: null});
+    }
+  };
+
+  // Validate UK ID fields
+  const validateUkId = () => {
+    const newErrors = {};
+    
+    if (!billingDetails.ukIdType) {
+      newErrors.ukIdType = 'Please select an ID type';
+    }
+    
+    if (!billingDetails.ukIdNumber) {
+      newErrors.ukIdNumber = 'ID number is required';
+    }
+    
+    if (!billingDetails.ukIdPhoto) {
+      newErrors.ukIdPhoto = 'Please upload a photo of your ID';
+    }
+    
+    return newErrors;
+  };
   
   // Load cart data from localStorage
   useEffect(() => {
     try {
-      const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-      setCart(Array.isArray(storedCart) ? storedCart : []);
+      const cartData = JSON.parse(localStorage.getItem('cartData')) || { items: [], total: 0 };
+      setCart(cartData.items || []);
       
-      // Load saved form data if available
+      // Rest of the localStorage loading logic remains the same
       const savedBillingDetails = JSON.parse(localStorage.getItem('billingDetails'));
       if (savedBillingDetails) {
         setBillingDetails(savedBillingDetails);
@@ -78,7 +115,9 @@ const Checkout = () => {
   
   // Calculate costs
   const calculateSubtotal = () => {
-    return cart.reduce((total, item) => total + (item.total || 0), 0);
+    return cart.reduce((total, item) => {
+      return total + ((item.rentalAmount + (item.insurance?.price || 0)) * (item.quantity || 1));
+    }, 0);
   };
   
   const getDeliveryCost = () => {
@@ -376,6 +415,51 @@ const Checkout = () => {
             />
             {errors.zipCode && <p className="text-red-500 text-xs mt-1">{errors.zipCode}</p>}
           </div>
+          {/* UK ID Type */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">UK ID Type</label>
+          <select
+            value={billingDetails.ukIdType}
+            onChange={(e) => setBillingDetails({...billingDetails, ukIdType: e.target.value})}
+            className={`w-full p-2 border rounded ${errors.ukIdType ? 'border-red-500' : 'border-gray-300'}`}
+          >
+            <option value="">Select ID Type</option>
+            <option value="passport">Passport</option>
+            <option value="driving_license">Driving License</option>
+            <option value="national_id">National ID</option>
+          </select>
+          {errors.ukIdType && <p className="text-red-500 text-xs mt-1">{errors.ukIdType}</p>}
+        </div>
+        
+        {/* UK ID Number */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">UK ID Number</label>
+          <input
+            type="text"
+            value={billingDetails.ukIdNumber}
+            onChange={(e) => setBillingDetails({...billingDetails, ukIdNumber: e.target.value})}
+            className={`w-full p-2 border rounded ${errors.ukIdNumber ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {errors.ukIdNumber && <p className="text-red-500 text-xs mt-1">{errors.ukIdNumber}</p>}
+        </div>
+        
+        {/* UK ID Photo Upload */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Upload ID Photo</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handlePhotoUpload}
+            className={`w-full p-2 border rounded ${errors.ukIdPhoto ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {errors.ukIdPhoto && <p className="text-red-500 text-xs mt-1">{errors.ukIdPhoto}</p>}
+          {billingDetails.ukIdPhoto && (
+            <p className="text-sm text-green-600 mt-1">
+              File selected: {billingDetails.ukIdPhoto.name}
+            </p>
+          )}
+          <p className="text-xs text-gray-500 mt-1">Maximum file size: 5MB</p>
+        </div>
         </div>
       </div>
     );
@@ -584,6 +668,7 @@ const Checkout = () => {
   };
   
   // Render order summary
+  // Render order summary with detailed price breakdown
   const renderOrderSummary = () => {
     return (
       <div className="bg-white rounded-lg shadow-sm p-6 sticky top-6">
@@ -591,11 +676,42 @@ const Checkout = () => {
         
         <div className="space-y-4 mb-6">
           {cart.map((item, index) => (
-            <div key={index} className="flex justify-between">
-              <span className="text-gray-600">
-                {item.name} x {item.quantity || 1}
-              </span>
-              <span className="font-medium">₹{(item.total || 0).toFixed(2)}</span>
+            <div key={index} className="border-b pb-4">
+              <div className="flex justify-between mb-2">
+                <span className="text-gray-800 font-medium">{item.name}</span>
+                <span className="font-medium">x {item.quantity || 1}</span>
+              </div>
+              
+              {/* Rental Period */}
+              <div className="text-sm text-gray-600 mb-2 flex items-center">
+                <FaCalendarAlt className="mr-2" />
+                <span>
+                  {new Date(item.startDate).toLocaleDateString()} - {new Date(item.endDate).toLocaleDateString()}
+                </span>
+              </div>
+              
+              {/* Price Breakdown */}
+              <div className="text-sm space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Rental Amount</span>
+                  <span>₹{item.rentalAmount}</span>
+                </div>
+                
+                {item.insurance && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600 flex items-center">
+                      <FaShieldAlt className="mr-1" />
+                      Insurance ({item.insurance.name})
+                    </span>
+                    <span>₹{item.insurance.price}</span>
+                  </div>
+                )}
+                
+                <div className="flex justify-between font-medium pt-1">
+                  <span>Item Total</span>
+                  <span>₹{((item.rentalAmount + (item.insurance?.price || 0)) * item.quantity).toFixed(2)}</span>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -700,9 +816,9 @@ const Checkout = () => {
               </div>
             </div>
             
-            <div className="w-full lg:w-1/3">
-              {renderOrderSummary()}
-            </div>
+            <div className="container mx-auto px-4 py-8">
+      {renderOrderSummary()}
+    </div>
           </div>
         </>
       )}
