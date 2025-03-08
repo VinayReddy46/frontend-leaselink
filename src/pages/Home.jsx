@@ -1,6 +1,5 @@
 import React from 'react'
 import Carousel from '../compoments/HomeComponents/LandingPageComponents/Carousel.jsx'
-import RentalCards from '../compoments/Rentalcomponents/RentalCards.jsx'
 import CarRentalSection from '../compoments/HomeComponents/LandingPageComponents/CarRentalSection.jsx'
 import FeaturedBuildings from '../compoments/HomeComponents/LandingPageComponents/FeauteredBuildings.jsx'
 import BlogPage from '../compoments/HomeComponents/LandingPageComponents/BlogPage.jsx'
