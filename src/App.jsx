@@ -42,6 +42,7 @@ import Myrentedproducts from "./compoments/profileComponents/MyRentedProducts";
 import { WishlistProvider } from "./compoments/contexts/WishlistContext";
 import WishlistPage from "./compoments/HomeComponents/LandingPageComponents/WishlistPage";
 import HelpdeskBtn from "./pages/HelpdeskBtn";
+import Contact from "./pages/Contact";
 
 
 const Laptops = () => <h1>Laptops Page</h1>;
@@ -139,6 +140,7 @@ function App() {
               <Route path="categories" element={<CategoryList />} />
               <Route path="users-management" element={<UserManagement />} />
             </Route>
+            <Route path="/contact" element={<Contact/>} />
           </Routes>
 
 
