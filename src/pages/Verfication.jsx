@@ -40,7 +40,7 @@ const OtpVerification = () => {
     try {
       const res=await verify({email,otp:otpCode})
       console.log(res)
-      if(res.data.status==="success"){
+      if(res?.data?.success){
         toast.success( res?.data?.message ||"User registered successfully.");
         navigate("/login");
       }
@@ -61,7 +61,7 @@ const OtpVerification = () => {
     try {
       const res = await resend({email})
       console.log(res)
-      if(res.data.status==="success"){
+      if(res.data.success){
         toast.success(res?.data?.message|| "OTP resent successfully!");
       }
       

@@ -35,6 +35,7 @@ import {
   useDeleteCategoryMutation,
 } from "../../../redux/services/categoriesSlice";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const iconMapping = {
   LaptopChromebook: <MdLaptopChromebook />,
@@ -91,10 +92,9 @@ const CategoryList = () => {
       if (currentCategory) {
         console.log(currentCategory);
         if (currentCategory._id) {
-
           const res = await updateCategory({
             id: currentCategory._id,
-            currentCategory,
+            updatedCategory:currentCategory,
           });
 
           console.log(res);
@@ -115,8 +115,26 @@ const CategoryList = () => {
   };
 
   const handleDelete = async (id) => {
-    await deleteCategory(id);
-    refetch();
+    try {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await deleteCategory(id);
+          refetch();
+          toast.success("Category deleted successfully");
+        }
+      });
+    } catch (error) {
+      console.log(error)
+      toast.error(error?.response.data?.message || "Something went wrong");
+    }
   };
 
   const actionBodyTemplate = (rowData) => {
@@ -129,7 +147,7 @@ const CategoryList = () => {
           <i className="pi pi-pencil mr-1"></i> Edit
         </button>
         <button
-          onClick={() => handleDelete(rowData.id)}
+          onClick={() => handleDelete(rowData._id)}
           className="flex items-center bg-red-500 text-white px-3 py-1 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
         >
           <i className="pi pi-trash mr-1"></i> Delete

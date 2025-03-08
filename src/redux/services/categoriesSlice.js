@@ -3,28 +3,28 @@ import { apiSlice } from "./apiSlice";
 export const categoriesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getCategories: builder.query({
-      query: () => "api/v1/categories",
+      query: () => "categories",
     }),
     getCategoryById: builder.query({
-      query: (id) => `api/v1/categories/${id}`,
+      query: (id) => `categories/${id}`,
     }),
     createCategory: builder.mutation({
       query: (newCategory) => ({
-        url: "api/v1/categories",
+        url: "categories",
         method: "POST",
         body: newCategory,
       }),
     }),
     updateCategory: builder.mutation({
       query: ({ id, updatedCategory }) => ({
-        url: `api/v1/categories/${id}`,
+        url: `categories/${id}`,
         method: "PUT",
         body: updatedCategory,
       }),
     }),
     deleteCategory: builder.mutation({
       query: (id) => ({
-        url: `api/v1/categories/${id}`,
+        url: `categories/${id}`,
         method: "DELETE",
       }),
     }),

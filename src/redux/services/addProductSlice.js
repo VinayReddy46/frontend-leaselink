@@ -1,22 +1,41 @@
 // src/services/blogSlice.js
-import { apiSlice } from './apiSlice';
+import { apiSlice } from "./apiSlice";
 
 export const addProductApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getProuducts: builder.query({
-      query: () => 'blogs',
+    getProducts: builder.query({
+      query: () => "products",
     }),
     getProductById: builder.query({
-      query: (id) => `blogs/${id}`,
+      query: (id) => `products/${id}`,
     }),
-    createBlog: builder.mutation({
-      query: (newBlog) => ({
-        url: 'blogs',
-        method: 'POST',
-        body: newBlog,
+    createProduct: builder.mutation({
+      query: (newProduct) => ({
+        url: "products",
+        method: "POST",
+        body: newProduct,
+      }),
+    }),
+    updateProduct: builder.mutation({
+      query: ({ id, ...updatedProduct }) => ({
+        url: `products/${id}`,
+        method: "PUT",
+        body: updatedProduct,
+      }),
+    }),
+    deleteProduct: builder.mutation({
+      query: (id) => ({
+        url: `products/${id}`,
+        method: "DELETE",
       }),
     }),
   }),
 });
 
-export const { useGetBlogsQuery, useGetBlogByIdQuery, useCreateBlogMutation } = blogApi;
+export const {
+  useGetProductsQuery,
+  useGetProductByIdQuery,
+  useCreateProductMutation,
+  useUpdateProductMutation,
+  useDeleteProductMutation,
+} = addProductApi;

@@ -11,6 +11,7 @@ import {
   FiMessageSquare,
   FiChevronDown,
   FiChevronUp,
+  FiGrid,
 } from "react-icons/fi";
 import { FaHome } from "react-icons/fa";
 
@@ -24,8 +25,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       name: "Content Management",
       icon: <FiFileText />, 
       children: [
-        { name: "FAQs", path: "faqs", icon: <FiHelpCircle /> },
+        
         { name: "Categories", path: "categories", icon: <FiTag /> },
+        { name: "Blogs", path: "blogs", icon: <FiGrid /> },
+        { name: "FAQs", path: "faqs", icon: <FiHelpCircle /> },
       ],
     },
     { name: "Users Management", icon: <FiUsers />, path: "users-management" },

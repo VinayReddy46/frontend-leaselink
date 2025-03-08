@@ -27,7 +27,7 @@ console.log(credentials)
       const response = await register(credentials);
       console.log(response.data)
       console.log(response.status)
-      if(response?.data?.status==="success"){
+      if(response?.data?.success){
         toast.success(response?.data?.message || "OTP sent to email");
         navigate(`/verification?email=${credentials.email}`);
       }

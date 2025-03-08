@@ -4,11 +4,15 @@ import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import logo from "../assets/logoForPages.webp";
 import { useLoginMutation,useForgotPasswordMutation } from "../redux/services/authSlice";
+import { setCredentials } from "../redux/features/authSlice";
+import { useDispatch } from "react-redux";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [show, setShow] = useState(false);
+
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
@@ -19,12 +23,11 @@ const Login = () => {
     e.preventDefault();
     try {
       const res=await login({email,password});
-      // console.log("login response",res.cookie)
-      // localStorage.setItem("accessToken", res.data.accessToken);
-      // localStorage.setItem("refreshToken", res.data.refreshToken);
-console.log("res.data.accessToken",res.data.accessToken)
-      if(res.data.status==="success"){
+      if(res.data.success){
         toast.success( res?.data?.message ||"Login successful.");
+        console.log(res.data.data)
+        const user = res.data.data;
+        dispatch(setCredentials(user));
         navigate("/");
       }
     } catch (error) {

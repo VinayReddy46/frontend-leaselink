@@ -26,6 +26,7 @@ import Settings from "./compoments/admin/Settings";
 import ProfileSettings from "./compoments/profileComponents/ProfileSettings";
 import FAQManager from "./compoments/admin/contentmangement/FAQsList";
 import CategoryList from "./compoments/admin/contentmangement/Categories";
+import Blogs from "./compoments/admin/contentmangement/Blogs";
 import UserManagement from "./compoments/admin/UserMangement";
 // import PaymentForm from "./compoments/HomeComponents/PaymentForm";
 import TrustSystem from "./pages/Ratings";
@@ -134,6 +135,7 @@ function App() {
           <Route path="settings" element={<Settings/>} />
           <Route path="faqs" element={<FAQManager/>} />
           <Route path="categories" element={<CategoryList/>} />
+          <Route path="blogs" element={<Blogs/>} />
           <Route path="users-management" element={<UserManagement />} />
         </Route>
       </Routes>

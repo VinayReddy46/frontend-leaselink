@@ -6,10 +6,11 @@ import { FiMenu, FiX } from "react-icons/fi";
 import { FiUser, FiSettings } from "react-icons/fi";
 import { HiOutlineLogout } from "react-icons/hi";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import Notifications from "./navbarComponents/Notifications";
 import { AiOutlineProduct } from "react-icons/ai";
 import { IoCartOutline } from "react-icons/io5";
+import { logout } from "../redux/features/authSlice";
 
 function Navbar() {
   const { totalQuantity } = useSelector((state) => state.cart);
@@ -25,6 +26,10 @@ function Navbar() {
   const location = useLocation();
   const role = 'userr1'; // This would normally come from your auth context/state
 
+  const dispatch = useDispatch()
+
+  const {userInfo, isAuthenticated}=useSelector(state=>state.auth)
+  console.log(userInfo,isAuthenticated)
   // Check if user is logged in on component mount
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -91,8 +96,9 @@ function Navbar() {
 
   // Handle logout
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    setIsLoggedIn(false);
+    // localStorage.removeItem('authToken');
+    // setIsLoggedIn(false);
+    dispatch(logout())
     navigate('/login');
   };
 
@@ -279,7 +285,7 @@ function Navbar() {
 
             {/* User Profile or Login Button */}
             <div className="hidden md:block">
-              {isLoggedIn ? (
+              {isAuthenticated ? (
                 <div
                   className="relative"
                 // onMouseEnter={() => setUserDropdown(true)}

@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { increaseQuantity, decreaseQuantity, removeFromCart } from "../../redux/cartSlice";
+import { increaseQuantity, decreaseQuantity, removeFromCart } from "../../redux/features/cartSlice";
 import { AiOutlinePlus, AiOutlineMinus, AiOutlineDelete } from "react-icons/ai";
 import { Link } from "react-router-dom";
 
