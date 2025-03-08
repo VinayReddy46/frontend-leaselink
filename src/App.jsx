@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route,useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react"; // ✅ Add useState & useEffect
-
+import { motion, AnimatePresence } from 'framer-motion';
+import { currentUser } from "./compoments/Ordercomponents/data/sampleData";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -44,7 +45,8 @@ import { SearchProvider } from "./compoments/contexts/SearchContext";
 import Myrentedproducts from "./compoments/profileComponents/MyRentedProducts";
 import { WishlistProvider } from "./compoments/contexts/WishlistContext";
 import WishlistPage from "./compoments/HomeComponents/LandingPageComponents/WishlistPage";
- 
+import LenderDashboard from "./compoments/Ordercomponents/LenderDashboard"; 
+import RenterDashboard from "./compoments/Ordercomponents/RenterDashboard";
 
 const Laptops = () => <h1>Laptops Page</h1>;
 const TVMonitors = () => <h1>TV & Monitors Page</h1>;
@@ -60,6 +62,7 @@ const Office = () => <h1>Office Equipment Page</h1>;
 const Security = () => <h1>Security Cameras Page</h1>;
 
 function App() {
+  const [user] = useState(currentUser);//for order status renter or lender order
   const location = useLocation();
    // Check if the path starts with "/admin"
    const isAdminRoute = location.pathname.startsWith("/admin");
@@ -82,6 +85,7 @@ function App() {
   return (
     <SearchProvider>
             <WishlistProvider>
+            <AnimatePresence mode="wait">
      <div>
       
       {!isAdminRoute && <Navbar />} {/* Show Navbar only for non-admin routes */}
@@ -142,6 +146,37 @@ function App() {
           <Route path="categories" element={<CategoryList/>} />
           <Route path="users-management" element={<UserManagement />} />
         </Route>
+        
+        
+              <Route 
+                path="/lenderorders" 
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <LenderDashboard />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path="/renterorders" 
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <RenterDashboard />
+                  </motion.div>
+                } 
+              />
+           
+          
+         
       </Routes>
 
       
@@ -149,7 +184,7 @@ function App() {
       {!isAdminRoute && <Footer />} {/* Show Footer only for non-admin routes */}
 
     
-      </div>
+      </div> </AnimatePresence>
       </WishlistProvider>
       </SearchProvider>
   );
