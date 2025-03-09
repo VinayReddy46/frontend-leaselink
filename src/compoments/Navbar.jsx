@@ -6,7 +6,7 @@ import { FiMenu, FiX } from "react-icons/fi";
 import { FiUser, FiSettings } from "react-icons/fi";
 import { HiOutlineLogout } from "react-icons/hi";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Notifications from "./navbarComponents/Notifications";
 import { AiOutlineProduct } from "react-icons/ai";
 import { IoCartOutline } from "react-icons/io5";
@@ -24,16 +24,16 @@ function Navbar() {
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const role = 'userr1'; // This would normally come from your auth context/state
+  const role = "user"; // This would normally come from your auth context/state
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const {userInfo, isAuthenticated}=useSelector(state=>state.auth)
-  console.log(userInfo,isAuthenticated)
+  const { userInfo, isAuthenticated } = useSelector((state) => state.auth);
+  console.log(userInfo, isAuthenticated);
   // Check if user is logged in on component mount
   useEffect(() => {
     const checkLoginStatus = () => {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem("authToken");
       setIsLoggedIn(!token);
     };
 
@@ -45,12 +45,10 @@ function Navbar() {
     {
       name: "Home",
       link: "/",
-
     },
     {
       name: "About Us",
       link: "/aboutus",
-
     },
     {
       name: "Rent a Product",
@@ -69,37 +67,39 @@ function Navbar() {
         { name: "Video Conferencing", link: "/rental/video" },
       ],
     },
-    role === 'user1' ?
-      { name: "Add Product", link: "/addproduct" }
-      : { name: "Dashboard", link: "/admin" }
+    role === "user"
+      ? { name: "Add Product", link: "/addproduct" }
+      : { name: "Dashboard", link: "/admin" },
   ];
 
   // Extract all searchable items for suggestions
-  const allCategories = data.flatMap(item =>
+  const allCategories = data.flatMap((item) =>
     item.dropdown
-      ? item.dropdown.map(subItem => ({
-        name: subItem.name,
-        link: subItem.link,
-        category: item.name
-      }))
-      : [{
-        name: item.name,
-        link: item.link,
-        category: null
-      }]
+      ? item.dropdown.map((subItem) => ({
+          name: subItem.name,
+          link: subItem.link,
+          category: item.name,
+        }))
+      : [
+          {
+            name: item.name,
+            link: item.link,
+            category: null,
+          },
+        ]
   );
 
   // Handle login button click
   const handleLoginClick = () => {
-    navigate('/login', { state: { returnUrl: '/home' } });
+    navigate("/login", { state: { returnUrl: "/home" } });
   };
 
   // Handle logout
   const handleLogout = () => {
     // localStorage.removeItem('authToken');
     // setIsLoggedIn(false);
-    dispatch(logout())
-    navigate('/login');
+    dispatch(logout());
+    navigate("/login");
   };
 
   // Handle search input change
@@ -114,7 +114,7 @@ function Navbar() {
     }
 
     // Filter categories based on input
-    const filtered = allCategories.filter(item =>
+    const filtered = allCategories.filter((item) =>
       item.name.toLowerCase().includes(value.toLowerCase())
     );
 
@@ -166,7 +166,11 @@ function Navbar() {
           {/* Logo and brand */}
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <img src="/leaselinklogo.png" alt="Logo" className="w-auto h-12" />
+              <img
+                src="/leaselinklogo.png"
+                alt="Logo"
+                className="w-auto h-12"
+              />
             </Link>
           </div>
 
@@ -186,7 +190,11 @@ function Navbar() {
                         setHovered(hovered === item.name ? null : item.name);
                       }}
                       className={`flex items-center space-x-1.5 px-2 py-1 rounded-md text-base font-medium transition-colors duration-200 
-                     ${isActive(item.link) ? "text-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
+                     ${
+                       isActive(item.link)
+                         ? "text-blue-600"
+                         : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
+                     }`}
                     >
                       <span className="ml-1.5">{item.name}</span>
                       <IoMdArrowDropdown className="text-xl" />
@@ -195,7 +203,11 @@ function Navbar() {
                     {/* Dropdown Panel */}
                     <div
                       className={`absolute left-0 mt-2 w-96 bg-white border border-gray-200 rounded-lg shadow-xl z-20 transition-all duration-200 ease-in-out transform origin-top-left
-                   ${hovered === item.name ? "opacity-100 max-h-72 overflow-y-auto visible" : "opacity-0 max-h-0 invisible"}`}
+                   ${
+                     hovered === item.name
+                       ? "opacity-100 max-h-72 overflow-y-auto visible"
+                       : "opacity-0 max-h-0 invisible"
+                   }`}
                     >
                       <div className="p-2 max-h-96 grid grid-cols-2 gap-2">
                         {item.dropdown.map((subItem, subIndex) => (
@@ -214,14 +226,17 @@ function Navbar() {
                   <Link
                     to={item.link}
                     className={`flex items-center space-x-1.5 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 
-                   ${isActive(item.link) ? "text-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
+                   ${
+                     isActive(item.link)
+                       ? "text-blue-600"
+                       : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
+                   }`}
                   >
                     {item.icon}
                     <span>{item.name}</span>
                   </Link>
                 )}
               </div>
-
             ))}
           </div>
 
@@ -229,10 +244,7 @@ function Navbar() {
           <div className="flex items-center space-x-5">
             {/* Desktop Search */}
             <div ref={searchRef} className="hidden md:block relative">
-              <form
-                onSubmit={handleSearchSubmit}
-                className="flex items-center"
-              >
+              <form onSubmit={handleSearchSubmit} className="flex items-center">
                 <div className="relative">
                   <input
                     type="text"
@@ -240,7 +252,9 @@ function Navbar() {
                     className="w-60 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     value={searchInput}
                     onChange={handleSearchChange}
-                    onFocus={() => searchInput.trim() !== "" && setShowSuggestions(true)}
+                    onFocus={() =>
+                      searchInput.trim() !== "" && setShowSuggestions(true)
+                    }
                   />
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                     <CiSearch className="w-5 h-5" />
@@ -260,7 +274,9 @@ function Navbar() {
                       >
                         <div className="text-gray-700">{result.name}</div>
                         {result.category && (
-                          <div className="text-xs text-gray-500">in {result.category}</div>
+                          <div className="text-xs text-gray-500">
+                            in {result.category}
+                          </div>
                         )}
                       </li>
                     ))}
@@ -273,7 +289,10 @@ function Navbar() {
             <div className="flex items-center space-x-2">
               <Notifications />
 
-              <Link to="/cart" className="p-2.5 text-gray-600 rounded-full hover:bg-gray-100 hover:text-blue-600 transition-colors relative">
+              <Link
+                to="/cart"
+                className="p-2.5 text-gray-600 rounded-full hover:bg-gray-100 hover:text-blue-600 transition-colors relative"
+              >
                 <FaShoppingCart className="w-5 h-5" />
                 {totalQuantity > 0 && (
                   <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold px-1.5 min-w-[18px] h-[18px] rounded-full flex items-center justify-center">
@@ -288,32 +307,47 @@ function Navbar() {
               {isAuthenticated ? (
                 <div
                   className="relative"
-                // onMouseEnter={() => setUserDropdown(true)}
-                // onMouseLeave={() => setUserDropdown(false)}
+                  // onMouseEnter={() => setUserDropdown(true)}
+                  // onMouseLeave={() => setUserDropdown(false)}
                 >
-                  <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100"
-                    onClick={() => setUserDropdown(!userDropdown)}>
+                  <button
+                    className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100"
+                    onClick={() => setUserDropdown(!userDropdown)}
+                  >
                     <FaUserCircle className="w-7 h-7" />
                   </button>
 
                   {/* User Dropdown */}
                   <div
                     className={`absolute right-0 mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-xl z-50 transition-all duration-200 ease-in-out transform origin-top-right
-                      ${userDropdown ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}
+                      ${
+                        userDropdown
+                          ? "opacity-100 scale-100"
+                          : "opacity-0 scale-95 pointer-events-none"
+                      }`}
                   >
                     <div className="border-b border-gray-100 p-4">
-                      <p className="text-sm font-medium text-gray-700">Welcome back!</p>
-                      <p className="text-xs text-gray-500">Manage your account</p>
+                      <p className="text-sm font-medium text-gray-700">
+                        Welcome back!
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Manage your account
+                      </p>
                     </div>
                     <div className="py-1">
-                      <Link to="/profile" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                      <Link
+                        to="/profile"
+                        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                         onClick={() => setUserDropdown(!userDropdown)}
                       >
                         <FiUser className="w-4 h-4 mr-3 text-gray-500" />
                         My Profile
                       </Link>
-                      <Link to="/settings" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
-                        onClick={() => setUserDropdown(!userDropdown)}>
+                      <Link
+                        to="/settings"
+                        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                        onClick={() => setUserDropdown(!userDropdown)}
+                      >
                         <FiSettings className="w-4 h-4 mr-3 text-gray-500" />
                         Settings
                       </Link>
@@ -325,8 +359,11 @@ function Navbar() {
                         <AiOutlineProduct className="w-4 h-4 mr-3 text-gray-500" />
                         <span>My Rented Products</span>
                       </Link>
-                      <Link to="/myorders" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
-                        onClick={() => setUserDropdown(!userDropdown)}>
+                      <Link
+                        to="/myorders"
+                        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                        onClick={() => setUserDropdown(!userDropdown)}
+                      >
                         <IoCartOutline className="w-4 h-4 mr-3 text-gray-500" />
                         My Orders
                       </Link>
@@ -355,7 +392,11 @@ function Navbar() {
               className="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100 transition-colors focus:outline-none"
               onClick={() => setMenuOpen(!menuOpen)}
             >
-              {menuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
+              {menuOpen ? (
+                <FiX className="w-6 h-6" />
+              ) : (
+                <FiMenu className="w-6 h-6" />
+              )}
             </button>
           </div>
         </div>
@@ -379,9 +420,14 @@ function Navbar() {
                 className="w-full pl-4 pr-2 py-2.5 focus:outline-none"
                 value={searchInput}
                 onChange={handleSearchChange}
-                onFocus={() => searchInput.trim() !== "" && setShowSuggestions(true)}
+                onFocus={() =>
+                  searchInput.trim() !== "" && setShowSuggestions(true)
+                }
               />
-              <button type="submit" className="px-4 py-2.5 bg-gray-100 text-gray-700">
+              <button
+                type="submit"
+                className="px-4 py-2.5 bg-gray-100 text-gray-700"
+              >
                 <CiSearch className="w-5 h-5" />
               </button>
             </form>
@@ -398,7 +444,9 @@ function Navbar() {
                     >
                       <div className="text-gray-700">{result.name}</div>
                       {result.category && (
-                        <div className="text-xs text-gray-500">in {result.category}</div>
+                        <div className="text-xs text-gray-500">
+                          in {result.category}
+                        </div>
                       )}
                     </li>
                   ))}
@@ -414,23 +462,35 @@ function Navbar() {
                 <div className="space-y-1  ">
                   {/* Dropdown Title */}
                   <button
-                    onClick={() => setHovered(hovered === item.name ? null : item.name)}
+                    onClick={() =>
+                      setHovered(hovered === item.name ? null : item.name)
+                    }
                     className={`flex justify-between items-center w-full px-3 py-2.5 rounded-md text-left 
-                      ${isActive(item.link)
-                        ? "bg-blue-50 text-blue-600"
-                        : "text-gray-700 hover:bg-gray-50"}`}
+                      ${
+                        isActive(item.link)
+                          ? "bg-blue-50 text-blue-600"
+                          : "text-gray-700 hover:bg-gray-50"
+                      }`}
                   >
                     <span className="flex items-center">
                       {item.icon}
                       <span className="ml-2">{item.name}</span>
                     </span>
-                    <IoMdArrowDropdown className={`text-xl transition-transform duration-200 ${hovered === item.name ? "transform rotate-180" : ""}`} />
+                    <IoMdArrowDropdown
+                      className={`text-xl transition-transform duration-200 ${
+                        hovered === item.name ? "transform rotate-180" : ""
+                      }`}
+                    />
                   </button>
 
                   {/* Dropdown Items */}
                   <div
                     className={`transition-all duration-200 ease-in-out overflow-hidden
-                      ${hovered === item.name ? "max-h-72 opacity-100 overflow-y-auto" : "max-h-0 opacity-0"}`}
+                      ${
+                        hovered === item.name
+                          ? "max-h-72 opacity-100 overflow-y-auto"
+                          : "max-h-0 opacity-0"
+                      }`}
                   >
                     <div className="pl-5 pr-3  space-y-1 border-l-2 border-gray-100 ml-3">
                       {item.dropdown.map((subItem, subIndex) => (
@@ -438,9 +498,11 @@ function Navbar() {
                           key={subIndex}
                           to={subItem.link}
                           className={`block px-3 py-2 rounded-md text-sm
-                            ${isActive(subItem.link)
-                              ? "bg-blue-50 text-blue-600"
-                              : "text-gray-600 hover:bg-gray-50"}`}
+                            ${
+                              isActive(subItem.link)
+                                ? "bg-blue-50 text-blue-600"
+                                : "text-gray-600 hover:bg-gray-50"
+                            }`}
                           onClick={() => setMenuOpen(false)}
                         >
                           {subItem.name}
@@ -453,9 +515,11 @@ function Navbar() {
                 <Link
                   to={item.link}
                   className={`flex items-center px-3 py-2.5 rounded-md text-base
-                    ${isActive(item.link)
-                      ? "bg-blue-50 text-blue-600"
-                      : "text-gray-700 hover:bg-gray-50"}`}
+                    ${
+                      isActive(item.link)
+                        ? "bg-blue-50 text-blue-600"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
                   onClick={() => setMenuOpen(false)}
                 >
                   {item.icon}

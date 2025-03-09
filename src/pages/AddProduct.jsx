@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiUpload, FiAlertCircle } from "react-icons/fi";
 import { MdOutlineDelete, MdEdit } from "react-icons/md";
 import { toast } from "react-toastify";
@@ -140,7 +140,7 @@ const AddProduct = () => {
   ]);
 
   //insurance
-  const { data: insurances, refetch } = useGetInsurancesQuery();
+  const { data: insuranceData, refetch } = useGetInsurancesQuery();
   const [createInsurance, { isLoading: isCreateLoading }] =
     useCreateInsuranceMutation();
   const [updateInsurance] = useUpdateInsuranceMutation();
@@ -149,6 +149,21 @@ const AddProduct = () => {
   //features
   const [features, setFeatures] = useState([]);
   const [newFeature, setNewFeature] = useState("");
+
+  useEffect(() => {
+    // Update predefined insurance plans with API data when available
+    if (insuranceData?.insurancePlans && insuranceData.insurancePlans.length > 0) {
+      const apiPlans = insuranceData.insurancePlans.map(plan => ({
+        id: plan._id,
+        name: plan.plan_name,
+        description: plan.description,
+        price: plan.price,
+        features: plan.features || []
+      }));
+      
+      setPredefinedInsurancePlans(apiPlans);
+    }
+  }, [insuranceData]);
 
   const handleAddFeature = () => {
     if (newFeature.trim()) {
@@ -197,39 +212,146 @@ const AddProduct = () => {
     }
   };
 
-  const handleAddInsurancePlan = async () => {
-    const newPlan = { ...insuranceForm };
-    if (editIndex !== null) {
-      const updatedPlans = [...insurancePlans];
-      updatedPlans[editIndex] = newPlan;
-      setInsurancePlans(updatedPlans);
-      console.log(insurancePlans);
-      const res = await updateInsurance(...insuranceForm, features);
-      console.log(res);
-    } else {
-      if (!insurancePlans.some((plan) => plan.name === newPlan.name)) {
-        setInsurancePlans([...insurancePlans, newPlan]);
-        setPredefinedInsurancePlans([...predefinedInsurancePlans, newPlan]);
-        const payload ={
-          plan_name: insuranceForm.plan_name,
-          description: insuranceForm.description,
-          price: insuranceForm.price,
-          features: features,
-        }
-        console.log(payload)
-        const res = await createInsurance(payload);
-        console.log(res);
-      }
+  const validateInsuranceForm = () => {
+    const errors = {};
+
+    if (!insuranceForm.plan_name.trim()) {
+      errors.plan_name = "Plan name is required";
     }
 
-    setShowInsuranceForm(false);
+    if (!insuranceForm.description.trim()) {
+      errors.description = "Description is required";
+    }
+
+    if (!insuranceForm.price) {
+      errors.price = "Price is required";
+    } else if (isNaN(Number(insuranceForm.price)) || Number(insuranceForm.price) < 0) {
+      errors.price = "Price must be a positive number";
+    }
+
+    return errors;
+  };
+
+  const handleEditInsurancePlan = (index) => {
+    const planToEdit = insurancePlans[index];
+    // Set the features array based on the plan being edited
+    setFeatures(planToEdit.features || []);
+    // Set the form values
     setInsuranceForm({
-      plan_name: "",
-      description: "",
-      price: "",
-      features: [],
+      plan_name: planToEdit.name,
+      description: planToEdit.description,
+      price: planToEdit.price.toString(),
     });
-    setEditIndex(null);
+    setEditIndex(index);
+    setShowInsuranceForm(true);
+  };
+
+  const handleAddInsurancePlan = async () => {
+    // Validate the form
+    const errors = validateInsuranceForm();
+
+    if (Object.keys(errors).length > 0) {
+      // Display errors for each field
+      Object.entries(errors).forEach(([field, message]) => {
+        toast.error(message);
+      });
+      return;
+    }
+
+    try {
+      // Create the payload with the required structure
+      const payload = {
+        plan_name: insuranceForm.plan_name,
+        description: insuranceForm.description,
+        price: Number(insuranceForm.price), // Convert to number
+        features: features.length > 0 ? features : undefined,
+      };
+
+      if (editIndex !== null) {
+        // Update existing plan
+        const planBeingEdited = insurancePlans[editIndex];
+        
+        // If the plan has an id (came from the API), update it through the API
+        if (planBeingEdited.id) {
+          try {
+            const res = await updateInsurance({ 
+              id: planBeingEdited.id, 
+              ...payload 
+            });
+            
+            if (res.data?.success) {
+              toast.success("Insurance plan updated successfully");
+              // Refresh the insurance plans list
+              refetch();
+            } else {
+              toast.error(res.error?.data?.message || "Failed to update insurance plan");
+            }
+          } catch (error) {
+            console.error("Error updating insurance plan:", error);
+            toast.error("Failed to update insurance plan");
+          }
+        }
+        
+        // Update the local state regardless of API success
+        const updatedPlans = [...insurancePlans];
+        updatedPlans[editIndex] = {
+          ...planBeingEdited, // Keep the id if it exists
+          name: payload.plan_name,
+          description: payload.description,
+          price: payload.price,
+          features: payload.features,
+        };
+        setInsurancePlans(updatedPlans);
+      } else {
+        // Add new plan
+        const newPlan = {
+          name: payload.plan_name,
+          description: payload.description,
+          price: payload.price,
+          features: payload.features,
+        };
+
+        if (!insurancePlans.some((plan) => plan.name === newPlan.name)) {
+          setInsurancePlans([...insurancePlans, newPlan]);
+
+          // Send to API
+          const res = await createInsurance(payload);
+
+          if (res.data?.success) {
+            toast.success("Insurance plan added successfully");
+            // Add the id from the response to the new plan
+            if (res.data?.insurancePlan?._id) {
+              const updatedPlans = [...insurancePlans];
+              updatedPlans[updatedPlans.length - 1] = {
+                ...newPlan,
+                id: res.data.insurancePlan._id
+              };
+              setInsurancePlans(updatedPlans);
+            }
+            // Refresh the list of insurance plans
+            refetch();
+          } else {
+            toast.error(res.error?.data?.message || "Failed to add insurance plan");
+          }
+        } else {
+          toast.warning("An insurance plan with this name already exists");
+        }
+      }
+
+      // Reset form
+      setShowInsuranceForm(false);
+      setInsuranceForm({
+        plan_name: "",
+        description: "",
+        price: "",
+        features: [],
+      });
+      setFeatures([]);
+      setEditIndex(null);
+    } catch (error) {
+      console.error("Error submitting insurance plan:", error);
+      toast.error(error.data?.message || "Failed to submit insurance plan");
+    }
   };
 
   const handleSubmit = (e) => {
@@ -400,7 +522,7 @@ const AddProduct = () => {
               className="w-full sm:flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
             >
               <option value="">-- Select a Plan --</option>
-              {predefinedInsurancePlans?.map((plan,i) => (
+              {predefinedInsurancePlans?.map((plan, i) => (
                 <option key={i} value={plan.name}>
                   {plan.name} - ${plan.price}
                 </option>
@@ -426,14 +548,32 @@ const AddProduct = () => {
           {insurancePlans.length > 0 && (
             <InsurancePlanTable
               plans={insurancePlans}
-              onEdit={(index) => {
-                setInsuranceForm(insurancePlans[index]);
-                setEditIndex(index);
-                setShowInsuranceForm(true);
+              onEdit={handleEditInsurancePlan}
+              onDelete={(index) => {
+                const planToDelete = insurancePlans[index];
+                // If the plan has an id (came from API), delete it through API
+                if (planToDelete.id) {
+                  deleteInsurance(planToDelete.id)
+                    .then((res) => {
+                      if (res.data?.success) {
+                        toast.success("Insurance plan deleted successfully");
+                        // Remove from local state
+                        setInsurancePlans(insurancePlans.filter((_, i) => i !== index));
+                        // Refresh the list
+                        refetch();
+                      } else {
+                        toast.error(res.error?.data?.message || "Failed to delete insurance plan");
+                      }
+                    })
+                    .catch((error) => {
+                      console.error("Error deleting insurance plan:", error);
+                      toast.error("Failed to delete insurance plan");
+                    });
+                } else {
+                  // Just remove from local state if it's not from API
+                  setInsurancePlans(insurancePlans.filter((_, i) => i !== index));
+                }
               }}
-              onDelete={(index) =>
-                setInsurancePlans(insurancePlans.filter((_, i) => i !== index))
-              }
             />
           )}
 
