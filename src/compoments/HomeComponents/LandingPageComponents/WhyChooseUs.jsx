@@ -6,7 +6,7 @@ const WhyChooseUs = () => {
   const [showVideo, setShowVideo] = useState(false);
 
   return (
-    <section className="relative w-full bg-black text-white">
+    <section className="relative w-full bg-gray-900 text-white">
       <div className="flex flex-col md:flex-row">
         {/* Left Section */}
         <div className="relative z-10 w-full md:w-1/2 p-6 md:p-16 space-y-6">
@@ -32,7 +32,7 @@ const WhyChooseUs = () => {
             <>
               <img
                 src="https://media.istockphoto.com/id/1466353453/photo/management-responsible-for-quality-control-iso-certification-product-quality-guarantee.jpg?s=612x612&w=0&k=20&c=kiRDWnLJBlAsSG_emYyZcqb8WEYrm82nlWx72emHGH0="
-                alt="Luxury Car"
+                alt="Why Choose Us"
                 className="w-full h-full object-cover"
               />
               <button

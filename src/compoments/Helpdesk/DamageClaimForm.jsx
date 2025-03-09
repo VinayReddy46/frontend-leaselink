@@ -30,6 +30,8 @@ const DamageClaimForm = ({ onClaimSubmit }) => {
 
   const handleNext = () => {
     if (validateStep(step)) {
+
+      
       setStep(step + 1);
     }
   };

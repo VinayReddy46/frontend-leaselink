@@ -10,7 +10,11 @@ import { useSelector, useDispatch } from "react-redux";
 import Notifications from "./navbarComponents/Notifications";
 import { AiOutlineProduct } from "react-icons/ai";
 import { IoCartOutline } from "react-icons/io5";
+
 import { logout } from "../redux/features/authSlice";
+
+import Wallet from "./navbarComponents/Wallet";
+
 
 function Navbar() {
   const { totalQuantity } = useSelector((state) => state.cart);
@@ -24,7 +28,10 @@ function Navbar() {
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const role = "user"; // This would normally come from your auth context/state
+
+
+  const role = 'user'; // This would normally come from your auth context/state
+
 
   const dispatch = useDispatch();
 
@@ -67,9 +74,10 @@ function Navbar() {
         { name: "Video Conferencing", link: "/rental/video" },
       ],
     },
-    role === "user"
-      ? { name: "Add Product", link: "/addproduct" }
-      : { name: "Dashboard", link: "/admin" },
+
+    role === 'user' ?
+      { name: "Add Product", link: "/addproduct" }
+      : { name: "Dashboard", link: "/admin" }
   ];
 
   // Extract all searchable items for suggestions
@@ -287,6 +295,7 @@ function Navbar() {
 
             {/* Notification and Cart Icons */}
             <div className="flex items-center space-x-2">
+             
               <Notifications />
 
               <Link
@@ -294,12 +303,15 @@ function Navbar() {
                 className="p-2.5 text-gray-600 rounded-full hover:bg-gray-100 hover:text-blue-600 transition-colors relative"
               >
                 <FaShoppingCart className="w-5 h-5" />
+                
+
                 {totalQuantity > 0 && (
                   <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold px-1.5 min-w-[18px] h-[18px] rounded-full flex items-center justify-center">
                     {totalQuantity}
                   </span>
                 )}
               </Link>
+               <Wallet/>
             </div>
 
             {/* User Profile or Login Button */}
