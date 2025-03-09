@@ -65,7 +65,7 @@ function Navbar() {
         { name: "Video Conferencing", link: "/rental/video" },
       ],
     },
-    role === 'user1' ?
+    role === 'user' ?
       { name: "Add Product", link: "/addproduct" }
       : { name: "Dashboard", link: "/admin" }
   ];
