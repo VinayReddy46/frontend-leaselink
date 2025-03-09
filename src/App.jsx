@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import React, { useState, useEffect } from "react"; // ✅ Add useState & useEffect
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import { motion, AnimatePresence } from 'framer-motion';
+import { currentUser } from "./compoments/Ordercomponents/data/sampleData";
 // import Signin from "./pages/Signin";
 import Verfication from "./pages/Verfication";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -26,7 +28,6 @@ import FAQManager from "./compoments/admin/contentmangement/FAQsList";
 import CategoryList from "./compoments/admin/contentmangement/Categories";
 import UserManagement from "./compoments/admin/UserMangement";
 // import PaymentForm from "./compoments/HomeComponents/PaymentForm";
-import TrustSystem from "./pages/Ratings";
 import AboutUs from "./pages/About"
 import NotificationDetails from "./compoments/navbarComponents/NotificationDetails"
 import Profile from "./pages/Profile";
@@ -43,6 +44,9 @@ import { WishlistProvider } from "./compoments/contexts/WishlistContext";
 import WishlistPage from "./compoments/HomeComponents/LandingPageComponents/WishlistPage";
 import HelpdeskBtn from "./pages/HelpdeskBtn";
 import Contact from "./pages/Contact";
+import WalletPage from "./compoments/navbarComponents/WalletDetails";
+import LenderDashboard from "./compoments/ordercomponents/LenderDashboard";
+import RenterDashboard from "./compoments/ordercomponents/RenterDashboard";
 
 
 const Laptops = () => <h1>Laptops Page</h1>;
@@ -81,6 +85,7 @@ function App() {
   return (
     <SearchProvider>
       <WishlistProvider>
+      <AnimatePresence mode="wait">
         <div>
 
           {!isAdminRoute && <Navbar />} {/* Show Navbar only for non-admin routes */}
@@ -106,8 +111,8 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<ProfileSettings />} />
             <Route path="/wishlist" element={<WishlistPage />} />
-            <Route path="/myorders" element={<MyOrders />} />
-            <Route path="/myrentedproducts" element={<Myrentedproducts />} />
+            {/* <Route path="/myorders" element={<MyOrders />} />
+            <Route path="/myrentedproducts" element={<Myrentedproducts />} /> */}
             <Route path="/checkout" element={<Checkout />} />
             <Route path="*" element={<Error />} />
             <Route path="/Helpdesk" element={<HelpDesk />} />
@@ -115,7 +120,8 @@ function App() {
             <Route path="/article/:articleId" element={<Article />} />
             <Route path="/contact-support" element={<ContactSupport />} />
             <Route path="/disputeandfile" element={<DisputaAndFile />} />
-
+            
+            <Route path="/wallet" element={<WalletPage/>} />
 
             <Route path="/laptops" element={<Laptops />} />
             <Route path="/tv-monitors" element={<TVMonitors />} />
@@ -140,18 +146,46 @@ function App() {
               <Route path="categories" element={<CategoryList />} />
               <Route path="users-management" element={<UserManagement />} />
             </Route>
+            
+            <Route 
+                path="/myorders" 
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <LenderDashboard/>
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path="/myrentedproducts" 
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <RenterDashboard />
+                  </motion.div>
+                } 
+              />
             <Route path="/contact" element={<Contact/>} />
           </Routes>
 
 
 
           {!isAdminRoute && <Footer />} {/* Show Footer only for non-admin routes */}
-
+          
           {!isAdminRoute && <HelpdeskBtn/>}
-        </div>
+        </div></AnimatePresence>
       </WishlistProvider>
     </SearchProvider>
   );
 }
 
 export default App;
+
