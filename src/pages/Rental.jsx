@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
 import RentalPage from "../compoments/Rentalcomponents/RentalPage";
-import ProductsData from "../compoments/CartComponents/Product";
-
 
 const Rental = () => {
   useEffect(() => {
@@ -10,11 +8,7 @@ const Rental = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* <productsData/> */}
-      <RentalPage products={ProductsData} />
-
-      
-      
+      <RentalPage />
     </div>
   );
 };
