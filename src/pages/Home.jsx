@@ -1,14 +1,15 @@
 import React from 'react'
-import Carousel from '../compoments/HomeComponents/LandingPageComponents/Carousel.jsx'
-import CarRentalSection from '../compoments/HomeComponents/LandingPageComponents/CarRentalSection.jsx'
-import FeaturedBuildings from '../compoments/HomeComponents/LandingPageComponents/FeauteredBuildings.jsx'
-import BlogPage from '../compoments/HomeComponents/LandingPageComponents/BlogPage.jsx'
-import RentalProcess from '../compoments/HomeComponents/LandingPageComponents/HowItsWork.jsx'
-import WhyChooseUs from '../compoments/HomeComponents/LandingPageComponents/WhyChooseUs.jsx'
-import FAQSection from '../compoments/HomeComponents/LandingPageComponents/FAQs.jsx'
+import Carousel from '../compoments/HomeComponents/Carousel'
+import RentalCards from '../compoments/HomeComponents/RentalCards.jsx'
+import CarRentalSection from '../compoments/HomeComponents/CarRentalSection.jsx'
+import FeaturedBuildings from '../compoments/HomeComponents/FeauteredBuildings.jsx'
+import BlogPage from '../compoments/HomeComponents/BlogPage.jsx'
+import RentalProcess from '../compoments/HomeComponents/HowItsWork.jsx'
+import WhyChooseUs from '../compoments/HomeComponents/WhyChooseUs.jsx'
+import FAQSection from '../compoments/HomeComponents/FAQs.jsx'
 // import ProductDetails from "./compoments/HomeComponents/ProductDetails";
-import TestimonialsCarousel from '../compoments/HomeComponents/LandingPageComponents/ScrollingTestimonials.jsx'
-import ProductList from '../compoments/HomeComponents/LandingPageComponents/ProductList.jsx'
+import TestimonialsCarousel from '../compoments/HomeComponents/ScrollingTestimonials.jsx'
+import ProductList from '../compoments/HomeComponents/ProductList.jsx'
 
 
 const Home = () => {

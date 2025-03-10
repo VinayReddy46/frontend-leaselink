@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaFilter, FaCalendarAlt } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import { useSearch } from "../../compoments/contexts/SearchContext";
+import { useSearch } from "../contexts/SearchContext";
 
 const SearchFilters = ({ onFilterChange }) => {
   const { filters, setFilters } = useSearch();
