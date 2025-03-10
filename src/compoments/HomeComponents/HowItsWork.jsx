@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaMapMarkerAlt, FaCar, FaCreditCard, FaCarSide } from 'react-icons/fa';
 import { TiChevronRight } from "react-icons/ti";
-import AnimationScroller from "../../../utils/AnimationScroller"
+import AnimationScroller from "../../utils/AnimationScroller"
 
 const ProcessStep = ({ number, title, description, icon }) => {
   return (

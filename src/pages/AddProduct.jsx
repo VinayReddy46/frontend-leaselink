@@ -188,8 +188,8 @@ const AddProduct = () => {
   console.log(categories);
 
   const handleImageUpload = (index, e) => {
-    const file = e.target.files[0];
-    if (file) {
+    if (e.target.files.length > 0) {
+      const file = e.target.files[0];
       const newImages = [...images];
       newImages[index] = { file, preview: URL.createObjectURL(file) };
       setImages(newImages);
@@ -522,12 +522,12 @@ const AddProduct = () => {
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {images.map((image, index) => (
               <div key={index} className="relative">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-2 sm:p-4 h-24 sm:h-32 flex items-center justify-center">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 h-32 flex items-center justify-center">
                   {image ? (
                     <div className="relative w-full h-full">
                       <img
                         src={image.preview}
-                        alt={`Upload ${index + 1}`}
+                        alt={Upload`${index+1}`}
                         className="w-full h-full object-cover rounded-lg"
                       />
                       <button
@@ -535,7 +535,7 @@ const AddProduct = () => {
                         onClick={() => handleRemoveImage(index)}
                         className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors transform hover:scale-110 hover:shadow-md active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300"
                       >
-                        <MdOutlineDelete className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <MdOutlineDelete className="w-4 h-4" />
                       </button>
                     </div>
                   ) : (
@@ -905,7 +905,7 @@ const AddProduct = () => {
             className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
           />
           <label htmlFor="bestseller" className="ml-2 text-sm text-gray-700">
-            Add to bestseller collection
+            Add to bestseller
           </label>
         </div>
 

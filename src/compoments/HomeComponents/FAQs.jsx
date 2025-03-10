@@ -3,24 +3,6 @@ import { FaChevronDown } from 'react-icons/fa';
 import { FaQuestion } from "react-icons/fa6";
 const FAQSection = () => {
   const [openIndex, setOpenIndex] = useState(null);
-   // const [faqs, setfaqs] = useState([]);
-  // const [loading, setLoading] = useState(true)
-
-  // useEffect(() => {
-  //   axios
-  //     .get("http://localhost:5000/faqs") // Replace with your API URL
-  //     .then((response) => {
-  //       setfaqs(response.data);
-  //       setLoading(false);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching data:", error);
-  //       setLoading(false);
-  //     });
-  // }, []);
-  // if (loading) {
-  //   return <p>Loading faqs...</p>;
-  // }
 
   const faqs = [
     {
@@ -67,7 +49,7 @@ const FAQSection = () => {
 
           <div className="rounded-2xl overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-[1.02]">
             <img 
-              src="https://media.istockphoto.com/id/638960674/vector/faq-web-page-banner-concept-with-thin-line-flat-design.jpg?s=612x612&w=0&k=20&c=EqSgbAfqxfzZCi0RO-Dn13QdYEMz4Vkf7xQeWXK_FCk="
+              src="https://live.themewild.com/carway/assets/img/faq/01.jpg"
               alt="Luxury Car"
               className="w-full h-[300px] object-cover"
             />

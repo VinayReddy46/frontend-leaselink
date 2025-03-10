@@ -1,29 +1,10 @@
 import React from "react";
-import LogoCarousel from "../LandingPageComponents/LogoCarousel";
+import LogoCarousel from "./LogoCarousel";
 import { useState, useEffect } from "react";
 import { FaUser, FaRegCalendarAlt, FaArrowRight } from "react-icons/fa";
-import AnimationScroller from "../../../utils/AnimationScroller"
+import AnimationScroller from "../../utils/AnimationScroller"
 
 const BlogPage = () => {
-  // const [blogPosts, setblogPosts]=useState([])
-  // const [loading, setLoading] = useState(true)
-
-  // useEffect(() => {
-  //   axios
-  //     .get("http://localhost:5000/blogPosts") // Replace with your API URL
-  //     .then((response) => {
-  //       setblogPosts(response.data);
-  //       setLoading(false);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching data:", error);
-  //       setLoading(false);
-  //     });
-  // }, []);
-  
-  // if (loading) {
-  //   return <p>Loading blogPosts...</p>;
-  // }
   
     const blogPosts = [
       {
@@ -111,6 +92,20 @@ const BlogPage = () => {
         </div>
       ))}
     </div>       
+
+    
+        <div className="mt-12 flex justify-center">
+          <nav className="inline-flex rounded-md shadow">
+            <a href="#" className="px-4 py-2 bg-gray-200 text-gray-700 rounded-l-md hover:bg-gray-300">Previous</a>
+            <a href="#" className="px-4 py-2 bg-indigo-500 text-white">1</a>
+            <a href="#" className="px-4 py-2 bg-gray-200 text-gray-700 hover:bg-gray-300">2</a>
+            <a href="#" className="px-4 py-2 bg-gray-200 text-gray-700 hover:bg-gray-300">3</a>
+            <a href="#" className="px-4 py-2 bg-gray-200 text-gray-700 rounded-r-md hover:bg-gray-300">Next</a>
+          </nav>
+        </div>
+        
+
+
       </div>
     );
   };

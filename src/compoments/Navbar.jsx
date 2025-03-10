@@ -28,8 +28,6 @@ function Navbar() {
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-
-
   const role = 'user'; // This would normally come from your auth context/state
 
 
@@ -43,24 +41,26 @@ function Navbar() {
       const token = localStorage.getItem("authToken");
       setIsLoggedIn(!token);
     };
-
+    
     checkLoginStatus();
   }, []);
 
   // Navigation data with icons
   const data = [
-    {
-      name: "Home",
-      link: "/",
+    { 
+      name: "Home", 
+      link: "/", 
+      
     },
-    {
-      name: "About Us",
-      link: "/aboutus",
+    { 
+      name: "About Us", 
+      link: "/aboutus", 
+      
     },
     {
       name: "Rent a Product",
       link: "/rental",
-
+      
       dropdown: [
         { name: "Laptops", link: "/rental/laptops" },
         { name: "Printer & Scanner", link: "/rental/printers" },
@@ -114,7 +114,7 @@ function Navbar() {
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchInput(value);
-
+    
     if (value.trim() === "") {
       setSearchResults([]);
       setShowSuggestions(false);
@@ -122,10 +122,10 @@ function Navbar() {
     }
 
     // Filter categories based on input
-    const filtered = allCategories.filter((item) =>
+    const filtered = allCategories.filter(item => 
       item.name.toLowerCase().includes(value.toLowerCase())
     );
-
+    
     setSearchResults(filtered);
     setShowSuggestions(true);
   };
@@ -137,7 +137,7 @@ function Navbar() {
         setShowSuggestions(false);
       }
     }
-
+    
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -275,8 +275,8 @@ function Navbar() {
                 <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                   <ul className="py-1 max-h-64 overflow-y-auto">
                     {searchResults.map((result, index) => (
-                      <li
-                        key={index}
+                      <li 
+                        key={index} 
                         className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
                         onClick={() => handleSuggestionClick(result.link)}
                       >
@@ -295,7 +295,6 @@ function Navbar() {
 
             {/* Notification and Cart Icons */}
             <div className="flex items-center space-x-2">
-             
               <Notifications />
 
               <Link
@@ -303,15 +302,12 @@ function Navbar() {
                 className="p-2.5 text-gray-600 rounded-full hover:bg-gray-100 hover:text-blue-600 transition-colors relative"
               >
                 <FaShoppingCart className="w-5 h-5" />
-                
-
                 {totalQuantity > 0 && (
                   <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold px-1.5 min-w-[18px] h-[18px] rounded-full flex items-center justify-center">
                     {totalQuantity}
                   </span>
                 )}
               </Link>
-               <Wallet/>
             </div>
 
             {/* User Profile or Login Button */}
@@ -330,7 +326,7 @@ function Navbar() {
                   </button>
 
                   {/* User Dropdown */}
-                  <div
+                  <div 
                     className={`absolute right-0 mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-xl z-50 transition-all duration-200 ease-in-out transform origin-top-right
                       ${
                         userDropdown
@@ -379,8 +375,8 @@ function Navbar() {
                         <IoCartOutline className="w-4 h-4 mr-3 text-gray-500" />
                         My Orders
                       </Link>
-                      <button
-                        onClick={handleLogout}
+                      <button 
+                        onClick={handleLogout} 
                         className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                       >
                         <HiOutlineLogout className="w-4 h-4 mr-3 text-gray-500" />
@@ -415,15 +411,15 @@ function Navbar() {
       </nav>
 
       {/* Mobile Menu - Only visible when menu is open */}
-      <div
+      <div 
         className={`md:hidden bg-white border-t border-gray-200 transition-all duration-300 ease-in-out overflow-hidden
           ${menuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"}`}
       >
         <div className="px-4 pt-2 pb-3 space-y-1">
           {/* Mobile Search */}
           <div className="py-2">
-            <form
-              onSubmit={handleSearchSubmit}
+            <form 
+              onSubmit={handleSearchSubmit} 
               className="flex items-center rounded-lg overflow-hidden border border-gray-300"
             >
               <input
@@ -449,8 +445,8 @@ function Navbar() {
               <div className="mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                 <ul className="py-1 max-h-64 overflow-y-auto">
                   {searchResults.map((result, index) => (
-                    <li
-                      key={index}
+                    <li 
+                      key={index} 
                       className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
                       onClick={() => handleSuggestionClick(result.link)}
                     >
@@ -496,7 +492,7 @@ function Navbar() {
                   </button>
 
                   {/* Dropdown Items */}
-                  <div
+                  <div 
                     className={`transition-all duration-200 ease-in-out overflow-hidden
                       ${
                         hovered === item.name
@@ -506,7 +502,7 @@ function Navbar() {
                   >
                     <div className="pl-5 pr-3  space-y-1 border-l-2 border-gray-100 ml-3">
                       {item.dropdown.map((subItem, subIndex) => (
-                        <Link
+                        <Link 
                           key={subIndex}
                           to={subItem.link}
                           className={`block px-3 py-2 rounded-md text-sm
@@ -524,8 +520,8 @@ function Navbar() {
                   </div>
                 </div>
               ) : (
-                <Link
-                  to={item.link}
+                <Link 
+                  to={item.link} 
                   className={`flex items-center px-3 py-2.5 rounded-md text-base
                     ${
                       isActive(item.link)
@@ -548,43 +544,35 @@ function Navbar() {
                 <div className="px-3 py-2">
                   <p className="text-sm font-medium text-gray-700">Account</p>
                 </div>
-                <Link
-                  to="/profile"
+                <Link 
+                  to="/profile" 
                   className="flex items-center px-3 py-2.5 rounded-md text-gray-700 hover:bg-gray-50"
                   onClick={() => setMenuOpen(false)}
                 >
                   <FiUser className="w-5 h-5 mr-2" />
                   <span>Profile</span>
                 </Link>
-                <Link
-                  to="/settings"
+                <Link 
+                  to="/settings" 
                   className="flex items-center px-3 py-2.5 rounded-md text-gray-700 hover:bg-gray-50"
                   onClick={() => setMenuOpen(false)}
                 >
                   <FiSettings className="w-5 h-5 mr-2" />
                   <span>Settings</span>
                 </Link>
-                <Link
-                  to="/myrentedproducts"
-                  className="flex items-center px-3 py-2.5 rounded-md text-gray-700 hover:bg-gray-50"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <FaShoppingCart className="w-5 h-5 mr-2" />
-                  <span>My Rented Products</span>
-                </Link>
-                <Link
-                  to="/myorders"
+                <Link 
+                  to="/myorders" 
                   className="flex items-center px-3 py-2.5 rounded-md text-gray-700 hover:bg-gray-50"
                   onClick={() => setMenuOpen(false)}
                 >
                   <FaShoppingCart className="w-5 h-5 mr-2" />
                   <span>My Orders</span>
                 </Link>
-                <button
+                <button 
                   onClick={() => {
                     handleLogout();
                     setMenuOpen(false);
-                  }}
+                  }} 
                   className="flex items-center w-full px-3 py-2.5 rounded-md text-gray-700 hover:bg-gray-50"
                 >
                   <HiOutlineLogout className="w-5 h-5 mr-2" />

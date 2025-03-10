@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaStar } from "react-icons/fa";
-import img1 from "../../../assets/profile-1.webp";
-import img2 from "../../../assets/profile-2.webp";
-import img3 from "../../../assets/profile-3.webp";
-import img4 from "../../../assets/profile-4.webp";
-import img5 from "../../../assets/profile-5.webp";
-import img6 from "../../../assets/profile-6.webp";
-import AnimationScroller from "../../../utils/AnimationScroller";
+import img1 from "../../assets/profile-1.webp";
+import img2 from "../../assets/profile-2.webp";
+import img3 from "../../assets/profile-3.webp";
+import img4 from "../../assets/profile-4.webp";
+import img5 from "../../assets/profile-5.webp";
+import img6 from "../../assets/profile-6.webp";
+import AnimationScroller from "../../utils/AnimationScroller";
 import { FaRegStar } from "react-icons/fa6";
 
 const TestimonialsCarousel = () => {
