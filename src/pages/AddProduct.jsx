@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { FiUpload, FiAlertCircle } from "react-icons/fi";
 import { MdOutlineDelete, MdEdit } from "react-icons/md";
 import { toast } from "react-toastify";
-import { useGetCategoriesQuery } from "../redux/services/categoriesSlice";
+import { FaSpinner } from "react-icons/fa";
 import {
-  useCreateInsuranceMutation,
-  useGetInsuranceByIdQuery,
-  useGetInsurancesQuery,
-  useUpdateInsuranceMutation,
-  useDeleteInsuranceMutation,
-} from "../redux/services/insuranceSlice";
+  useGetCategoriesQuery,
+} from "../redux/services/categoriesSlice";
 import {
   useCreateProductMutation,
   useGetProductsQuery,
@@ -17,6 +14,13 @@ import {
   useUpdateProductMutation,
   useDeleteProductMutation,
 } from "../redux/services/addProductSlice";
+import {
+  useCreateInsuranceMutation,
+  useGetInsurancesQuery,
+  useGetInsuranceByIdQuery,
+  useUpdateInsuranceMutation,
+  useDeleteInsuranceMutation,
+} from "../redux/services/insuranceSlice";
 
 // Reusable Input Component
 const Input = ({
@@ -153,6 +157,8 @@ const AddProduct = () => {
 
   const [createProduct, { isLoading: isCreatingProduct }] =
     useCreateProductMutation();
+
+  const userInfo = useSelector((state) => state.auth.userInfo);
 
   useEffect(() => {
     // Update predefined insurance plans with API data when available
@@ -394,7 +400,7 @@ const AddProduct = () => {
     e.preventDefault();
     setSubmitAttempted(true);
 
-    // Validate required fields
+    // Basic validation - required fields
     const errors = {};
     if (!product.name.trim()) errors.name = "Product name is required";
     if (!product.brand.trim()) errors.brand = "Brand name is required";
@@ -412,8 +418,11 @@ const AddProduct = () => {
       errors.quantity = "Valid quantity is required";
 
     // Check if at least one image is uploaded
-    if (!images.some((img) => img !== null))
+    const hasImages = images.some((img) => img !== null);
+    if (!hasImages) {
       errors.images = "At least one product image is required";
+      toast.error("Please upload at least one product image");
+    }
 
     // If insurance plans exist but none selected, show error
     if (insurancePlans.length > 0 && selectedInsurances.length === 0) {
@@ -432,8 +441,8 @@ const AddProduct = () => {
 
       // Add product details exactly as expected by the backend
       formData.append("name", product.name);
-      formData.append("brand", product.brand);
-      formData.append("model", product.model);
+      formData.append("brand_name", product.brand);
+      formData.append("model_name", product.model);
       formData.append("description", product.description);
       formData.append("category", product.category); // This should already be the category ID from the select
       formData.append("is_best_seller", product.isBestseller);
@@ -466,6 +475,12 @@ const AddProduct = () => {
           formData.append("images", image.file);
         }
       });
+
+      // Get user information from redux state
+      if (userInfo && userInfo.id) {
+        formData.append("userId", userInfo.id);
+        console.log("Added userId to form data:", userInfo.id);
+      }
 
       // Send product data to API
       await createProduct(formData);
@@ -522,12 +537,18 @@ const AddProduct = () => {
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {images.map((image, index) => (
               <div key={index} className="relative">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 h-32 flex items-center justify-center">
+                <div
+                  className={`border-2 border-dashed ${
+                    formErrors.images && !images.some((img) => img !== null)
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } rounded-lg p-4 h-32 flex items-center justify-center`}
+                >
                   {image ? (
                     <div className="relative w-full h-full">
                       <img
                         src={image.preview}
-                        alt={Upload`${index+1}`}
+                        alt={`Image ${index + 1}`}
                         className="w-full h-full object-cover rounded-lg"
                       />
                       <button
@@ -556,6 +577,11 @@ const AddProduct = () => {
               </div>
             ))}
           </div>
+          {formErrors.images && (
+            <p className="mt-1 text-xs text-red-600 flex items-center">
+              <FiAlertCircle className="mr-1" /> {formErrors.images}
+            </p>
+          )}
         </div>
 
         <div className="space-y-4">
@@ -912,10 +938,16 @@ const AddProduct = () => {
         <div className="flex justify-end pt-2">
           <button
             type="submit"
-            className="w-full sm:w-auto px-6 py-3 bg-black text-white font-medium rounded-md hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transform hover:scale-105 hover:shadow-lg active:bg-gray-900 active:scale-100"
+            className="w-full sm:w-auto px-6 py-3 bg-black text-white font-medium rounded-md hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transform hover:scale-105 hover:shadow-lg active:bg-gray-900 active:scale-100 flex items-center justify-center"
             disabled={isCreatingProduct}
           >
-            {isCreatingProduct ? "ADDING PRODUCT..." : "ADD PRODUCT"}
+            {isCreatingProduct ? (
+              <>
+                <FaSpinner className="animate-spin mr-2" /> ADDING PRODUCT...
+              </>
+            ) : (
+              "ADD PRODUCT"
+            )}
           </button>
         </div>
       </form>
