@@ -3,14 +3,11 @@ import { FaUserCircle, FaShoppingCart } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { FiMenu, FiX } from "react-icons/fi";
-import { FiUser, FiHeart,FiSettings } from "react-icons/fi";
+import { FiUser, FiSettings } from "react-icons/fi";
 import { HiOutlineLogout } from "react-icons/hi";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Notifications from "./navbarComponents/Notifications";
-import { AiOutlineProduct } from "react-icons/ai";
-import { IoCartOutline } from "react-icons/io5";
-import Wallet from "./navbarComponents/Wallet";
 
 function Navbar() {
   const { totalQuantity } = useSelector((state) => state.cart);
@@ -24,7 +21,7 @@ function Navbar() {
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const role = 'user'; // This would normally come from your auth context/state
+  const role = 'userr1'; // This would normally come from your auth context/state
 
   // Check if user is logged in on component mount
   useEffect(() => {
@@ -32,26 +29,26 @@ function Navbar() {
       const token = localStorage.getItem('authToken');
       setIsLoggedIn(!token);
     };
-
+    
     checkLoginStatus();
   }, []);
 
   // Navigation data with icons
   const data = [
-    {
-      name: "Home",
-      link: "/",
-
+    { 
+      name: "Home", 
+      link: "/", 
+      
     },
-    {
-      name: "About Us",
-      link: "/aboutus",
-
+    { 
+      name: "About Us", 
+      link: "/aboutus", 
+      
     },
     {
       name: "Rent a Product",
       link: "/rental",
-
+      
       dropdown: [
         { name: "Laptops", link: "/rental/laptops" },
         { name: "Printer & Scanner", link: "/rental/printers" },
@@ -65,24 +62,24 @@ function Navbar() {
         { name: "Video Conferencing", link: "/rental/video" },
       ],
     },
-    role === 'user1' ?
-      { name: "Add Product", link: "/addproduct" }
-      : { name: "Dashboard", link: "/admin" }
+    role === 'user1' ? 
+      { name: "Add Product", link: "/addproduct" } 
+      : { name: "Dashboard", link: "/admin"}
   ];
 
   // Extract all searchable items for suggestions
-  const allCategories = data.flatMap(item =>
-    item.dropdown
-      ? item.dropdown.map(subItem => ({
-        name: subItem.name,
-        link: subItem.link,
-        category: item.name
-      }))
-      : [{
-        name: item.name,
-        link: item.link,
-        category: null
-      }]
+  const allCategories = data.flatMap(item => 
+    item.dropdown 
+      ? item.dropdown.map(subItem => ({ 
+          name: subItem.name, 
+          link: subItem.link,
+          category: item.name
+        })) 
+      : [{ 
+          name: item.name, 
+          link: item.link,
+          category: null
+        }]
   );
 
   // Handle login button click
@@ -101,7 +98,7 @@ function Navbar() {
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchInput(value);
-
+    
     if (value.trim() === "") {
       setSearchResults([]);
       setShowSuggestions(false);
@@ -109,10 +106,10 @@ function Navbar() {
     }
 
     // Filter categories based on input
-    const filtered = allCategories.filter(item =>
+    const filtered = allCategories.filter(item => 
       item.name.toLowerCase().includes(value.toLowerCase())
     );
-
+    
     setSearchResults(filtered);
     setShowSuggestions(true);
   };
@@ -124,7 +121,7 @@ function Navbar() {
         setShowSuggestions(false);
       }
     }
-
+    
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -168,55 +165,55 @@ function Navbar() {
           {/* Desktop Navigation Links - Hidden on Mobile */}
           <div className="hidden lg:flex items-center justify-center">
             {data.map((item, index) => (
-              <div key={index} className="relative">
-                {item.dropdown ? (
-                  <div
-                    className="relative group"
-                    onMouseEnter={() => setHovered(item.name)}
-                    onMouseLeave={() => setHovered(null)}
-                  >
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setHovered(hovered === item.name ? null : item.name);
-                      }}
-                      className={`flex items-center space-x-1.5 px-2 py-1 rounded-md text-base font-medium transition-colors duration-200 
+             <div key={index} className="relative">
+             {item.dropdown ? (
+               <div
+                 className="relative group"
+                 onMouseEnter={() => setHovered(item.name)}
+                 onMouseLeave={() => setHovered(null)}
+               >
+                 <button
+                   onClick={(e) => {
+                     e.preventDefault(); 
+                     setHovered(hovered === item.name ? null : item.name);
+                   }}
+                   className={`flex items-center space-x-1.5 px-2 py-1 rounded-md text-base font-medium transition-colors duration-200 
                      ${isActive(item.link) ? "text-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
-                    >
-                      <span className="ml-1.5">{item.name}</span>
-                      <IoMdArrowDropdown className="text-xl" />
-                    </button>
-
-                    {/* Dropdown Panel */}
-                    <div
-                      className={`absolute left-0 mt-2 w-96 bg-white border border-gray-200 rounded-lg shadow-xl z-20 transition-all duration-200 ease-in-out transform origin-top-left
+                 >
+                   <span className="ml-1.5">{item.name}</span>
+                   <IoMdArrowDropdown className="text-xl" />
+                 </button>
+           
+                 {/* Dropdown Panel */}
+                 <div
+                   className={`absolute left-0 mt-2 w-96 bg-white border border-gray-200 rounded-lg shadow-xl z-20 transition-all duration-200 ease-in-out transform origin-top-left
                    ${hovered === item.name ? "opacity-100 max-h-72 overflow-y-auto visible" : "opacity-0 max-h-0 invisible"}`}
-                    >
-                      <div className="p-2 max-h-96 grid grid-cols-2 gap-2">
-                        {item.dropdown.map((subItem, subIndex) => (
-                          <Link
-                            key={subIndex}
-                            to={subItem.link}
-                            className={`block px-4 py-3 text-sm rounded-md hover:bg-blue-50 transition-colors duration-150 text-gray-700`}
-                          >
-                            {subItem.name}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <Link
-                    to={item.link}
-                    className={`flex items-center space-x-1.5 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 
+                 >
+                   <div className="p-2 max-h-96 grid grid-cols-2 gap-2">
+                     {item.dropdown.map((subItem, subIndex) => (
+                       <Link
+                         key={subIndex}
+                         to={subItem.link}
+                         className={`block px-4 py-3 text-sm rounded-md hover:bg-blue-50 transition-colors duration-150 text-gray-700`}
+                       >
+                         {subItem.name}
+                       </Link>
+                     ))}
+                   </div>
+                 </div>
+               </div>
+             ) : (
+               <Link
+                 to={item.link}
+                 className={`flex items-center space-x-1.5 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 
                    ${isActive(item.link) ? "text-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
-                  >
-                    {item.icon}
-                    <span>{item.name}</span>
-                  </Link>
-                )}
-              </div>
-
+               >
+                 {item.icon}
+                 <span>{item.name}</span>
+               </Link>
+             )}
+           </div>
+           
             ))}
           </div>
 
@@ -224,8 +221,8 @@ function Navbar() {
           <div className="flex items-center space-x-5">
             {/* Desktop Search */}
             <div ref={searchRef} className="hidden md:block relative">
-              <form
-                onSubmit={handleSearchSubmit}
+              <form 
+                onSubmit={handleSearchSubmit} 
                 className="flex items-center"
               >
                 <div className="relative">
@@ -248,8 +245,8 @@ function Navbar() {
                 <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                   <ul className="py-1 max-h-64 overflow-y-auto">
                     {searchResults.map((result, index) => (
-                      <li
-                        key={index}
+                      <li 
+                        key={index} 
                         className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
                         onClick={() => handleSuggestionClick(result.link)}
                       >
@@ -266,20 +263,16 @@ function Navbar() {
 
             {/* Notification and Cart Icons */}
             <div className="flex items-center space-x-2">
-             
               <Notifications />
-
+              
               <Link to="/cart" className="p-2.5 text-gray-600 rounded-full hover:bg-gray-100 hover:text-blue-600 transition-colors relative">
                 <FaShoppingCart className="w-5 h-5" />
-                
-
                 {totalQuantity > 0 && (
                   <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold px-1.5 min-w-[18px] h-[18px] rounded-full flex items-center justify-center">
                     {totalQuantity}
                   </span>
                 )}
               </Link>
-               <Wallet/>
             </div>
 
             {/* User Profile or Login Button */}
@@ -287,16 +280,16 @@ function Navbar() {
               {isLoggedIn ? (
                 <div
                   className="relative"
-                // onMouseEnter={() => setUserDropdown(true)}
-                // onMouseLeave={() => setUserDropdown(false)}
+                  // onMouseEnter={() => setUserDropdown(true)}
+                  // onMouseLeave={() => setUserDropdown(false)}
                 >
                   <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100"
-                    onClick={() => setUserDropdown(!userDropdown)}>
+                  onClick={()=>setUserDropdown(!userDropdown)}>
                     <FaUserCircle className="w-7 h-7" />
                   </button>
 
                   {/* User Dropdown */}
-                  <div
+                  <div 
                     className={`absolute right-0 mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-xl z-50 transition-all duration-200 ease-in-out transform origin-top-right
                       ${userDropdown ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}
                   >
@@ -306,31 +299,23 @@ function Navbar() {
                     </div>
                     <div className="py-1">
                       <Link to="/profile" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
-                        onClick={() => setUserDropdown(!userDropdown)}
+                      onClick={()=>setUserDropdown(!userDropdown)}
                       >
                         <FiUser className="w-4 h-4 mr-3 text-gray-500" />
                         My Profile
                       </Link>
-                      <Link to="/wishlist" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
-                        onClick={() => setUserDropdown(!userDropdown)}>
-                        <FiHeart className="w-4 h-4 mr-3 text-gray-500" />
-                        Wishlist
-                      </Link>
-                      <Link
-                        to="/myrentedproducts"
-                        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        <AiOutlineProduct className="w-4 h-4 mr-3 text-gray-500" />
-                        <span>My Rented Products</span>
+                      <Link to="/settings" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                      onClick={()=>setUserDropdown(!userDropdown)}>
+                        <FiSettings className="w-4 h-4 mr-3 text-gray-500" />
+                        Settings
                       </Link>
                       <Link to="/myorders" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
-                        onClick={() => setUserDropdown(!userDropdown)}>
-                        <IoCartOutline className="w-4 h-4 mr-3 text-gray-500" />
+                      onClick={()=>setUserDropdown(!userDropdown)}>
+                        <FaShoppingCart className="w-4 h-4 mr-3 text-gray-500" />
                         My Orders
                       </Link>
-                      <button
-                        onClick={handleLogout}
+                      <button 
+                        onClick={handleLogout} 
                         className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                       >
                         <HiOutlineLogout className="w-4 h-4 mr-3 text-gray-500" />
@@ -361,15 +346,15 @@ function Navbar() {
       </nav>
 
       {/* Mobile Menu - Only visible when menu is open */}
-      <div
+      <div 
         className={`md:hidden bg-white border-t border-gray-200 transition-all duration-300 ease-in-out overflow-hidden
           ${menuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"}`}
       >
         <div className="px-4 pt-2 pb-3 space-y-1">
           {/* Mobile Search */}
           <div className="py-2">
-            <form
-              onSubmit={handleSearchSubmit}
+            <form 
+              onSubmit={handleSearchSubmit} 
               className="flex items-center rounded-lg overflow-hidden border border-gray-300"
             >
               <input
@@ -390,8 +375,8 @@ function Navbar() {
               <div className="mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                 <ul className="py-1 max-h-64 overflow-y-auto">
                   {searchResults.map((result, index) => (
-                    <li
-                      key={index}
+                    <li 
+                      key={index} 
                       className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
                       onClick={() => handleSuggestionClick(result.link)}
                     >
@@ -412,11 +397,11 @@ function Navbar() {
               {item.dropdown ? (
                 <div className="space-y-1  ">
                   {/* Dropdown Title */}
-                  <button
+                  <button 
                     onClick={() => setHovered(hovered === item.name ? null : item.name)}
                     className={`flex justify-between items-center w-full px-3 py-2.5 rounded-md text-left 
-                      ${isActive(item.link)
-                        ? "bg-blue-50 text-blue-600"
+                      ${isActive(item.link) 
+                        ? "bg-blue-50 text-blue-600" 
                         : "text-gray-700 hover:bg-gray-50"}`}
                   >
                     <span className="flex items-center">
@@ -427,18 +412,18 @@ function Navbar() {
                   </button>
 
                   {/* Dropdown Items */}
-                  <div
+                  <div 
                     className={`transition-all duration-200 ease-in-out overflow-hidden
                       ${hovered === item.name ? "max-h-72 opacity-100 overflow-y-auto" : "max-h-0 opacity-0"}`}
                   >
                     <div className="pl-5 pr-3  space-y-1 border-l-2 border-gray-100 ml-3">
                       {item.dropdown.map((subItem, subIndex) => (
-                        <Link
+                        <Link 
                           key={subIndex}
                           to={subItem.link}
                           className={`block px-3 py-2 rounded-md text-sm
-                            ${isActive(subItem.link)
-                              ? "bg-blue-50 text-blue-600"
+                            ${isActive(subItem.link) 
+                              ? "bg-blue-50 text-blue-600" 
                               : "text-gray-600 hover:bg-gray-50"}`}
                           onClick={() => setMenuOpen(false)}
                         >
@@ -449,11 +434,11 @@ function Navbar() {
                   </div>
                 </div>
               ) : (
-                <Link
-                  to={item.link}
+                <Link 
+                  to={item.link} 
                   className={`flex items-center px-3 py-2.5 rounded-md text-base
-                    ${isActive(item.link)
-                      ? "bg-blue-50 text-blue-600"
+                    ${isActive(item.link) 
+                      ? "bg-blue-50 text-blue-600" 
                       : "text-gray-700 hover:bg-gray-50"}`}
                   onClick={() => setMenuOpen(false)}
                 >
@@ -471,43 +456,35 @@ function Navbar() {
                 <div className="px-3 py-2">
                   <p className="text-sm font-medium text-gray-700">Account</p>
                 </div>
-                <Link
-                  to="/profile"
+                <Link 
+                  to="/profile" 
                   className="flex items-center px-3 py-2.5 rounded-md text-gray-700 hover:bg-gray-50"
                   onClick={() => setMenuOpen(false)}
                 >
                   <FiUser className="w-5 h-5 mr-2" />
                   <span>Profile</span>
                 </Link>
-                <Link
-                  to="/settings"
+                <Link 
+                  to="/settings" 
                   className="flex items-center px-3 py-2.5 rounded-md text-gray-700 hover:bg-gray-50"
                   onClick={() => setMenuOpen(false)}
                 >
                   <FiSettings className="w-5 h-5 mr-2" />
                   <span>Settings</span>
                 </Link>
-                <Link
-                  to="/myrentedproducts"
-                  className="flex items-center px-3 py-2.5 rounded-md text-gray-700 hover:bg-gray-50"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <FaShoppingCart className="w-5 h-5 mr-2" />
-                  <span>My Rented Products</span>
-                </Link>
-                <Link
-                  to="/myorders"
+                <Link 
+                  to="/myorders" 
                   className="flex items-center px-3 py-2.5 rounded-md text-gray-700 hover:bg-gray-50"
                   onClick={() => setMenuOpen(false)}
                 >
                   <FaShoppingCart className="w-5 h-5 mr-2" />
                   <span>My Orders</span>
                 </Link>
-                <button
+                <button 
                   onClick={() => {
                     handleLogout();
                     setMenuOpen(false);
-                  }}
+                  }} 
                   className="flex items-center w-full px-3 py-2.5 rounded-md text-gray-700 hover:bg-gray-50"
                 >
                   <HiOutlineLogout className="w-5 h-5 mr-2" />
