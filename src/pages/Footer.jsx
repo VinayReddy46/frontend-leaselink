@@ -57,7 +57,7 @@ const Footer = () => {
                 <img src="https://www.svgrepo.com/show/22048/dribbble.svg" className="" width="30" height="30" alt="db" />
             </div>
         </div>
-        <p className="font-sans p-8 text-start md:text-center md:text-lg md:p-4">© 2023 You Company Inc. All rights reserved.</p>
+        <p className="font-sans p-8 text-gray-800 dark:text-gray-300 text-start md:text-center md:text-lg md:p-4">© 2023 You Company Inc. All rights reserved.</p>
     </div>
 </footer>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Shield, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import productsData from './Product';
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
@@ -7,23 +7,42 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { addToCart } from '../../redux/features/cartSlice';
 import { useSelector, useDispatch } from 'react-redux';
+import { useGetProductByIdQuery } from '../../redux/services/addProductSlice';
 
 const ProductDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const product = location.state?.product;
-
-  if (!product) {
-    return <h2 className="text-center text-red-500 font-semibold text-xl py-12">⚠️ No Product Found</h2>;
-  }
-
+  const { id } = useParams();
+  console.log("productId", id);
+  
+  const { data: productData, isLoading, error } = useGetProductByIdQuery(id);
+  console.log("productData", productData);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [rentalAmount, setRentalAmount] = useState(0);
   const [selectedInsurance, setSelectedInsurance] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+
+  if (isLoading) {
+    return <h2 className="text-center font-semibold text-xl py-12">Loading product details...</h2>;
+  }
+
+  if (error) {
+    return <h2 className="text-center text-red-500 font-semibold text-xl py-12">⚠️ Error loading product: {error.message}</h2>;
+  }
+
+  if (!productData || !productData.product) {
+    return <h2 className="text-center text-red-500 font-semibold text-xl py-12">⚠️ No Product Found</h2>;
+  }
+
+  const product = productData.product;
+  const category = productData.category;
+  const averageRating = productData.averageRating;
+  const insurance = productData.insurance;
+  
+  console.log("product", product);
 
   // Setup product images array - use multiple images if available or create an array with the single image
   const productImages = product.images || (product.image ? [product.image] : []);
@@ -74,7 +93,7 @@ const ProductDetails = () => {
     }
   
     const cartItem = {
-      id: product.id,
+      id: product._id,
       name: product.name,
       image: product.image || product.images?.[0], // Include product image
       price: product.price, // Keep original price
@@ -361,7 +380,7 @@ const ProductDetails = () => {
                       key={plan.id} 
                       className={`border rounded-xl p-4 cursor-pointer transition-all duration-200 ${
                         selectedInsurance?.id === plan.id 
-                          ? 'border-blue-500 bg-blue-50 shadow-sm' 
+                          ? 'border-blue-600 bg-blue-50 shadow-sm' 
                           : 'border-slate-200 hover:border-blue-200 hover:bg-slate-50'
                       }`} 
                       onClick={() => setSelectedInsurance(plan)}

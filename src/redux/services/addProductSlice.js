@@ -10,7 +10,7 @@ export const addProductApi = apiSlice.injectEndpoints({
       query: () => `product/`,
     }),
     getProductById: builder.query({
-      query: (id) => `products/${id}`,
+      query: (id) => `product/products/${id}`,
     }),
     createProduct: builder.mutation({
       query: (newProduct) => ({
