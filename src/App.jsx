@@ -26,6 +26,7 @@ import Settings from "./compoments/admin/Settings";
 import ProfileSettings from "./compoments/profileComponents/ProfileSettings";
 import FAQManager from "./compoments/admin/contentmangement/FAQsList";
 import CategoryList from "./compoments/admin/contentmangement/Categories";
+import Trancsactions from "./compoments/admin/Transactions"; 
 import UserManagement from "./compoments/admin/UserMangement";
 // import PaymentForm from "./compoments/HomeComponents/PaymentForm";
 import TrustSystem from "./pages/Ratings";
@@ -44,7 +45,8 @@ import { SearchProvider } from "./compoments/contexts/SearchContext";
 import Myrentedproducts from "./compoments/profileComponents/MyRentedProducts";
 import { WishlistProvider } from "./compoments/contexts/WishlistContext";
 import WishlistPage from "./compoments/HomeComponents/LandingPageComponents/WishlistPage";
- 
+import WithdrawRequest from "./compoments/admin/WithdrawRequest";
+
 
 const Laptops = () => <h1>Laptops Page</h1>;
 const TVMonitors = () => <h1>TV & Monitors Page</h1>;
@@ -137,6 +139,9 @@ function App() {
           <Route index element={<Dashboard/>} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="customer-service" element={<CustomerService/>} />
+          <Route path="transactions" element={<Trancsactions/>} />  
+          <Route path="withdrawrequest" element={<WithdrawRequest/>} />  
+
           <Route path="settings" element={<Settings/>} />
           <Route path="faqs" element={<FAQManager/>} />
           <Route path="categories" element={<CategoryList/>} />

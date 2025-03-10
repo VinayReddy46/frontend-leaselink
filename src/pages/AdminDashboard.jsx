@@ -12,7 +12,9 @@ import {
   FiChevronDown,
   FiChevronUp,
 } from "react-icons/fi";
-import { FaHome } from "react-icons/fa";
+import { FaFileInvoice, FaHome } from "react-icons/fa";
+import { CiBank } from "react-icons/ci";
+
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [openMenus, setOpenMenus] = useState({});
@@ -34,6 +36,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       icon: <FiMessageSquare />,
       path: "customer-service",
     },
+    { name: "Trancsactions", icon: <FaFileInvoice />, path: "transactions" },
+    { name: "Withdraw request", icon: <CiBank /> , path: "withdrawrequest" },
+
     { name: "Settings", icon: <FiSettings />, path: "settings" },
   ];
 
