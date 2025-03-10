@@ -1,30 +1,32 @@
 import { configureStore } from "@reduxjs/toolkit";
-import cartReducer from "./cartSlice";
+import cartReducer from "./features/cartSlice";
 import { persistStore, persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage"; // Uses localStorage
+import storage from "redux-persist/lib/storage"; 
 import { combineReducers } from "redux";
+import { apiSlice } from "./services/apiSlice"; 
+import authSlice from "./features/authSlice";
 
-// Combine reducers (useful if you have multiple reducers)
 const rootReducer = combineReducers({
   cart: cartReducer,
+  auth: authSlice,
+  [apiSlice.reducerPath]: apiSlice.reducer, 
 });
 
-// Configure Redux Persist
 const persistConfig = {
   key: "root",
-  storage, 
+  storage,
+  whitelist: ["cart"], 
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-// Create store with persisted reducer
+
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: persistedReducer, 
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // Required for redux-persist
-    }),
+      serializableCheck: false, 
+    }).concat(apiSlice.middleware), 
 });
 
-// Create persistor to persist state
 export const persistor = persistStore(store);

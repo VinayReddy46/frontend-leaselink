@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { currentUser } from "./compoments/Ordercomponents/data/sampleData";
 // import Signin from "./pages/Signin";
 import Verfication from "./pages/Verfication";
+import Blog from "./compoments/admin/contentmangement/Blog";
 import AdminDashboard from "./pages/AdminDashboard";
 import Rental from "./pages/Rental";
 import BookingPayment from "./pages/BookingPayment";
@@ -143,6 +144,8 @@ function App() {
               <Route path="customer-service" element={<CustomerService />} />
               <Route path="settings" element={<Settings />} />
               <Route path="faqs" element={<FAQManager />} />
+
+              <Route path="blogs" element={<Blog />} />
               <Route path="categories" element={<CategoryList />} />
               <Route path="users-management" element={<UserManagement />} />
             </Route>

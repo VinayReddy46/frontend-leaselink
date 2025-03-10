@@ -6,11 +6,12 @@ import { FiMenu, FiX } from "react-icons/fi";
 import { FiUser, FiSettings } from "react-icons/fi";
 import { HiOutlineLogout } from "react-icons/hi";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Notifications from "./navbarComponents/Notifications";
 import { AiOutlineProduct } from "react-icons/ai";
 import { IoCartOutline } from "react-icons/io5";
 import Wallet from "./navbarComponents/Wallet";
+import { logout } from "../redux/features/authSlice";
 
 function Navbar() {
   const { totalQuantity } = useSelector((state) => state.cart);
@@ -25,16 +26,18 @@ function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const role = 'user'; // This would normally come from your auth context/state
+  const {userInfo,isAuthenticated } =useSelector(state=>state.auth)
 
   // Check if user is logged in on component mount
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      const token = localStorage.getItem('authToken');
-      setIsLoggedIn(!token);
-    };
+  // useEffect(() => {
+  //   const checkLoginStatus = () => {
+  //     const token = localStorage.getItem('authToken');
+  //     setIsLoggedIn(!token);
+  //   };
 
-    checkLoginStatus();
-  }, []);
+  //   checkLoginStatus();
+  // }, []);
+  const dispatch =useDispatch();
 
   // Navigation data with icons
   const data = [
@@ -92,8 +95,9 @@ function Navbar() {
 
   // Handle logout
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    setIsLoggedIn(false);
+    dispatch(logout())
+    // localStorage.removeItem('authToken');
+    // setIsLoggedIn(false);
     navigate('/login');
   };
 
@@ -284,7 +288,7 @@ function Navbar() {
 
             {/* User Profile or Login Button */}
             <div className="hidden md:block">
-              {isLoggedIn ? (
+              {!isAuthenticated ? (
                 <div
                   className="relative"
                 // onMouseEnter={() => setUserDropdown(true)}
