@@ -3,22 +3,40 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import logo from "../assets/logoForPages.webp";
-
+import { useLoginMutation,useForgotPasswordMutation } from "../redux/services/authSlice";
+import { setCredentials } from "../redux/features/authSlice";
+import { useDispatch } from "react-redux";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [show, setShow] = useState(false);
 
+  const dispatch = useDispatch();
+
   const navigate = useNavigate();
+
+  const [login, { isLoading: isLoggingIn }] = useLoginMutation();
+  const [forgot, { isLoading: isForgotLoading }] = useLoginMutation();
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    try {
+      const res=await login({email,password});
+      if(res.data.success){
+        toast.success( res?.data?.message ||"Login successful.");
+        console.log(res.data.data)
+        const user = res.data.data;
+        dispatch(setCredentials(user));
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error?.data?.message || "Login Failed")
+    }
 
-    toast.success("Login Successful! Welcome back!");
-    navigate("/");
-    setIsLoading(false);
+   
+    
   };
 
   return (
@@ -92,9 +110,9 @@ const Login = () => {
             <button
               type="submit"
               className="bg-blue-500 w-full text-white px-4 py-2 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
-              disabled={isLoading}
+              disabled={isLoggingIn}
             >
-              {isLoading ? "Loading..." : "Login"}
+              {isLoggingIn ? "Loading..." : "Login"}
             </button>
           </div>
         </form>

@@ -17,15 +17,15 @@ const productsData = [
     insurancePlans: [
       {
         id: 'basic',
-        name: 'Dell basic coverage',
+        name: 'basic coverage',
         description: 'cover accidental damage',
-        price: 400,
+        price: 500,
       },
       {
         id: 'premium',
-        name: 'Dell premium',
+        name: 'full coverage',
         description: 'cover all damages including water damage',
-        price: 1600
+        price: 1500
       }
     ]
   },
@@ -46,15 +46,15 @@ const productsData = [
     insurancePlans: [
       {
         id: 'basic',
-        name: 'HP lite',
+        name: 'basic coverage',
         description: 'cover accidental damage',
-        price: 200
+        price: 500
       },
       {
         id: 'premium',
-        name: 'HP Advanced',
+        name: 'full coverage',
         description: 'cover all damages including water damage',
-        price: 2500
+        price: 1500
       }
     ]
   },
@@ -75,13 +75,13 @@ const productsData = [
     insurancePlans: [
       {
         id: 'basic',
-        name: 'Lenovo Min',
+        name: 'basic coverage',
         description: 'cover accidental damage',
-        price: 750
+        price: 500
       },
       {
         id: 'premium',
-        name: 'Lenovo Sheild',
+        name: 'full coverage',
         description: 'cover all damages including water damage',
         price: 1500
       }
@@ -104,15 +104,15 @@ const productsData = [
     insurancePlans: [
       {
         id: 'basic',
-        name: 'Apple One',
+        name: 'basic coverage',
         description: 'cover accidental damage',
-        price: 1500
+        price: 500
       },
       {
         id: 'premium',
-        name: 'Apple Advanced',
+        name: 'full coverage',
         description: 'cover all damages including water damage',
-        price: 3500
+        price: 1500
       }
     ]
   },

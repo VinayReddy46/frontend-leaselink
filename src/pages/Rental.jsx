@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import RentalPage from "../compoments/Rentalcomponents/RentalPage";
+import RentalPage from "../compoments/HomeComponents/RentalPage";
 import ProductsData from "../compoments/CartComponents/Product";
 
 

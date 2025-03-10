@@ -3,7 +3,7 @@ import { FaRegPaperPlane } from "react-icons/fa";
 import { IoMdRefresh } from "react-icons/io";
 import { toast } from "react-toastify";
 import { useSearchParams,useNavigate } from 'react-router-dom';
-
+import { useOtpVerifyMutation,useReSendOtpMutation } from "../redux/services/authSlice";
 
 const OtpVerification = () => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -28,25 +28,49 @@ const OtpVerification = () => {
     }
   };
 
+  const [verify, { isLoading: isVerifingIn }] = useOtpVerifyMutation();
+  const [resend] = useReSendOtpMutation();
+
   // Submit OTP
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     const otpCode = otp.join("");
-  setLoading(false)
-    toast.success( "User registered successfully.");
-    navigate("/");  
+
+    try {
+      const res=await verify({email,otp:otpCode})
+      console.log(res)
+      if(res?.data?.success){
+        toast.success( res?.data?.message ||"User registered successfully.");
+        navigate("/login");
+      }
+       
+    } catch (error) {
+      console.log(error)
+      toast.error(error?.data?.message || "OTP Verifing Failed")
+    }
+  
+    
   };
 
   // Resend OTP
   const handleResendOTP = async () => {
 
     setResendDisabled(true);
+    console.log(email)
+    try {
+      const res = await resend({email})
+      console.log(res)
+      if(res.data.success){
+        toast.success(res?.data?.message|| "OTP resent successfully!");
+      }
       
-        toast.success( "OTP resent successfully!");
-    
-    setTimeout(() => setResendDisabled(false), 60000); // Disable resend for 60s
+    } catch (error) {
+      console.log(error)
+      toast.error(error?.data?.message ||"Resend OTP Failed...")
+    }
+      
+    setTimeout(() => setResendDisabled(false), 6000); // Disable resend for 60s
   };
 
   return (
@@ -76,7 +100,7 @@ const OtpVerification = () => {
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 disabled:bg-gray-400"
           disabled={loading}
         >
-          {loading ? "Verifying..." : "Verify OTP"}
+          {isVerifingIn ? "Verifying..." : "Verify OTP"}
           <FaRegPaperPlane />
         </button>
       </form>
