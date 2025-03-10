@@ -6,25 +6,25 @@ export const insuranceApi = apiSlice.injectEndpoints({
       query: () => "insurance",
     }),
     getInsuranceById: builder.query({
-      query: (id) => `insurances/${id}`,
+      query: (id) => `insurance/${id}`,
     }),
     createInsurance: builder.mutation({
       query: (newInsurance) => ({
-        url: "insurances",
+        url: "insurance",
         method: "POST",
         body: newInsurance,
       }),
     }),
     updateInsurance: builder.mutation({
       query: ({ id, ...updatedInsurance }) => ({
-        url: `insurances/${id}`,
+        url: `insurance/${id}`,
         method: "PUT",
         body: updatedInsurance,
       }),
     }),
     deleteInsurance: builder.mutation({
       query: (id) => ({
-        url: `insurances/${id}`,
+        url: `insurance/${id}`,
         method: "DELETE",
       }),
     }),

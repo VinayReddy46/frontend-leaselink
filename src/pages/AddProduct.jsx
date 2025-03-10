@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiUpload, FiAlertCircle } from "react-icons/fi";
 import { MdOutlineDelete, MdEdit } from "react-icons/md";
 import { toast } from "react-toastify";
@@ -138,9 +138,10 @@ const AddProduct = () => {
     { name: "Gold", description: "Gold Coverage", price: "20" },
     { name: "Full", description: "Full Coverage", price: "30" },
   ]);
+  const [selectedInsurances, setSelectedInsurances] = useState([]);
 
   //insurance
-  const { data: insurances, refetch } = useGetInsurancesQuery();
+  const { data: insuranceData, refetch } = useGetInsurancesQuery();
   const [createInsurance, { isLoading: isCreateLoading }] =
     useCreateInsuranceMutation();
   const [updateInsurance] = useUpdateInsuranceMutation();
@@ -149,6 +150,27 @@ const AddProduct = () => {
   //features
   const [features, setFeatures] = useState([]);
   const [newFeature, setNewFeature] = useState("");
+
+  const [createProduct, { isLoading: isCreatingProduct }] =
+    useCreateProductMutation();
+
+  useEffect(() => {
+    // Update predefined insurance plans with API data when available
+    if (
+      insuranceData?.insurancePlans &&
+      insuranceData.insurancePlans.length > 0
+    ) {
+      const apiPlans = insuranceData.insurancePlans.map((plan) => ({
+        id: plan._id,
+        name: plan.plan_name,
+        description: plan.description,
+        price: plan.price,
+        features: plan.features || [],
+      }));
+
+      setPredefinedInsurancePlans(apiPlans);
+    }
+  }, [insuranceData]);
 
   const handleAddFeature = () => {
     if (newFeature.trim()) {
@@ -183,65 +205,307 @@ const AddProduct = () => {
   };
 
   const handleAddPredefinedPlan = () => {
-    if (selectedPlan) {
-      const planToAdd = predefinedInsurancePlans.find(
-        (plan) => plan.name === selectedPlan
-      );
-      if (
-        planToAdd &&
-        !insurancePlans.some((plan) => plan.name === planToAdd.name)
-      ) {
-        setInsurancePlans([...insurancePlans, planToAdd]);
-        setSelectedPlan("");
-      }
+    if (!selectedPlan) return;
+
+    // Find the selected plan in the predefined plans
+    const planToAdd = predefinedInsurancePlans.find(
+      (plan) => plan.id === selectedPlan || plan.name === selectedPlan
+    );
+
+    if (!planToAdd) return;
+
+    // Check if plan already exists in insurancePlans
+    const planExists = insurancePlans.some(
+      (plan) =>
+        (plan.id && plan.id === planToAdd.id) ||
+        (plan.name && plan.name === planToAdd.name) ||
+        (plan.plan_name && plan.plan_name === planToAdd.name)
+    );
+
+    if (planExists) {
+      toast.warning("This insurance plan is already added");
+      return;
     }
+
+    // Add to insurancePlans
+    setInsurancePlans([...insurancePlans, planToAdd]);
+
+    // Also add this plan's ID to the selectedInsurances array
+    const planId = planToAdd.id || planToAdd._id || planToAdd.name;
+    setSelectedInsurances((prev) => [...prev, planId]);
+
+    // Clear selection
+    setSelectedPlan("");
+    toast.success("Insurance plan added");
+  };
+
+  const handleEditInsurancePlan = (index) => {
+    const planToEdit = insurancePlans[index];
+    // Set the features array based on the plan being edited
+    setFeatures(planToEdit.features || []);
+    // Set the form values
+    setInsuranceForm({
+      plan_name: planToEdit.name,
+      description: planToEdit.description,
+      price: planToEdit.price.toString(),
+    });
+    setEditIndex(index);
+    setShowInsuranceForm(true);
   };
 
   const handleAddInsurancePlan = async () => {
-    const newPlan = { ...insuranceForm };
-    if (editIndex !== null) {
-      const updatedPlans = [...insurancePlans];
-      updatedPlans[editIndex] = newPlan;
-      setInsurancePlans(updatedPlans);
-      console.log(insurancePlans);
-      const res = await updateInsurance(...insuranceForm, features);
-      console.log(res);
-    } else {
-      if (!insurancePlans.some((plan) => plan.name === newPlan.name)) {
-        setInsurancePlans([...insurancePlans, newPlan]);
-        setPredefinedInsurancePlans([...predefinedInsurancePlans, newPlan]);
-        const payload ={
-          plan_name: insuranceForm.plan_name,
-          description: insuranceForm.description,
-          price: insuranceForm.price,
-          features: features,
-        }
-        console.log(payload)
-        const res = await createInsurance(payload);
-        console.log(res);
-      }
+    // Validate the form
+    const errors = validateInsuranceForm();
+
+    if (Object.keys(errors).length > 0) {
+      // Display errors for each field
+      Object.entries(errors).forEach(([field, message]) => {
+        toast.error(message);
+      });
+      return;
     }
 
-    setShowInsuranceForm(false);
-    setInsuranceForm({
-      plan_name: "",
-      description: "",
-      price: "",
-      features: [],
-    });
-    setEditIndex(null);
+    try {
+      // Create the payload with the required structure
+      const payload = {
+        plan_name: insuranceForm.plan_name,
+        description: insuranceForm.description,
+        price: Number(insuranceForm.price), // Convert to number
+        features: features.length > 0 ? features : undefined,
+      };
+
+      if (editIndex !== null) {
+        // Update existing plan
+        const planBeingEdited = insurancePlans[editIndex];
+
+        // If the plan has an id (came from the API), update it through the API
+        if (planBeingEdited.id) {
+          try {
+            const res = await updateInsurance({
+              id: planBeingEdited.id,
+              ...payload,
+            });
+
+            if (res.data?.success) {
+              toast.success("Insurance plan updated successfully");
+              // Refresh the insurance plans list
+              refetch();
+            } else {
+              toast.error(
+                res.error?.data?.message || "Failed to update insurance plan"
+              );
+            }
+          } catch (error) {
+            console.error("Error updating insurance plan:", error);
+            toast.error("Failed to update insurance plan");
+          }
+        }
+
+        // Update the local state regardless of API success
+        const updatedPlans = [...insurancePlans];
+        updatedPlans[editIndex] = {
+          ...planBeingEdited, // Keep the id if it exists
+          name: payload.plan_name,
+          description: payload.description,
+          price: payload.price,
+          features: payload.features,
+        };
+        setInsurancePlans(updatedPlans);
+      } else {
+        // Add new plan
+        const newPlan = {
+          name: payload.plan_name,
+          description: payload.description,
+          price: payload.price,
+          features: payload.features,
+        };
+
+        if (!insurancePlans.some((plan) => plan.name === newPlan.name)) {
+          setInsurancePlans([...insurancePlans, newPlan]);
+
+          // Send to API
+          const res = await createInsurance(payload);
+
+          if (res.data?.success) {
+            toast.success("Insurance plan added successfully");
+            // Add the id from the response to the new plan
+            if (res.data?.insurancePlan?._id) {
+              const updatedPlans = [...insurancePlans];
+              updatedPlans[updatedPlans.length - 1] = {
+                ...newPlan,
+                id: res.data.insurancePlan._id,
+              };
+              setInsurancePlans(updatedPlans);
+            }
+            // Refresh the list of insurance plans
+            refetch();
+          } else {
+            toast.error(
+              res.error?.data?.message || "Failed to add insurance plan"
+            );
+          }
+        } else {
+          toast.warning("An insurance plan with this name already exists");
+        }
+      }
+
+      // Reset form
+      setShowInsuranceForm(false);
+      setInsuranceForm({
+        plan_name: "",
+        description: "",
+        price: "",
+        features: [],
+      });
+      setFeatures([]);
+      setEditIndex(null);
+    } catch (error) {
+      console.error("Error submitting insurance plan:", error);
+      toast.error(error.data?.message || "Failed to submit insurance plan");
+    }
   };
 
-  const handleSubmit = (e) => {
+  const validateInsuranceForm = () => {
+    const errors = {};
+
+    if (!insuranceForm.plan_name.trim()) {
+      errors.plan_name = "Plan name is required";
+    }
+
+    if (!insuranceForm.description.trim()) {
+      errors.description = "Description is required";
+    }
+
+    if (!insuranceForm.price) {
+      errors.price = "Price is required";
+    } else if (
+      isNaN(Number(insuranceForm.price)) ||
+      Number(insuranceForm.price) < 0
+    ) {
+      errors.price = "Price must be a positive number";
+    }
+
+    return errors;
+  };
+
+  const [formErrors, setFormErrors] = useState({});
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
 
-    console.log({
-      ...product,
-      images: images.filter((img) => img !== null),
-      insurancePlans,
+    // Validate required fields
+    const errors = {};
+    if (!product.name.trim()) errors.name = "Product name is required";
+    if (!product.brand.trim()) errors.brand = "Brand name is required";
+    if (!product.model.trim()) errors.model = "Model name is required";
+    if (!product.description.trim())
+      errors.description = "Description is required";
+    if (!product.category) errors.category = "Category is required";
+    if (!product.price || isNaN(product.price) || Number(product.price) <= 0)
+      errors.price = "Valid price is required";
+    if (
+      !product.quantity ||
+      isNaN(product.quantity) ||
+      Number(product.quantity) < 0
+    )
+      errors.quantity = "Valid quantity is required";
+
+    // Check if at least one image is uploaded
+    if (!images.some((img) => img !== null))
+      errors.images = "At least one product image is required";
+
+    // If insurance plans exist but none selected, show error
+    if (insurancePlans.length > 0 && selectedInsurances.length === 0) {
+      errors.selectedInsurances = "Please select at least one insurance plan";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      // Display errors and stop submission
+      setFormErrors(errors);
+      return;
+    }
+
+    try {
+      // Format data for API according to backend requirements
+      const formData = new FormData();
+
+      // Add product details exactly as expected by the backend
+      formData.append("name", product.name);
+      formData.append("brand", product.brand);
+      formData.append("model", product.model);
+      formData.append("description", product.description);
+      formData.append("category", product.category); // This should already be the category ID from the select
+      formData.append("is_best_seller", product.isBestseller);
+      formData.append("price", parseFloat(product.price));
+      formData.append("total_quantity", parseInt(product.quantity));
+
+      // Handle insurance - match the backend's expected fields
+      const hasInsurance = insurancePlans.length > 0;
+      formData.append("insurance", hasInsurance);
+
+      // Add selected insurance IDs if available
+      if (hasInsurance && selectedInsurances.length > 0) {
+        // Since FormData doesn't naturally handle arrays, we need to either:
+        // 1. Use append multiple times with the same key
+        selectedInsurances.forEach((insuranceId) => {
+          formData.append("selected_insurance", insuranceId);
+        });
+
+        // 2. Or convert to JSON string if the backend expects it that way
+        // formData.append("selected_insurance", JSON.stringify(selectedInsurances));
+      }
+
+      // Add images that are not null - the backend expects them in req.files
+      // which will be automatically populated since we're using FormData with files
+      images.forEach((image) => {
+        if (image && image.file) {
+          console.log(image.file, "inside image");
+          // The backend expects multiple files with no specific field name
+          // The multer middleware will collect them into req.files
+          formData.append("images", image.file);
+        }
+      });
+
+      // Send product data to API
+      await createProduct(formData);
+
+      toast.success("Product added successfully!");
+
+      // Reset form
+      setProduct({
+        name: "",
+        brand: "",
+        model: "",
+        description: "",
+        price: "",
+        quantity: "",
+        category: "",
+        isBestseller: false,
+      });
+      setImages(Array(4).fill(null));
+      setInsurancePlans([]);
+      setSelectedInsurances([]);
+      setSubmitAttempted(false);
+      setFormErrors({});
+    } catch (error) {
+      console.error("Failed to add product:", error);
+      toast.error(
+        error.data?.message || "Failed to add product. Please try again."
+      );
+    }
+  };
+
+  const handleInsuranceSelection = (planId) => {
+    setSelectedInsurances((prev) => {
+      if (prev.includes(planId)) {
+        // If already selected, remove it
+        return prev.filter((id) => id !== planId);
+      } else {
+        // If not selected, add it
+        return [...prev, planId];
+      }
     });
-    setSubmitAttempted(false);
   };
 
   return (
@@ -304,6 +568,7 @@ const AddProduct = () => {
               onChange={(e) => setProduct({ ...product, name: e.target.value })}
               placeholder="Type product name here"
               required
+              error={formErrors.name}
             />
             <Input
               label="Brand Name"
@@ -315,6 +580,7 @@ const AddProduct = () => {
               }
               placeholder="Type Brand name here"
               required
+              error={formErrors.brand}
             />
             <Input
               label="Model Name"
@@ -326,6 +592,7 @@ const AddProduct = () => {
               }
               placeholder="Type Model name here"
               required
+              error={formErrors.model}
             />
           </div>
           <Input
@@ -337,6 +604,7 @@ const AddProduct = () => {
               setProduct({ ...product, description: e.target.value })
             }
             placeholder="Write product description here"
+            error={formErrors.description}
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <Input
@@ -350,6 +618,7 @@ const AddProduct = () => {
               placeholder="25"
               min="0.01"
               step="0.01"
+              error={formErrors.price}
             />
             <Input
               label="Quantity"
@@ -361,6 +630,7 @@ const AddProduct = () => {
               }
               placeholder="25"
               min="1"
+              error={formErrors.quantity}
             />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -373,18 +643,23 @@ const AddProduct = () => {
                   setProduct({ ...product, category: e.target.value })
                 }
                 className={`w-full px-3 py-2 border ${
-                  submitAttempted
+                  submitAttempted && formErrors.category
                     ? "border-red-500 focus:ring-red-500"
                     : "border-gray-300 focus:ring-blue-500"
                 } rounded-md focus:outline-none focus:ring-2 transition-colors`}
               >
                 <option value="">Select a Category</option>
                 {categories?.map((cat) => (
-                  <option key={cat._id} value={cat.name}>
+                  <option key={cat._id} value={cat._id}>
                     {cat.name}
                   </option>
                 ))}
               </select>
+              {formErrors.category && (
+                <p className="mt-1 text-xs text-red-600 flex items-center">
+                  <FiAlertCircle className="mr-1" /> {formErrors.category}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -400,8 +675,8 @@ const AddProduct = () => {
               className="w-full sm:flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
             >
               <option value="">-- Select a Plan --</option>
-              {predefinedInsurancePlans?.map((plan,i) => (
-                <option key={i} value={plan.name}>
+              {predefinedInsurancePlans?.map((plan) => (
+                <option key={plan.id || plan.name} value={plan.id || plan.name}>
                   {plan.name} - ${plan.price}
                 </option>
               ))}
@@ -426,15 +701,78 @@ const AddProduct = () => {
           {insurancePlans.length > 0 && (
             <InsurancePlanTable
               plans={insurancePlans}
-              onEdit={(index) => {
-                setInsuranceForm(insurancePlans[index]);
-                setEditIndex(index);
-                setShowInsuranceForm(true);
+              onEdit={handleEditInsurancePlan}
+              onDelete={(index) => {
+                const planToDelete = insurancePlans[index];
+                // If the plan has an id (came from API), delete it through API
+                if (planToDelete.id) {
+                  deleteInsurance(planToDelete.id)
+                    .then((res) => {
+                      if (res.data?.success) {
+                        toast.success("Insurance plan deleted successfully");
+                        // Remove from local state
+                        setInsurancePlans(
+                          insurancePlans.filter((_, i) => i !== index)
+                        );
+                        // Refresh the list
+                        refetch();
+                      } else {
+                        toast.error(
+                          res.error?.data?.message ||
+                            "Failed to delete insurance plan"
+                        );
+                      }
+                    })
+                    .catch((error) => {
+                      console.error("Error deleting insurance plan:", error);
+                      toast.error("Failed to delete insurance plan");
+                    });
+                } else {
+                  // Just remove from local state if it's not from API
+                  setInsurancePlans(
+                    insurancePlans.filter((_, i) => i !== index)
+                  );
+                }
               }}
-              onDelete={(index) =>
-                setInsurancePlans(insurancePlans.filter((_, i) => i !== index))
-              }
             />
+          )}
+
+          {insurancePlans.length > 0 && (
+            <div className="mt-3">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Insurance Plans for Product
+              </label>
+
+              <div className="space-y-2">
+                {insurancePlans.map((plan) => {
+                  const planId = plan.id || plan._id || plan.name;
+                  return (
+                    <div key={planId} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id={`insurance-${planId}`}
+                        checked={selectedInsurances.includes(planId)}
+                        onChange={() => handleInsuranceSelection(planId)}
+                        className="mr-2 h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                      />
+                      <label
+                        htmlFor={`insurance-${planId}`}
+                        className="text-sm"
+                      >
+                        {plan.plan_name || plan.name} - ${plan.price}
+                      </label>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {formErrors.selectedInsurances && (
+                <p className="mt-1 text-xs text-red-600 flex items-center">
+                  <FiAlertCircle className="mr-1" />{" "}
+                  {formErrors.selectedInsurances}
+                </p>
+              )}
+            </div>
           )}
 
           {showInsuranceForm && (
@@ -575,8 +913,9 @@ const AddProduct = () => {
           <button
             type="submit"
             className="w-full sm:w-auto px-6 py-3 bg-black text-white font-medium rounded-md hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transform hover:scale-105 hover:shadow-lg active:bg-gray-900 active:scale-100"
+            disabled={isCreatingProduct}
           >
-            ADD PRODUCT
+            {isCreatingProduct ? "ADDING PRODUCT..." : "ADD PRODUCT"}
           </button>
         </div>
       </form>
