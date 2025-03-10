@@ -5,8 +5,10 @@ import productsData from './Product';
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { addToCart } from '../../redux/cartSlice';
+
+import { addToCart } from '../../redux/features/cartSlice';
 import { useSelector ,useDispatch } from 'react-redux';
+
 
 const ProductDetails = () => {
   const location = useLocation();

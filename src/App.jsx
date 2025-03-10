@@ -26,6 +26,7 @@ import CustomerService from "./compoments/admin/CustomerService";
 import Settings from "./compoments/admin/Settings";
 import FAQManager from "./compoments/admin/contentmangement/FAQsList";
 import CategoryList from "./compoments/admin/contentmangement/Categories";
+import Blogs from "./compoments/admin/contentmangement/Blogs";
 import UserManagement from "./compoments/admin/UserMangement";
 import PaymentForm from "./compoments/HomeComponents/PaymentForm";
 import AboutUs from "./pages/About";

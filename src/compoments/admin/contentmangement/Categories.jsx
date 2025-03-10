@@ -1,57 +1,139 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
+import { Dropdown } from "primereact/dropdown";
+import {
+  MdLaptopChromebook,
+  MdTv,
+  MdPhoneIphone,
+  MdWatch,
+  MdHeadset,
+  MdCameraAlt,
+} from "react-icons/md";
+import {
+  FaRegSnowflake,
+  FaTablet,
+  FaGamepad,
+  FaBlender,
+  FaFan,
+  FaLightbulb,
+} from "react-icons/fa";
+import { ImVideoCamera } from "react-icons/im";
+import { FiPrinter } from "react-icons/fi";
+import { MdAudiotrack } from "react-icons/md";
+import {
+  GiRiceCooker,
+  GiVacuumCleaner,
+  GiWashingMachine,
+} from "react-icons/gi";
+import { BiSolidCctv, BiSolidJoystick, BiFridge } from "react-icons/bi";
+import {
+  useGetCategoriesQuery,
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
+} from "../../../redux/services/categoriesSlice";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
-const initialProducts = [
-  { id: 1, name: "Laptop & Desktop", description: "High-performance laptops and desktops for work and gaming." },
-  { id: 2, name: "TV & Monitors", description: "Smart TVs and monitors for entertainment and professional use." },
-  { id: 3, name: "Air Purifier / Cooler", description: "Stay cool and breathe fresh with air purifiers and coolers." },
-  { id: 4, name: "Smartphones", description: "Latest smartphones with advanced features and high-speed performance." },
-  { id: 5, name: "Headphones & Earbuds", description: "Noise-canceling headphones and high-quality earbuds for immersive sound." },
-  { id: 6, name: "Gaming Consoles", description: "Experience next-gen gaming with the latest gaming consoles." },
-  { id: 7, name: "Smart Home Devices", description: "Upgrade your home with smart lighting, security, and automation devices." },
-  { id: 8, name: "Cameras & Accessories", description: "Capture stunning moments with professional cameras and accessories." },
-  { id: 9, name: "Wearable Technology", description: "Smartwatches, fitness trackers, and wearable health monitoring devices." },
-  { id: 10, name: "Kitchen Appliances", description: "Smart kitchen appliances for easy and efficient cooking." },
-  { id: 11, name: "Printers & Scanners", description: "Reliable printers and scanners for home and office use." },
-  { id: 12, name: "Car Accessories", description: "Essential car gadgets and accessories for a better driving experience." }
-];
+const iconMapping = {
+  LaptopChromebook: <MdLaptopChromebook />,
+  Tv: <MdTv />,
+  Snowflake: <FaRegSnowflake />,
+  Tablet: <FaTablet />,
+  VideoCamera: <ImVideoCamera />,
+  Printer: <FiPrinter />,
+  Audiotrack: <MdAudiotrack />,
+  RiceCooker: <GiRiceCooker />,
+  Cctv: <BiSolidCctv />,
+  Joystick: <BiSolidJoystick />,
+  Phone: <MdPhoneIphone />,
+  Watch: <MdWatch />,
+  Headset: <MdHeadset />,
+  Camera: <MdCameraAlt />,
+  Gamepad: <FaGamepad />,
+  Blender: <FaBlender />,
+  Fan: <FaFan />,
+  Lightbulb: <FaLightbulb />,
+  VacuumCleaner: <GiVacuumCleaner />,
+  WashingMachine: <GiWashingMachine />,
+  Fridge: <BiFridge />,
+};
+
+const iconOptions = Object.keys(iconMapping).map((key) => ({
+  label: key,
+  value: key,
+  icon: iconMapping[key],
+}));
 
 const CategoryList = () => {
-  const [products, setProducts] = useState(initialProducts);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [editProduct, setEditProduct] = useState(null);
-  const [newProduct, setNewProduct] = useState({ name: "", description: "" });
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
+  const { data, refetch } = useGetCategoriesQuery();
+  const [createCategory, { isLoading: isCreateLoading }] =
+    useCreateCategoryMutation();
+  const [updateCategory] = useUpdateCategoryMutation();
+  const [deleteCategory] = useDeleteCategoryMutation();
 
-  const handleEdit = (product) => {
-    setEditProduct({ ...product });
-    setShowEditModal(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentCategory, setCurrentCategory] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
+  const handleEdit = (category) => {
+    setCurrentCategory({ ...category });
+    setShowModal(true);
   };
 
-  const handleSave = () => {
-    if (editProduct) {
-      setProducts(products.map((p) => (p.id === editProduct.id ? editProduct : p)));
-      setShowEditModal(false);
+  const handleSave = async () => {
+    try {
+      if (currentCategory) {
+        console.log(currentCategory);
+        if (currentCategory._id) {
+          const res = await updateCategory({
+            id: currentCategory._id,
+            updatedCategory:currentCategory,
+          });
+
+          console.log(res);
+          toast.success(res?.data?.message || "Category updated successfully");
+        } else {
+          const res = await createCategory(currentCategory);
+          console.log(res);
+          toast.success(res?.data?.message || "Category added successfully");
+        }
+        setShowModal(false);
+        setCurrentCategory(null);
+        refetch();
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.response.data?.message || "Something went wrong");
     }
   };
 
-  const handleDelete = (id) => {
-    setProducts(products.filter((product) => product.id !== id));
-  };
-
-  const handleAdd = () => {
-    if (newProduct.name && newProduct.description) {
-      const newEntry = {
-        id: products.length + 1,
-        name: newProduct.name,
-        description: newProduct.description,
-      };
-      setProducts([...products, newEntry]);
-      setNewProduct({ name: "", description: "" });
-      setShowAddModal(false);
+  const handleDelete = async (id) => {
+    try {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await deleteCategory(id);
+          refetch();
+          toast.success("Category deleted successfully");
+        }
+      });
+    } catch (error) {
+      console.log(error)
+      toast.error(error?.response.data?.message || "Something went wrong");
     }
   };
 
@@ -65,7 +147,7 @@ const CategoryList = () => {
           <i className="pi pi-pencil mr-1"></i> Edit
         </button>
         <button
-          onClick={() => handleDelete(rowData.id)}
+          onClick={() => handleDelete(rowData._id)}
           className="flex items-center bg-red-500 text-white px-3 py-1 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
         >
           <i className="pi pi-trash mr-1"></i> Delete
@@ -74,12 +156,25 @@ const CategoryList = () => {
     );
   };
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const iconBodyTemplate = (rowData) => {
+    return <div className="text-2xl">{iconMapping[rowData.icon]}</div>;
+  };
+
+  const iconOptionTemplate = (option) => {
+    return (
+      <div className="flex flex-row items-center">
+        <div className="text-2xl mr-2">{option.icon} </div>
+        <div className="text-2xl mr-2">{option.value}</div>
+      </div>
+    );
+  };
+
+  const filteredCategories = data?.categories?.filter((category) =>
+    category.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className="min-h-screen  p-3 md:p-6">
+    <div className="min-h-screen p-3 md:p-6">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-indigo-800">
           <i className="pi pi-th-large mr-2 text-xl"></i>
@@ -88,16 +183,18 @@ const CategoryList = () => {
 
         <div className="mb-6 flex gap-4">
           <span className="p-input-icon-left w-full">
-            
             <InputText
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by Product Name"
-              className="w-full px-3 py-2 rounded-lg  bg-white border-2 bordergray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300"
+              className="w-full px-3 py-2 rounded-lg bg-white border-2 border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300"
             />
           </span>
-           <button
-            onClick={setShowAddModal}
+          <button
+            onClick={() => {
+              setCurrentCategory({ name: "", description: "", icon: "" });
+              setShowModal(true);
+            }}
             className="min-w-52 md:w-auto px-4 bg-blue-500 text-white rounded-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center"
           >
             <i className="pi pi-plus mr-2"></i> Add Category
@@ -106,7 +203,7 @@ const CategoryList = () => {
 
         <div className="card rounded-lg bg-white border-2 border-gray-200 overflow-hidden">
           <DataTable
-            value={filteredProducts}
+            value={filteredCategories}
             paginator
             rows={10}
             rowsPerPageOptions={[5, 10, 15, 20]}
@@ -116,6 +213,11 @@ const CategoryList = () => {
             rowHover
             className="custom-datatable"
           >
+            <Column
+              body={iconBodyTemplate}
+              header="Icon"
+              style={{ width: "10%" }}
+            ></Column>
             <Column field="name" header="Name" sortable></Column>
             <Column field="description" header="Description" sortable></Column>
             <Column
@@ -127,12 +229,13 @@ const CategoryList = () => {
         </div>
       </div>
 
-      {/* Edit Modal */}
-      {showEditModal && editProduct && (
+      {/* Modal */}
+      {showModal && currentCategory && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white/90 border border-white/50 backdrop-blur-md p-6 rounded-lg w-full max-w-md shadow-2xl transform transition-all duration-300 animate-fadeIn">
             <h2 className="text-xl font-bold mb-4 text-indigo-800 flex items-center">
-              <i className="pi pi-pencil mr-2"></i> Edit Product
+              <i className="pi pi-pencil mr-2"></i>{" "}
+              {currentCategory.id ? "Edit Category" : "Add Category"}
             </h2>
             <form
               onSubmit={(e) => {
@@ -141,25 +244,58 @@ const CategoryList = () => {
               }}
             >
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-2 text-gray-700">Product Name</label>
+                <label className="block text-sm font-medium mb-2 text-gray-700">
+                  Category Name
+                </label>
                 <InputText
-                  value={editProduct.name}
-                  onChange={(e) => setEditProduct({ ...editProduct, name: e.target.value })}
+                  value={currentCategory.name}
+                  onChange={(e) =>
+                    setCurrentCategory({
+                      ...currentCategory,
+                      name: e.target.value,
+                    })
+                  }
                   className="w-full p-3 border rounded-lg bg-white/80 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300"
+                  required
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-2 text-gray-700">Description</label>
-                <InputText
-                  value={editProduct.description}
-                  onChange={(e) => setEditProduct({ ...editProduct, description: e.target.value })}
+                <label className="block text-sm font-medium mb-2 text-gray-700">
+                  Description
+                </label>
+                <textarea
+                  rows="3"
+                  value={currentCategory.description}
+                  onChange={(e) =>
+                    setCurrentCategory({
+                      ...currentCategory,
+                      description: e.target.value,
+                    })
+                  }
                   className="w-full p-3 border rounded-lg bg-white/80 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2 text-gray-700">
+                  Icon
+                </label>
+                <Dropdown
+                  value={currentCategory.icon}
+                  options={iconOptions}
+                  onChange={(e) =>
+                    setCurrentCategory({ ...currentCategory, icon: e.value })
+                  }
+                  placeholder="Select an Icon"
+                  className="w-full px-2 border rounded-lg bg-white/80 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300"
+                  itemTemplate={iconOptionTemplate}
+                  required
                 />
               </div>
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   type="button"
-                  onClick={() => setShowEditModal(false)}
+                  onClick={() => setShowModal(false)}
                   className="bg-gray-500 text-white px-4 py-2 rounded-lg flex items-center hover:shadow-lg transform hover:scale-105 transition-all duration-300"
                 >
                   <i className="pi pi-times mr-2"></i> Cancel
@@ -168,58 +304,13 @@ const CategoryList = () => {
                   type="submit"
                   className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center hover:shadow-lg transform hover:scale-105 transition-all duration-300"
                 >
-                  <i className="pi pi-check mr-2"></i> Save
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Add Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white border-2 border-gray-200 p-6 rounded-lg w-full max-w-md transform transition-all duration-300 animate-fadeIn">
-            <h2 className="text-xl font-bold mb-4 text-indigo-800 flex items-center">
-              <i className="pi pi-pencil mr-2"></i> Add  Category
-            </h2>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleAdd();
-              }}
-            >
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-2 text-gray-700">Product Name</label>
-                <InputText
-                  value={newProduct.name}
-                  onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300"
-                  placeholder="Enter Product Name"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-2 text-gray-700">Description</label>
-                <InputText
-                  value={newProduct.description}
-                  onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg bg-white/80 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300"
-                  placeholder="Enter Product Description"
-                />
-              </div>
-              <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg flex items-center hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-                >
-                  <i className="pi pi-times mr-2"></i> Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-                >
-                  <i className="pi pi-check mr-2"></i> Add
+                  {isCreateLoading ? (
+                    <i className="pi pi-spin pi-spinner mr-2"></i>
+                  ) : (
+                    <>
+                      <i className="pi pi-check mr-2"></i> <span>Save</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>
@@ -230,8 +321,14 @@ const CategoryList = () => {
       {/* Add custom styles for glass effect and animations */}
       <style jsx="true">{`
         @keyframes fadeIn {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
         }
         .animate-fadeIn {
           animation: fadeIn 0.3s ease-out forwards;
