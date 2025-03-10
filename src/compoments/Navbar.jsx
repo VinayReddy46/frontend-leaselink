@@ -3,7 +3,7 @@ import { FaUserCircle, FaShoppingCart } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { FiMenu, FiX } from "react-icons/fi";
-import { FiUser, FiSettings } from "react-icons/fi";
+import { FiUser, FiHeart,FiSettings } from "react-icons/fi";
 import { HiOutlineLogout } from "react-icons/hi";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -65,7 +65,7 @@ function Navbar() {
         { name: "Video Conferencing", link: "/rental/video" },
       ],
     },
-    role === 'user' ?
+    role === 'user1' ?
       { name: "Add Product", link: "/addproduct" }
       : { name: "Dashboard", link: "/admin" }
   ];
@@ -311,10 +311,10 @@ function Navbar() {
                         <FiUser className="w-4 h-4 mr-3 text-gray-500" />
                         My Profile
                       </Link>
-                      <Link to="/settings" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                      <Link to="/wishlist" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                         onClick={() => setUserDropdown(!userDropdown)}>
-                        <FiSettings className="w-4 h-4 mr-3 text-gray-500" />
-                        Settings
+                        <FiHeart className="w-4 h-4 mr-3 text-gray-500" />
+                        Wishlist
                       </Link>
                       <Link
                         to="/myrentedproducts"
