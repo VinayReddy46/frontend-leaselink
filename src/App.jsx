@@ -50,6 +50,7 @@ import LenderDashboard from "./compoments/ordercomponents/LenderDashboard";
 import RenterDashboard from "./compoments/ordercomponents/RenterDashboard";
 import WithdrawRequest from "./compoments/admin/WithdrawRequest";
 import Transactions from "./compoments/admin/Transactions";
+import Bank from "./pages/Bank";
 
 
 const Laptops = () => <h1>Laptops Page</h1>;
@@ -112,6 +113,7 @@ function App() {
             <Route path="/insurance" element={<Insurance />} />
             <Route path="/addproduct" element={<AddProduct />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/bank" element={<Bank/>} />
             <Route path="/settings" element={<ProfileSettings />} />
             <Route path="/wishlist" element={<WishlistPage />} />
             {/* <Route path="/myorders" element={<MyOrders />} />
