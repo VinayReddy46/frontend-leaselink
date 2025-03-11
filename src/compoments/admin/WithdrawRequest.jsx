@@ -4,16 +4,16 @@ import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 
 const WithdrawRequest = () => {
   const [bankData, setBankData] = useState([
-    { id: 1, bankName: "HDFC Bank", accountHolder: "Rajesh Kumar", accountNumber: "123456789012", bankAddress: "MG Road, Bengaluru" },
-    { id: 2, bankName: "ICICI Bank", accountHolder: "Priya Sharma", accountNumber: "234567890123", bankAddress: "Connaught Place, Delhi" },
-    { id: 3, bankName: "SBI Bank", accountHolder: "Amit Verma", accountNumber: "345678901234", bankAddress: "Park Street, Kolkata" },
-    { id: 4, bankName: "Axis Bank", accountHolder: "Sneha Patel", accountNumber: "456789012345", bankAddress: "Bandra, Mumbai" },
-    { id: 5, bankName: "Kotak Mahindra", accountHolder: "Manish Singh", accountNumber: "567890123456", bankAddress: "JP Nagar, Bengaluru" },
-    { id: 6, bankName: "PNB Bank", accountHolder: "Rakesh Gupta", accountNumber: "678901234567", bankAddress: "Civil Lines, Jaipur" },
-    { id: 7, bankName: "Canara Bank", accountHolder: "Anjali Nair", accountNumber: "789012345678", bankAddress: "Anna Salai, Chennai" },
-    { id: 8, bankName: "Bank of Baroda", accountHolder: "Surya Teja", accountNumber: "890123456789", bankAddress: "Abids, Hyderabad" },
-    { id: 9, bankName: "Indian Bank", accountHolder: "Kavita Mehta", accountNumber: "901234567890", bankAddress: "Koregaon Park, Pune" },
-    { id: 10, bankName: "UCO Bank", accountHolder: "Tarun Malhotra", accountNumber: "012345678901", bankAddress: "Hazratganj, Lucknow" },
+    { id: 1, bankName: "HDFC Bank", accountHolder: "Rajesh Kumar", accountNumber: "123456789012", bankAddress: "MG Road, Bengaluru",amount:"500" },
+    { id: 2, bankName: "ICICI Bank", accountHolder: "Priya Sharma", accountNumber: "234567890123", bankAddress: "Connaught Place, Delhi",amount:"1500" },
+    { id: 3, bankName: "SBI Bank", accountHolder: "Amit Verma", accountNumber: "345678901234", bankAddress: "Park Street, Kolkata",amount:"2000" },
+    { id: 4, bankName: "Axis Bank", accountHolder: "Sneha Patel", accountNumber: "456789012345", bankAddress: "Bandra, Mumbai" ,amount:"1000"},
+    { id: 5, bankName: "Kotak Mahindra", accountHolder: "Manish Singh", accountNumber: "567890123456", bankAddress: "JP Nagar, Bengaluru",amount:"5000" },
+    { id: 6, bankName: "PNB Bank", accountHolder: "Rakesh Gupta", accountNumber: "678901234567", bankAddress: "Civil Lines, Jaipur",amount:"3000" },
+    { id: 7, bankName: "Canara Bank", accountHolder: "Anjali Nair", accountNumber: "789012345678", bankAddress: "Anna Salai, Chennai",amount:"1800" },
+    { id: 8, bankName: "Bank of Baroda", accountHolder: "Surya Teja", accountNumber: "890123456789", bankAddress: "Abids, Hyderabad" ,amount:"1600"},
+    { id: 9, bankName: "Indian Bank", accountHolder: "Kavita Mehta", accountNumber: "901234567890", bankAddress: "Koregaon Park, Pune",amount:"1200" },
+    { id: 10, bankName: "UCO Bank", accountHolder: "Tarun Malhotra", accountNumber: "012345678901", bankAddress: "Hazratganj, Lucknow",amount:"4000" },
   ]);
   
 
@@ -47,6 +47,7 @@ const WithdrawRequest = () => {
               <th className="p-3 border border-gray-300">User Name</th>
               <th className="p-3 border border-gray-300">Bank Name</th>
               <th className="p-3 border border-gray-300">Details</th>
+              <th className="p-3 border border-gray-300">Amount</th>
               <th className="p-3 border border-gray-300">Pay</th>
               <th className="p-3 border border-gray-300">Action</th>
             </tr>
@@ -74,6 +75,9 @@ const WithdrawRequest = () => {
                       )}
                       <span className="hidden sm:inline">View Details</span>
                     </button>
+                  </td>
+                  <td className="p-3 border border-gray-300">
+                    {bank.amount}
                   </td>
                   <td className="p-3 border border-gray-300">
                     <button
