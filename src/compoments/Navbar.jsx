@@ -182,6 +182,7 @@ function Navbar() {
                     <button
                       onClick={(e) => {
                         e.preventDefault();
+
                         setHovered(hovered === item.name ? null : item.name);
                       }}
                       className={`flex items-center space-x-1.5 px-2 py-1 rounded-md text-base font-medium transition-colors duration-200 
