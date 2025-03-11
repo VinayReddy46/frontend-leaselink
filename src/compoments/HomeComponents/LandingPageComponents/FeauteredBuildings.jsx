@@ -94,6 +94,9 @@ const ItemCard = ({ item }) => {
   const handleWishlistClick = () => {
     navigate("/wishlist");
   };
+  const handleImageClick = () => {
+    navigate(`/product/${product.id}`, { state: { product } });
+  };
 
   const renderRatingStars = (rating) => {
     const roundedRating = Math.round(rating);
@@ -109,7 +112,9 @@ const ItemCard = ({ item }) => {
   };
 
   return (
-    <div className="relative bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl flex flex-col">
+    <div className="relative bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl flex flex-col"
+    onClick={handleImageClick}
+    >
       {/* Clickable Heart Icon */}
       <div className="absolute top-3 right-3">
         <button

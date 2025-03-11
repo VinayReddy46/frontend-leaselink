@@ -155,7 +155,7 @@ function App() {
             </Route>
             
             <Route 
-                path="/myorders" 
+                path="/myrentedproducts" 
                 element={
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -168,7 +168,7 @@ function App() {
                 } 
               />
               <Route 
-                path="/myrentedproducts" 
+                path="/myorders" 
                 element={
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
