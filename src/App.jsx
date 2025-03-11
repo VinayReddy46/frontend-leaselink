@@ -48,6 +48,8 @@ import Contact from "./pages/Contact";
 import WalletPage from "./compoments/navbarComponents/WalletDetails";
 import LenderDashboard from "./compoments/ordercomponents/LenderDashboard";
 import RenterDashboard from "./compoments/ordercomponents/RenterDashboard";
+import WithdrawRequest from "./compoments/admin/WithdrawRequest";
+import Transactions from "./compoments/admin/Transactions";
 
 
 const Laptops = () => <h1>Laptops Page</h1>;
@@ -136,6 +138,7 @@ function App() {
             <Route path="/video-conference" element={<VideoConference />} />
             <Route path="/office" element={<Office />} />
             <Route path="/security" element={<Security />} />
+           
             {/* <Route path="/Rating" element={<TrustSystem />} /> */}
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />}>
@@ -144,14 +147,15 @@ function App() {
               <Route path="customer-service" element={<CustomerService />} />
               <Route path="settings" element={<Settings />} />
               <Route path="faqs" element={<FAQManager />} />
-
+              <Route path="transactions" element={<Transactions/>} /> 
+              <Route path="withdrawrequest" element={<WithdrawRequest/>} />
               <Route path="blogs" element={<Blog />} />
               <Route path="categories" element={<CategoryList />} />
               <Route path="users-management" element={<UserManagement />} />
             </Route>
             
             <Route 
-                path="/myorders" 
+                path="/myrentedproducts" 
                 element={
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -164,7 +168,7 @@ function App() {
                 } 
               />
               <Route 
-                path="/myrentedproducts" 
+                path="/myorders" 
                 element={
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}

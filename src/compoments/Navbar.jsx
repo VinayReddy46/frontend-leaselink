@@ -182,6 +182,7 @@ function Navbar() {
                     <button
                       onClick={(e) => {
                         e.preventDefault();
+
                         setHovered(hovered === item.name ? null : item.name);
                       }}
                       className={`flex items-center space-x-1.5 px-2 py-1 rounded-md text-base font-medium transition-colors duration-200 
@@ -326,12 +327,12 @@ function Navbar() {
                         onClick={() => setMenuOpen(false)}
                       >
                         <AiOutlineProduct className="w-4 h-4 mr-3 text-gray-500" />
-                        <span>My Rented Products</span>
+                        <span>My lending orders</span>
                       </Link>
                       <Link to="/myorders" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                         onClick={() => setUserDropdown(!userDropdown)}>
                         <IoCartOutline className="w-4 h-4 mr-3 text-gray-500" />
-                        My Orders
+                        My rental Orders
                       </Link>
                       <button
                         onClick={handleLogout}
