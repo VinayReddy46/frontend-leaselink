@@ -4,12 +4,13 @@ import { FaHeart, FaRegHeart, FaStar } from "react-icons/fa";
 import { useWishlist } from "../contexts/WishlistContext";
 
 const ProductCard = ({ product }) => {
+  console.log("Product:", product);
   const navigate = useNavigate();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const inWishlist = isInWishlist(product.id);
 
   const handleImageClick = () => {
-    navigate(`/product/${product.id}`, { state: { product } });
+    navigate(`/product/${product.id}`);
   };
 
   return (

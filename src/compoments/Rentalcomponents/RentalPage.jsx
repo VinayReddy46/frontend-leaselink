@@ -2,36 +2,127 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ProductCard from "../CartComponents/ProductCard";
 import SearchFilter from "./SearchFilter";
-import productsData from "../CartComponents/Product";
+import {
+  useGetProductsQuery,
+  useGetAllProductsQuery
+} from "../../redux/services/addProductSlice";
+import { useGetCategoriesQuery } from "../../redux/services/categoriesSlice";
 
 const RentalPage = () => {
   const { category } = useParams();
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [categoryName, setCategoryName] = useState("");
+  console.log("category", category);
+
+  // Fetch categories to get the name
+  const { data: categoriesData } = useGetCategoriesQuery();
+
+  // Use getProducts query when category exists, skip otherwise
+  const {
+    data: categoryProducts,
+    isLoading: isCategoryLoading,
+    error: categoryError,
+  } = useGetProductsQuery(category, { skip: !category });
+
+  // Use getAllProducts query when no category exists, skip otherwise
+  const {
+    data: allProducts,
+    isLoading: isAllProductsLoading,
+    error: allProductsError,
+  } = useGetAllProductsQuery(undefined, { skip: !!category });
 
   useEffect(() => {
-    let updatedProducts = category
-      ? productsData.filter((product) => product.category === category)
-      : productsData;
-    setFilteredProducts(updatedProducts);
-  }, [category]);
+    // If category exists and products are loaded, update filtered products
+    if (category && categoryProducts) {
+      console.log("Category products:", categoryProducts);
+      setFilteredProducts(categoryProducts);
+    } 
+    // If no category and all products are loaded, update filtered products
+    else if (!category && allProducts) {
+      console.log("All products:", allProducts);
+      setFilteredProducts(allProducts);
+    }
+  }, [category, categoryProducts, allProducts]);
+
+  useEffect(() => {
+    // Update category name when categories are loaded or category changes
+    if (categoriesData?.categories && category) {
+      const foundCategory = categoriesData.categories.find(cat => cat._id === category);
+      setCategoryName(foundCategory ? foundCategory.name : "Unknown");
+    } else {
+      setCategoryName("");
+    }
+  }, [categoriesData, category]);
 
   const handleFilterChange = (filters) => {
-    let filtered = category
-      ? productsData.filter((product) => product.category === category)
-      : productsData;
+    // Get the source data based on whether we have a category
+    const sourceData = category ? categoryProducts : allProducts;
+    
+    // Apply filters to the products
+    if (!sourceData) return;
 
-    if (filters.price) {
-      filtered = filtered.filter((product) => product.price <= parseInt(filters.price));
+    // Apply filters
+    let filtered = [...sourceData];
+
+    if (filters.price && filters.price.max) {
+      filtered = filtered.filter(
+        (product) => product.price <= parseInt(filters.price.max)
+      );
     }
-    if (filters.processor) {
-      filtered = filtered.filter((product) => product.processor === filters.processor);
+
+    if (filters.price && filters.price.min) {
+      filtered = filtered.filter(
+        (product) => product.price >= parseInt(filters.price.min)
+      );
     }
+
     if (filters.brand) {
-      filtered = filtered.filter((product) => product.brand === filters.brand);
+      filtered = filtered.filter(
+        (product) =>
+          product.brand_name &&
+          product.brand_name.toLowerCase().includes(filters.brand.toLowerCase())
+      );
+    }
+
+    // Apply model filtering if available
+    if (filters.model) {
+      filtered = filtered.filter(
+        (product) =>
+          product.model_name &&
+          product.model_name.toLowerCase().includes(filters.model.toLowerCase())
+      );
     }
 
     setFilteredProducts(filtered);
   };
+
+  // Loading state
+  const isLoading = category ? isCategoryLoading : isAllProductsLoading;
+  
+  // Error state
+  const error = category ? categoryError : allProductsError;
+
+  if (isLoading) {
+    return (
+      <div className="px-4 py-8 flex flex-col lg:flex-row mt-10">
+        <div className="w-full text-center">
+          <p className="text-lg font-medium">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="px-4 py-8 flex flex-col lg:flex-row mt-10">
+        <div className="w-full text-center">
+          <p className="text-lg font-medium text-red-500">
+            Error loading products. Please try again later.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 py-8 flex flex-col lg:flex-row mt-10">
@@ -43,12 +134,31 @@ const RentalPage = () => {
       {/* Products Section */}
       <div className="w-full lg:w-3/4">
         <h2 className="text-2xl font-bold mb-6">
-          {category ? `Products in ${category}` : "All Products"}
+          {category ? (categoryName ? `Products in ${categoryName}` : "Loading category...") : "All Products"}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-          {filteredProducts.length > 0 ? (
+          {filteredProducts && filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard
+                key={product._id}
+                product={{
+                  id: product._id,
+                  name: product.name,
+                  brand: product.brand_name,
+                  model: product.model_name,
+                  description: product.description,
+                  price: product.price,
+                  category: product.category,
+                  mainImage:
+                    product.images && product.images.length > 0
+                      ? product.images[0].url
+                      : "",
+                  isBestseller: product.is_best_seller,
+                  images: product.images?.map(img => img.url) || [],
+                  availability: product.total_quantity > 0,
+                  insurance: product.insurance
+                }}
+              />
             ))
           ) : (
             <p className="text-gray-500 text-center col-span-full">

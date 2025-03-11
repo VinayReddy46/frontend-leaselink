@@ -12,6 +12,7 @@ import { AiOutlineProduct } from "react-icons/ai";
 import { IoCartOutline } from "react-icons/io5";
 import Wallet from "./navbarComponents/Wallet";
 import { logout } from "../redux/features/authSlice";
+import { useGetCategoriesQuery } from "../redux/services/categoriesSlice";
 
 function Navbar() {
   const { totalQuantity } = useSelector((state) => state.cart);
@@ -27,6 +28,9 @@ function Navbar() {
   const location = useLocation();
   const role = 'user'; // This would normally come from your auth context/state
   const {userInfo,isAuthenticated } =useSelector(state=>state.auth)
+  
+  // Fetch categories
+  const { data: categoriesData, isLoading, error } = useGetCategoriesQuery();
 
   // Check if user is logged in on component mount
   // useEffect(() => {
@@ -54,19 +58,24 @@ function Navbar() {
     {
       name: "Rent a Product",
       link: "/rental",
-
-      dropdown: [
-        { name: "Laptops", link: "/rental/laptops" },
-        { name: "Printer & Scanner", link: "/rental/printers" },
-        { name: "TV & Monitors", link: "/rental/monitors" },
-        { name: "Kitchen Appliance", link: "/rental/kitchen" },
-        { name: "Projector", link: "/rental/projectors" },
-        { name: "Tablet", link: "/rental/tablet" },
-        { name: "Audio & Karaoke", link: "/rental/audio" },
-        { name: "Air Purifier", link: "/rental/air" },
-        { name: "Playstation", link: "/rental/playstation" },
-        { name: "Video Conferencing", link: "/rental/video" },
-      ],
+      // Replace hardcoded dropdown with dynamic categories
+      dropdown: error ? [
+        { name: "Error loading categories", link: "/rental" }
+      ] : isLoading ? [
+        { name: "Loading categories...", link: "/rental" }
+      ] : categoriesData?.categories ? 
+        [
+          { name: "All Products", link: "/rental" },
+          ...categoriesData.categories.map(category => ({
+            name: category.name,
+            link: `/rental/${category._id}`,
+            categoryId: category._id // Store ID for reference
+          }))
+        ] : 
+        // Fallback if categories are not available yet
+        [
+          { name: "No categories available", link: "/rental" }
+        ],
     },
     role === 'user' ?
       { name: "Add Product", link: "/addproduct" }
@@ -289,7 +298,7 @@ function Navbar() {
 
             {/* User Profile or Login Button */}
             <div className="hidden md:block">
-              {!isAuthenticated ? (
+              {isAuthenticated ? (
                 <div
                   className="relative"
                 // onMouseEnter={() => setUserDropdown(true)}
