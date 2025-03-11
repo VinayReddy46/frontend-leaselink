@@ -10,6 +10,13 @@ export const cartApiSlice = apiSlice.injectEndpoints({
       }),
       providesTags: ["Cart"],
     }),
+    getCartItemsByUserId: builder.query({
+      query: (userId) => ({
+        url: `/cart/${userId}`,
+        method: "GET",
+      }),
+      providesTags: ["Cart"],
+    }),
 
     // Add item to cart
     addToCart: builder.mutation({
@@ -24,7 +31,7 @@ export const cartApiSlice = apiSlice.injectEndpoints({
     // Remove item from cart
     removeFromCart: builder.mutation({
       query: (itemId) => ({
-        url: `/cart/remove/${itemId}`,
+        url: `/cart/${itemId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Cart"],
@@ -33,7 +40,7 @@ export const cartApiSlice = apiSlice.injectEndpoints({
     // Update cart item quantity
     updateCartItemQuantity: builder.mutation({
       query: ({ itemId, quantity }) => ({
-        url: `/cart/update/${itemId}`,
+        url: `/cart/${itemId}`,
         method: "PUT",
         body: { quantity },
       }),
@@ -48,13 +55,24 @@ export const cartApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Cart"],
     }),
+
+    // Count cart items
+    countCartItems: builder.query({
+      query: (userId) => ({
+        url: `/cart/count/${userId}`,
+        method: "GET",
+      }),
+      providesTags: ["Cart"],
+    }),
   }),
 });
 
 export const {
   useGetCartItemsQuery,
+  useGetCartItemsByUserIdQuery,
   useAddToCartMutation,
   useRemoveFromCartMutation,
   useUpdateCartItemQuantityMutation,
   useClearCartMutation,
+  useCountCartItemsQuery,
 } = cartApiSlice;
