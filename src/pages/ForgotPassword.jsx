@@ -15,6 +15,8 @@ const ForgotPassword = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    console.log("email", email);
+
     // Simulating API call
     setTimeout(() => {
       toast.success("Password reset link sent to your email!");
