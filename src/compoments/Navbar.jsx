@@ -77,7 +77,7 @@ function Navbar() {
           { name: "No categories available", link: "/rental" }
         ],
     },
-    role === 'user1' ?
+    role === 'user' ?
       { name: "Add Product", link: "/addproduct" }
       : { name: "Dashboard", link: "/admin" }
   ];

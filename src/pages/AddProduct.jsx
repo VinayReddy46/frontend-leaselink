@@ -150,6 +150,7 @@ const AddProduct = () => {
   const { data: insuranceData, refetch } = useGetInsurancesQuery(userId, {
     skip: !userId
   });
+  console.log()
   const [createInsurance, { isLoading: isCreateLoading }] =
     useCreateInsuranceMutation();
   const [updateInsurance] = useUpdateInsuranceMutation();
@@ -170,8 +171,10 @@ const AddProduct = () => {
       insuranceData.insurancePlans.length > 0
     ) {
       const apiPlans = insuranceData.insurancePlans.map((plan) => ({
-        id: plan._id,
+        id: plan.plan_id,
+        plan_id: plan.plan_id, // Store both id and plan_id for consistency
         name: plan.plan_name,
+        plan_name: plan.plan_name, // Store both name and plan_name for consistency
         description: plan.description,
         price: plan.price,
         features: plan.features || [],
@@ -214,24 +217,27 @@ const AddProduct = () => {
   };
 
   const handleAddPredefinedPlan = () => {
-    if (!selectedPlan) return;
+    if (!selectedPlan) {
+      toast.warning("Please select an insurance plan");
+      return;
+    }
 
-    // Find the selected plan in the predefined plans
+    // Find the selected plan from the predefined plans
     const planToAdd = predefinedInsurancePlans.find(
-      (plan) => plan.id === selectedPlan || plan.name === selectedPlan
+      (plan) => (plan.id === selectedPlan || plan.plan_id === selectedPlan)
     );
 
-    if (!planToAdd) return;
+    if (!planToAdd) {
+      toast.error("Selected plan not found");
+      return;
+    }
 
-    // Check if plan already exists in insurancePlans
-    const planExists = insurancePlans.some(
-      (plan) =>
-        (plan.id && plan.id === planToAdd.id) ||
-        (plan.name && plan.name === planToAdd.name) ||
-        (plan.plan_name && plan.plan_name === planToAdd.name)
-    );
-
-    if (planExists) {
+    // Check if this plan is already in the insurancePlans list
+    if (
+      insurancePlans.some((plan) => 
+        (plan.id === planToAdd.id || plan.plan_id === planToAdd.plan_id || plan.name === planToAdd.name)
+      )
+    ) {
       toast.warning("This insurance plan is already added");
       return;
     }
@@ -240,7 +246,7 @@ const AddProduct = () => {
     setInsurancePlans([...insurancePlans, planToAdd]);
 
     // Also add this plan's ID to the selectedInsurances array
-    const planId = planToAdd.id || planToAdd._id || planToAdd.name;
+    const planId = planToAdd.id || planToAdd.plan_id;
     setSelectedInsurances((prev) => [...prev, planId]);
 
     // Clear selection
@@ -273,7 +279,7 @@ const AddProduct = () => {
       });
       return;
     }
-
+    
     try {
       // Create the payload with the required structure
       const payload = {
@@ -290,6 +296,7 @@ const AddProduct = () => {
 
         // If the plan has an id (came from the API), update it through the API
         if (planBeingEdited.id) {
+          console.log("updateInsurance", payload);
           try {
             const res = await updateInsurance({
               id: planBeingEdited.id,
@@ -342,11 +349,11 @@ const AddProduct = () => {
           if (res.data?.success) {
             toast.success("Insurance plan added successfully");
             // Add the id from the response to the new plan
-            if (res.data?.insurancePlan?._id) {
+            if (res.data?.insurancePlan?.plan_id) {
               const updatedPlans = [...insurancePlans];
               updatedPlans[updatedPlans.length - 1] = {
                 ...newPlan,
-                id: res.data.insurancePlan._id,
+                id: res.data.insurancePlan.plan_id,
                 userId,
               };
               setInsurancePlans(updatedPlans);
@@ -465,6 +472,7 @@ const AddProduct = () => {
       if (hasInsurance && selectedInsurances.length > 0) {
         // Since FormData doesn't naturally handle arrays, we need to either:
         // 1. Use append multiple times with the same key
+        console.log("selectedInsurances", selectedInsurances);
         selectedInsurances.forEach((insuranceId) => {
           formData.append("selected_insurance", insuranceId);
         });
@@ -704,14 +712,17 @@ const AddProduct = () => {
           </label>
           <div className="flex flex-col sm:flex-row gap-3">
             <select
+              className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
               value={selectedPlan}
               onChange={(e) => setSelectedPlan(e.target.value)}
-              className="w-full sm:flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
             >
               <option value="">-- Select a Plan --</option>
               {predefinedInsurancePlans?.map((plan) => (
-                <option key={plan.id || plan.name} value={plan.id || plan.name}>
-                  {plan.name} - ${plan.price}
+                <option
+                  key={plan.id || plan.plan_id}
+                  value={plan.id || plan.plan_id}
+                >
+                  {plan.name || plan.plan_name} - ${plan.price}
                 </option>
               ))}
             </select>
@@ -739,8 +750,8 @@ const AddProduct = () => {
               onDelete={(index) => {
                 const planToDelete = insurancePlans[index];
                 // If the plan has an id (came from API), delete it through API
-                if (planToDelete.id) {
-                  deleteInsurance(planToDelete.id)
+                if (planToDelete.plan_id) {
+                  deleteInsurance(planToDelete.plan_id)
                     .then((res) => {
                       if (res.data?.success) {
                         toast.success("Insurance plan deleted successfully");
@@ -779,7 +790,9 @@ const AddProduct = () => {
 
               <div className="space-y-2">
                 {insurancePlans.map((plan) => {
-                  const planId = plan.id || plan._id || plan.name;
+                  // Use consistent ID approach - check both possible ID fields
+                  const planId = plan.id || plan.plan_id;
+                  
                   return (
                     <div key={planId} className="flex items-center">
                       <input
@@ -793,7 +806,7 @@ const AddProduct = () => {
                         htmlFor={`insurance-${planId}`}
                         className="text-sm"
                       >
-                        {plan.plan_name || plan.name} - ${plan.price}
+                        {plan.name || plan.plan_name} - ${plan.price}
                       </label>
                     </div>
                   );
