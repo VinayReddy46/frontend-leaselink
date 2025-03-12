@@ -15,7 +15,7 @@ export const addProductApi = apiSlice.injectEndpoints({
     createProduct: builder.mutation({
       query: (newProduct) => ({
         url: "product/add",
-        method: "POST",
+        method: "PUT",
         body: newProduct,
       }),
     }),
