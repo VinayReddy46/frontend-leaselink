@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaUserCircle, FaShoppingCart } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 import { IoMdArrowDropdown } from "react-icons/io";
@@ -13,35 +13,35 @@ import { IoCartOutline } from "react-icons/io5";
 import Wallet from "./navbarComponents/Wallet";
 import { logout } from "../redux/features/authSlice";
 import { useGetCategoriesQuery } from "../redux/services/categoriesSlice";
+import { useCountCartItemsQuery } from "../redux/services/cartApiSlice";
 
 function Navbar() {
-  const { totalQuantity } = useSelector((state) => state.cart);
+  const { userInfo, isAuthenticated } = useSelector(state => state.auth);
+  const userId = userInfo?.id;
+  
+  // Fetch cart count from API
+  const { data: cartCountData } = useCountCartItemsQuery(userId, {
+    skip: !userId // Skip the query if userId is not available
+  });
+  
+  // Get cart count from API response
+  const cartCount = cartCountData?.count || 0;
+  
   const [hovered, setHovered] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
   const role = 'user'; // This would normally come from your auth context/state
-  const {userInfo,isAuthenticated } =useSelector(state=>state.auth)
   
   // Fetch categories
   const { data: categoriesData, isLoading, error } = useGetCategoriesQuery();
 
-  // Check if user is logged in on component mount
-  // useEffect(() => {
-  //   const checkLoginStatus = () => {
-  //     const token = localStorage.getItem('authToken');
-  //     setIsLoggedIn(!token);
-  //   };
-
-  //   checkLoginStatus();
-  // }, []);
-  const dispatch =useDispatch();
+  const dispatch = useDispatch();
 
   // Navigation data with icons
   const data = [
@@ -105,8 +105,6 @@ function Navbar() {
   // Handle logout
   const handleLogout = () => {
     dispatch(logout())
-    // localStorage.removeItem('authToken');
-    // setIsLoggedIn(false);
     navigate('/login');
   };
 
@@ -225,8 +223,7 @@ function Navbar() {
                     className={`flex items-center space-x-1.5 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 
                    ${isActive(item.link) ? "text-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
                   >
-                    {item.icon}
-                    <span>{item.name}</span>
+                    {item.name}
                   </Link>
                 )}
               </div>
@@ -287,9 +284,9 @@ function Navbar() {
                 <FaShoppingCart className="w-5 h-5" />
                 
 
-                {totalQuantity > 0 && (
+                {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold px-1.5 min-w-[18px] h-[18px] rounded-full flex items-center justify-center">
-                    {totalQuantity}
+                    {cartCount}
                   </span>
                 )}
               </Link>
@@ -442,8 +439,7 @@ function Navbar() {
                         : "text-gray-700 hover:bg-gray-50"}`}
                   >
                     <span className="flex items-center">
-                      {item.icon}
-                      <span className="ml-2">{item.name}</span>
+                      {item.name}
                     </span>
                     <IoMdArrowDropdown className={`text-xl transition-transform duration-200 ${hovered === item.name ? "transform rotate-180" : ""}`} />
                   </button>
@@ -479,8 +475,7 @@ function Navbar() {
                       : "text-gray-700 hover:bg-gray-50"}`}
                   onClick={() => setMenuOpen(false)}
                 >
-                  {item.icon}
-                  <span className="ml-2">{item.name}</span>
+                  {item.name}
                 </Link>
               )}
             </div>
@@ -488,7 +483,7 @@ function Navbar() {
 
           {/* Mobile User Controls */}
           <div className="pt-2 pb-3 border-t border-gray-200">
-            {isLoggedIn ? (
+            {isAuthenticated ? (
               <div className="space-y-1">
                 <div className="px-3 py-2">
                   <p className="text-sm font-medium text-gray-700">Account</p>

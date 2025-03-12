@@ -1,9 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { cartApiSlice } from "../services/cartApiSlice";
 
 const initialState = {
   cartItems: [],
   totalQuantity: 0,
   totalPrice: 0,
+  loading: false,
+  error: null,
 };
 
 const cartSlice = createSlice({
@@ -60,10 +63,85 @@ const cartSlice = createSlice({
         state.totalPrice -= item.subTotal;
       }
     },
+    setCartItems: (state, action) => {
+      state.cartItems = action.payload;
+      state.totalQuantity = action.payload.reduce((total, item) => total + item.quantity, 0);
+      state.totalPrice = action.payload.reduce((total, item) => total + item.totalPrice, 0);
+    },
+    clearCart: (state) => {
+      state.cartItems = [];
+      state.totalQuantity = 0;
+      state.totalPrice = 0;
+    },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    // Handle loading states from cartApiSlice
+    builder
+      // getCartItems
+      .addMatcher(
+        cartApiSlice.endpoints.getCartItems.matchPending,
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        cartApiSlice.endpoints.getCartItems.matchFulfilled,
+        (state, { payload }) => {
+          state.loading = false;
+          state.cartItems = payload;
+          state.totalQuantity = payload.reduce((total, item) => total + item.quantity, 0);
+          state.totalPrice = payload.reduce((total, item) => total + (item.subtotal || 0), 0);
+        }
+      )
+      .addMatcher(
+        cartApiSlice.endpoints.getCartItems.matchRejected,
+        (state, { payload }) => {
+          state.loading = false;
+          state.error = payload?.error || "Failed to fetch cart items";
+        }
+      )
+
+      // addToCart
+      .addMatcher(
+        cartApiSlice.endpoints.addToCart.matchPending,
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        cartApiSlice.endpoints.addToCart.matchFulfilled,
+        (state) => {
+          state.loading = false;
+          // We'll handle the actual cart update via getCartItems query invalidation
+        }
+      )
+      .addMatcher(
+        cartApiSlice.endpoints.addToCart.matchRejected,
+        (state, { payload }) => {
+          state.loading = false;
+          state.error = payload?.error || "Failed to add item to cart";
+        }
+      );
   },
 });
 
-export const { addToCart, removeFromCart, increaseQuantity, decreaseQuantity } =
-  cartSlice.actions;
+export const { 
+  addToCart, 
+  removeFromCart, 
+  increaseQuantity, 
+  decreaseQuantity,
+  setCartItems,
+  clearCart,
+  setLoading,
+  setError
+} = cartSlice.actions;
 
 export default cartSlice.reducer;

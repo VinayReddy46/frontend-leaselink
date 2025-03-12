@@ -5,18 +5,20 @@ import productsData from "./Product";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { addToCart } from "../../redux/features/cartSlice";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useGetProductByIdQuery } from "../../redux/services/addProductSlice";
+import { useAddToCartMutation } from "../../redux/services/cartApiSlice";
+import { toast } from "react-toastify";
 
 const ProductDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { id } = useParams();
   console.log("productId", id);
 
   const { data: productData, isLoading, error } = useGetProductByIdQuery(id);
+  const [addToCartMutation, { isLoading: isAddingToCart }] = useAddToCartMutation();
+const userInfo = useSelector((state) => state.auth.userInfo);
   console.log("isLoading", isLoading);
   console.log("productData", productData);
   const [startDate, setStartDate] = useState("");
@@ -37,24 +39,26 @@ const ProductDetails = () => {
   const productImages = product.images?.map((img) => img.url) || [];
 
   // Memoized calculation functions
-  const calculateTotalHours = useCallback(() => {
+  const calculateTotalDays = useCallback(() => {
     if (!startDate || !endDate) return 0;
     const start = new Date(startDate);
     const end = new Date(endDate);
     if (isNaN(start.getTime()) || isNaN(end.getTime())) return 0;
 
-    const diffInHours = Math.ceil((end - start) / (1000 * 60 * 60));
-    return diffInHours > 0 ? diffInHours : 0;
+    // Calculate difference in days (count full days)
+    const diffInMs = end.getTime() - start.getTime();
+    const diffInDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24));
+    return diffInDays > 0 ? diffInDays : 0;
   }, [startDate, endDate]);
 
   // Calculate rental amount when dates or product changes
   useEffect(() => {
     if (!productData?.product) return;
-    const hours = calculateTotalHours();
-    const hourlyRate = productData.product.price / 24; // Convert daily price to hourly
-    const rentAmount = hours * hourlyRate;
+    const days = calculateTotalDays();
+    const dailyRate = productData.product.price; // Using daily price directly
+    const rentAmount = days * dailyRate;
     setRentalAmount(rentAmount);
-  }, [productData, calculateTotalHours]);
+  }, [productData, calculateTotalDays]);
 
   const calculateTotal = () => {
     return rentalAmount + (selectedInsurance ? selectedInsurance.price : 0);
@@ -130,30 +134,46 @@ const ProductDetails = () => {
     return () => clearInterval(interval);
   }, [isTransitioning, goToNextSlide, productImages.length]);
 
-  const handleSubmit = () => {
-    if (!startDate || !endDate || calculateTotalHours() === 0) {
-      alert("⚠️ Please select valid rental duration.");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!startDate || !endDate) {
+      alert("Please select both start and end dates");
+      return;
+    }
+
+    // Format dates to ISO string format
+    const startTimeISO = new Date(startDate).toISOString();
+    const endTimeISO = new Date(endDate).toISOString();
+
+    // Get user ID from auth state
+    const userId = userInfo?.id;
+    
+    if (!userId) {
+      toast.error("You must be logged in to add items to cart");
+      navigate("/login");
       return;
     }
 
     const cartItem = {
-      id: product._id,
-      name: product.name,
-      image:
-        product.images && product.images.length > 0
-          ? product.images[0].url
-          : "",
-      price: product.price,
-      startDate,
-      endDate,
-      rentalAmount: parseFloat(rentalAmount.toFixed(2)),
-      insurance: selectedInsurance || null,
-      subtotal: parseFloat(calculateTotal().toFixed(2)),
+      userId: userId,
+      productId: product._id,
       quantity: 1,
+      insuranceId: selectedInsurance?._id || null,
+      start_time: startTimeISO,
+      end_time: endTimeISO,
+      total_price: parseFloat(calculateTotal().toFixed(2))
     };
+    
+    console.log("cartItem", cartItem);
 
-    dispatch(addToCart(cartItem));
-    navigate("/cart");
+    try {
+      await addToCartMutation(cartItem).unwrap();
+      toast.success("Item added to cart successfully!");
+      navigate("/cart");
+    } catch (error) {
+      console.error("Failed to add item to cart:", error);
+      toast.error("Failed to add item to cart. Please try again.");
+    }
   };
 
   const RatingStars = ({ rating }) => {
@@ -182,7 +202,7 @@ const ProductDetails = () => {
   // Render loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="h-screen flex items-center justify-center bg-slate-50">
         <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
           <div className="flex flex-col items-center space-y-4">
             <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -404,7 +424,7 @@ const ProductDetails = () => {
                     <span className="font-medium text-slate-500">
                       Daily Rate
                     </span>
-                    <span className="font-semibold text-blue-600">
+                    <span className="font-medium text-blue-600">
                       ₹{product.price}
                     </span>
                   </div>
@@ -523,31 +543,29 @@ const ProductDetails = () => {
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Start Date & Time
+                    Start Date
                   </label>
                   <DatePicker
                     selected={startDate}
                     onChange={(date) => setStartDate(date)}
-                    showTimeSelect
-                    dateFormat="Pp"
+                    dateFormat="dd MMM yyyy"
                     className="block w-full rounded-lg border-slate-200 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3.5 border bg-white text-slate-900"
                     minDate={new Date()}
-                    placeholderText="Select start date and time"
+                    placeholderText="Select start date"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    End Date & Time
+                    End Date
                   </label>
                   <DatePicker
                     selected={endDate}
                     onChange={(date) => setEndDate(date)}
-                    showTimeSelect
-                    dateFormat="Pp"
+                    dateFormat="dd MMM yyyy"
                     className="block w-full rounded-lg border-slate-200 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3.5 border bg-white text-slate-900"
                     minDate={startDate}
-                    placeholderText="Select end date and time"
+                    placeholderText="Select end date"
                     disabled={!startDate}
                   />
                 </div>
@@ -617,7 +635,7 @@ const ProductDetails = () => {
                   <div className="flex justify-between text-sm text-slate-600">
                     <span>Rental Duration</span>
                     <span className="font-medium text-slate-900">
-                      {calculateTotalHours()} hours
+                      {calculateTotalDays()} days
                     </span>
                   </div>
                   <div className="flex justify-between text-sm text-slate-600">
@@ -627,8 +645,7 @@ const ProductDetails = () => {
                     </span>
                   </div>
                   <div className="text-xs text-slate-500 ml-4">
-                    ₹{(product.price / 24).toFixed(2)}/hour ×{" "}
-                    {calculateTotalHours()} hours
+                    ₹{product.price}/day × {calculateTotalDays()} days
                   </div>
                   <div className="flex justify-between text-sm text-slate-600">
                     <span>Insurance</span>
@@ -647,11 +664,12 @@ const ProductDetails = () => {
               </div>
 
               <button
+                type="submit"
                 onClick={handleSubmit}
-                disabled={!startDate || !endDate || calculateTotalHours() === 0}
+                disabled={!startDate || !endDate || calculateTotalDays() === 0 || isAddingToCart}
                 className="w-full mt-8 bg-blue-600 text-white py-4 rounded-xl font-medium hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-all duration-200 shadow-md disabled:shadow-none flex items-center justify-center text-base"
               >
-                {!startDate || !endDate
+                {isAddingToCart ? "Adding to Cart..." : !startDate || !endDate
                   ? "Select Dates to Continue"
                   : "Add to Cart"}
               </button>

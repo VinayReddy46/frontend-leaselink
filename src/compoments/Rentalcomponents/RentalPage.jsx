@@ -114,11 +114,25 @@ const RentalPage = () => {
 
   if (error) {
     return (
-      <div className="px-4 py-8 flex flex-col lg:flex-row mt-10">
-        <div className="w-full text-center">
-          <p className="text-lg font-medium text-red-500">
-            Error loading products. Please try again later.
-          </p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-2">
+              <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-slate-700">Error Loading Products</h2>
+            <p className="text-slate-500 text-center">
+              We're having trouble loading the products. Please try again later or contact support if the problem persists.
+            </p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
         </div>
       </div>
     );
