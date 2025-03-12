@@ -116,6 +116,8 @@ const InsurancePlanTable = ({ plans, onEdit, onDelete }) => (
 // Main AddProduct Component
 const AddProduct = () => {
   const [images, setImages] = useState(Array(4).fill(null));
+  const userInfo = useSelector((state) => state.auth.userInfo);
+  const userId = userInfo?.id;
   const [product, setProduct] = useState({
     name: "",
     brand: "",
@@ -145,7 +147,9 @@ const AddProduct = () => {
   const [selectedInsurances, setSelectedInsurances] = useState([]);
 
   //insurance
-  const { data: insuranceData, refetch } = useGetInsurancesQuery();
+  const { data: insuranceData, refetch } = useGetInsurancesQuery(userId, {
+    skip: !userId
+  });
   const [createInsurance, { isLoading: isCreateLoading }] =
     useCreateInsuranceMutation();
   const [updateInsurance] = useUpdateInsuranceMutation();
@@ -158,7 +162,6 @@ const AddProduct = () => {
   const [createProduct, { isLoading: isCreatingProduct }] =
     useCreateProductMutation();
 
-  const userInfo = useSelector((state) => state.auth.userInfo);
 
   useEffect(() => {
     // Update predefined insurance plans with API data when available
@@ -278,6 +281,7 @@ const AddProduct = () => {
         description: insuranceForm.description,
         price: Number(insuranceForm.price), // Convert to number
         features: features.length > 0 ? features : undefined,
+        userId,
       };
 
       if (editIndex !== null) {
@@ -290,6 +294,7 @@ const AddProduct = () => {
             const res = await updateInsurance({
               id: planBeingEdited.id,
               ...payload,
+              userId,
             });
 
             if (res.data?.success) {
@@ -315,6 +320,7 @@ const AddProduct = () => {
           description: payload.description,
           price: payload.price,
           features: payload.features,
+          userId,
         };
         setInsurancePlans(updatedPlans);
       } else {
@@ -324,6 +330,7 @@ const AddProduct = () => {
           description: payload.description,
           price: payload.price,
           features: payload.features,
+          userId,
         };
 
         if (!insurancePlans.some((plan) => plan.name === newPlan.name)) {
@@ -340,6 +347,7 @@ const AddProduct = () => {
               updatedPlans[updatedPlans.length - 1] = {
                 ...newPlan,
                 id: res.data.insurancePlan._id,
+                userId,
               };
               setInsurancePlans(updatedPlans);
             }

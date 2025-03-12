@@ -3,7 +3,7 @@ import { apiSlice } from "./apiSlice";
 export const insuranceApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getInsurances: builder.query({
-      query: () => "insurance",
+      query: (userId) => `insurance/${userId}`,
     }),
     getInsuranceById: builder.query({
       query: (id) => `insurance/${id}`,
