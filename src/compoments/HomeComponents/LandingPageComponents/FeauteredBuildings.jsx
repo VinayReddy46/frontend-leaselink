@@ -5,7 +5,7 @@ const items = [
   {
     id: 1,
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2xTNDcIuwjdCmP00fk9Mr-qbWdpZZWcjBqw&s",
-    title: "Modern Skyscraper",
+    name: "Modern Skyscraper",
     details: "Model: 2022 | 50 Floors | Smart Building",
     features: ["24/7 Security", "Energy Efficient"],
     price: "$390 / month",
@@ -15,7 +15,7 @@ const items = [
   {
     id: 2,
     image: "https://media.architecturaldigest.com/photos/63079fc7b4858efb76814bd2/16:9/w_4000,h_2250,c_limit/9.%20DeLorean-Alpha-5%20%5BDeLorean%5D.jpg",
-    title: "Supra",
+    name: "Supra",
     details: "Model: 2023 | Ultra Modern | Super Fast",
     features: ["Energy Efficient", "Smart Tech"],
     price: "$10000 / month",
@@ -25,7 +25,7 @@ const items = [
   {
     id: 3,
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuruFWuubJNCwmfITvcPE4TkK_BUlTcKpMRg&s",
-    title: "Dell Laptop",
+    name: "Dell Laptop",
     details: "Model: Intel i5 8th Gen | 8GB RAM | 1TB HDD",
     features: ["Ultra fast", "Chargeable"],
     price: "$1000 / month",
@@ -35,7 +35,7 @@ const items = [
   {
     id: 4,
     image: "https://i1.adis.ws/i/canon/eos-r8-frt_gallery-module_05_365x228_aa065f319187416e9ccdd3d67a9ba48b?$hotspot-dt-jpg$",
-    title: "Canon Camera",
+    name: "Canon Camera",
     details: "Model: 2023 | 4K | 60fps",
     features: ["Shutter speed", "Smart tech"],
     price: "$10000 / month",
@@ -45,7 +45,7 @@ const items = [
   {
     id: 5,
     image: "https://m.media-amazon.com/images/I/81qFhtzh5KL.jpg",
-    title: "LG Television",
+    name: "LG Television",
     details: "Model: 2020 | 64 inches | Color efficient",
     features: ["Energy Efficient", "Smart Tech"],
     price: "$1000 / month",
@@ -55,7 +55,7 @@ const items = [
   {
     id: 6,
     image: "https://p2-ofp.static.pub/fes/cms/2021/10/28/juqs65pgl1gh3dysi7yv1tnvtsiqva364946.png",
-    title: "Tablet",
+    name: "Tablet",
     details: "Model: 2023 | Smooth | Fast",
     features: ["Energy Efficient", "Smart Tech"],
     price: "$700 / month",
@@ -65,7 +65,7 @@ const items = [
   {
     id: 7,
     image: "https://m.media-amazon.com/images/I/71jG+e7roXL._SL1500_.jpg",
-    title: "PlayStation 5",
+    name: "PlayStation 5",
     details: "Model: 2023 | 4K Gaming | 825GB SSD",
     features: [ "Haptic Feedback", "Ultra Performance"],
     price: "$600 / month",
@@ -75,7 +75,7 @@ const items = [
   {
     id: 8,
     image: "https://m.media-amazon.com/images/I/81qFhtzh5KL.jpg",
-    title: "Hero Karizma XMR",
+    name: "Hero Karizma XMR",
     details: "Model: 2024 | 210cc | Liquid-Cooled Engine",
     features: ["Sporty Design", "Fuel Efficient"],
     price: "$500 / month",
@@ -87,15 +87,51 @@ const items = [
 const ItemCard = ({ item }) => {
   const navigate = useNavigate();
 
-  const handleChatClick = () => {
+  const handleChatClick = (e) => {
+    e.stopPropagation(); // Prevent triggering the card click
     navigate("/chat");
   };
 
-  const handleWishlistClick = () => {
+  const handleWishlistClick = (e) => {
+    e.stopPropagation(); // Prevent triggering the card click
     navigate("/wishlist");
   };
-  const handleImageClick = () => {
-    navigate(`/product/${product.id}`, { state: { product } });
+
+  const handleCardClick = () => {
+    // Only navigate if the item is available
+    if (!item.isAvailable) {
+      return;
+    }
+    
+    // Navigate to product details with the item data
+    navigate(`/product/${item.id}`, { 
+      state: { 
+        product: {
+          ...item,
+          // Add additional fields needed by ProductDetails component
+          brand: item.name.split(' ')[0], // Use first word of name as brand
+          model: item.details.split('|')[0].trim().replace('Model: ', ''),
+          processor: "N/A",
+          category: "Rental",
+          price: parseInt(item.price.replace(/[^0-9]/g, '')), // Extract number from price
+          images: [item.image], // Create images array from single image
+          insurancePlans: [
+            {
+              id: 1,
+              name: "Basic Coverage",
+              description: "Covers damage and theft",
+              price: Math.round(parseInt(item.price.replace(/[^0-9]/g, '')) * 0.1) // 10% of item price
+            },
+            {
+              id: 2,
+              name: "Premium Coverage",
+              description: "Comprehensive coverage including accidental damage",
+              price: Math.round(parseInt(item.price.replace(/[^0-9]/g, '')) * 0.15) // 15% of item price
+            }
+          ]
+        }
+      }
+    });
   };
 
   const renderRatingStars = (rating) => {
@@ -112,8 +148,9 @@ const ItemCard = ({ item }) => {
   };
 
   return (
-    <div className="relative bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl flex flex-col"
-    onClick={handleImageClick}
+    <div 
+      className={`relative bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl flex flex-col ${item.isAvailable ? 'cursor-pointer' : 'cursor-not-allowed opacity-75'}`}
+      onClick={handleCardClick}
     >
       {/* Clickable Heart Icon */}
       <div className="absolute top-3 right-3">
@@ -125,11 +162,11 @@ const ItemCard = ({ item }) => {
         </button>
       </div>
 
-      <img src={item.image} alt={item.title} className="w-full h-52 object-cover" />
+      <img src={item.image} alt={item.name} className="w-full h-52 object-cover" />
       
       <div className="p-4 flex flex-col flex-grow">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-bold text-gray-800">{item.title}</h3>
+          <h3 className="text-lg font-bold text-gray-800">{item.name}</h3>
           <span className={`text-sm font-medium ${item.isAvailable ? "text-green-600" : "text-red-500"}`}>
             {item.isAvailable ? "Available" : "Not Available"}
           </span>
