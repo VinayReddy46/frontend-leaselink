@@ -50,6 +50,7 @@ import LenderDashboard from "./compoments/ordercomponents/LenderDashboard";
 import RenterDashboard from "./compoments/ordercomponents/RenterDashboard";
 import WithdrawRequest from "./compoments/admin/WithdrawRequest";
 import Transactions from "./compoments/admin/Transactions";
+import ResetPassword from "./pages/ResetPassword";
 
 
 const Laptops = () => <h1>Laptops Page</h1>;
@@ -107,6 +108,7 @@ function App() {
               {/* added */}
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route path='/forgot-password' element={<ForgotPassword />} />
+              <Route path='/reset-password/:token' element={<ResetPassword />} />
               {/* <Route path="/payment" element={<PaymentForm/>} /> */}
               <Route path="/ratings" element={<Ratings />} />
               <Route path="/messaging" element={<Message />} />

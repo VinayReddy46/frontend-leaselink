@@ -2,7 +2,7 @@ import { useState ,useEffect} from "react";
 import { Link } from "react-router-dom";
 import { FaEnvelope } from "react-icons/fa";
 import { toast } from "react-toastify";
-
+import { useForgotPasswordMutation } from "../redux/services/authSlice";
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -11,11 +11,14 @@ const ForgotPassword = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  const [forgot, {isLoading:forgotLoading}] =useForgotPasswordMutation()
+
   const submitHandler = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     console.log("email", email);
+    await forgot({email});
 
     // Simulating API call
     setTimeout(() => {
@@ -52,9 +55,9 @@ const ForgotPassword = () => {
           <button
             type="submit"
             className="w-full bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition duration-300"
-            disabled={isLoading}
+            disabled={forgotLoading}
           >
-            {isLoading ? "Sending..." : "Send Reset Link"}
+            {forgotLoading ? "Sending..." : "Send Reset Link"}
           </button>
         </form>
 
