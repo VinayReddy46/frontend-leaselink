@@ -77,7 +77,7 @@ function Navbar() {
           { name: "No categories available", link: "/rental" }
         ],
     },
-    role === 'user' ?
+    role === 'user1' ?
       { name: "Add Product", link: "/addproduct" }
       : { name: "Dashboard", link: "/admin" }
   ];
@@ -326,6 +326,14 @@ function Navbar() {
                         onClick={() => setUserDropdown(!userDropdown)}>
                         <FiSettings className="w-4 h-4 mr-3 text-gray-500" />
                         Settings
+                      </Link>
+                      <Link
+                        to="/bank"
+                        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <AiOutlineProduct className="w-4 h-4 mr-3 text-gray-500" />
+                        <span>Bank Details</span>
                       </Link>
                       <Link
                         to="/myrentedproducts"
