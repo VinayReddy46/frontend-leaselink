@@ -9,10 +9,12 @@ const Cart = () => {
   const navigate = useNavigate();
   const userInfo = useSelector((state) => state.auth.userInfo);
   const userId = userInfo?.id;
-  const { data: cartItemsData, isLoading: isCartLoading, refetch } = useGetCartItemsByUserIdQuery(userId);
+  const { data, isLoading: isCartLoading, refetch } = useGetCartItemsByUserIdQuery(userId);
+  const cartItemsData = data?.cartItems || [];
+  const totalCartPrice = data?.totalCartPrice || 0;
   const [removeFromCart] = useRemoveFromCartMutation();
   const [updateCartItemQuantity] = useUpdateCartItemQuantityMutation();
-
+  console.log("cartItemsData", cartItemsData);
   // Format date to a readable string
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -33,10 +35,8 @@ const Cart = () => {
 
   // Calculate total price
   const calculateTotal = () => {
-    if (!cartItemsData || cartItemsData.length === 0) return 0;
-    return cartItemsData.reduce((total, item) => {
-      return total + item.total_price;
-    }, 0);
+    if (!totalCartPrice) return 0;
+    return totalCartPrice;
   };
 
   // Handle remove item
@@ -134,8 +134,8 @@ const Cart = () => {
                       {/* Product Image */}
                       <div className="w-full sm:w-32 h-32 bg-gray-200 rounded-lg overflow-hidden">
                         <img
-                          src={item.product?.images?.[0]?.url || "https://via.placeholder.com/150"}
-                          alt={item.product?.name || "Product"}
+                          src={item.productDetails?.images?.[0]?.url || item.product?.images?.[0]?.url || "https://via.placeholder.com/150"}
+                          alt={item.productDetails?.name || item.product?.name || "Product"}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -143,7 +143,7 @@ const Cart = () => {
                       {/* Product Details */}
                       <div className="flex-1">
                         <div className="flex justify-between">
-                          <h3 className="text-lg font-medium text-gray-900">{item.product?.name || `Product ID: ${item.productId}`}</h3>
+                          <h3 className="text-lg font-medium text-gray-900">{item.productDetails?.name || item.product?.name || `Product ID: ${item.productId}`}</h3>
                           <button
                             onClick={() => handleRemoveItem(item._id)}
                             className="text-gray-400 hover:text-red-500"
@@ -162,16 +162,27 @@ const Cart = () => {
                         </div>
 
                         {/* Insurance Details */}
-                        {item.insurance?.plan_name && (
+                        {item.insuranceId && (
                           <div className="mt-2 flex items-center text-sm text-gray-500">
                             <FaShieldAlt className="mr-2" />
-                            <span>{item.insurance.plan_name}</span>
+                            <span>Insurance Applied</span>
                           </div>
                         )}
+
+                        {/* Product Details */}
+                        <div className="mt-2 text-sm text-gray-500">
+                          <p>{item.productDetails?.description || item.product?.description || "No description available"}</p>
+                          {(item.productDetails?.model_name || item.product?.model_name) && (
+                            <p className="mt-1">Model: {item.productDetails?.model_name || item.product?.model_name}</p>
+                          )}
+                        </div>
 
                         {/* Price Details */}
                         <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
                           <div>
+                            <p className="text-sm text-gray-500">
+                              Price: ₹{item.productDetails?.price || item.product?.price || 0} per day
+                            </p>
                             <p className="mt-1 text-lg font-medium text-gray-900">
                               Total: ₹{item.total_price.toFixed(2)}
                             </p>
