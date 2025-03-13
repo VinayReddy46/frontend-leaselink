@@ -9,7 +9,6 @@ import { useDispatch } from "react-redux";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [show, setShow] = useState(false);
 
   const dispatch = useDispatch();
@@ -17,17 +16,18 @@ const Login = () => {
   const navigate = useNavigate();
 
   const [login, { isLoading: isLoggingIn }] = useLoginMutation();
-  const [forgot, { isLoading: isForgotLoading }] = useLoginMutation();
 
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
       const res=await login({email,password});
+      console.log(res)
       if(res.data.success){
         toast.success( res?.data?.message ||"Login successful.");
-        console.log(res.data.data)
-        const user = res.data.data;
+        const user = res.data.user;
         dispatch(setCredentials(user));
+        localStorage.setItem("accessToken", res.data.accessToken);
+        localStorage.setItem("refreshToken", res.data.refreshToken);
         navigate("/");
       }
     } catch (error) {

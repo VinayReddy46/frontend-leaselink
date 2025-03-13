@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { useResetPasswordMutation } from "../redux/services/authSlice";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -11,7 +12,9 @@ const ResetPassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const { token } = useParams();
+  console.log(token)
   const navigate = useNavigate();
+  const [reset, { isLoading: resetLoading }] = useResetPasswordMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,25 +23,22 @@ const ResetPassword = () => {
       return;
     }
     try {
-      setIsLoading(true);
-     
+      await reset({token,credentials: { newPassword:password } });
         toast.success("Password Reset Successful!");
-     
+        navigate("/login");
     } catch (err) {
       toast.error(err||"Invalid Data");
-    } finally {
-      setIsLoading(false);
-    }
+    } 
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-red-500 via-white-500 to-yellow-300">
-      <div className="max-w-md w-full rounded-lg p-6 bg-white bg-opacity-10 backdrop-blur-md border border-white border-opacity-20">
-        <h1 className="text-3xl font-semibold text-white text-center mb-6">Reset Password</h1>
+    <div className="min-h-screen w-full flex items-center justify-center">
+      <div className="max-w-md w-full rounded-lg p-6 border-2 border-gray-200">
+        <h1 className="text-3xl font-semibold  text-center mb-6">Reset Password</h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-white">
-              <div className="flex items-center rounded-full mt-1 relative">
+            <label className="block">
+              <div className="flex items-center rounded-lg border-2 border-gray-200 mt-1 relative">
                 <span className="px-3">
                   <FaLock />
                 </span>
@@ -48,17 +48,17 @@ const ResetPassword = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={8}
-                  className="w-full px-3 py-2 rounded-full focus:outline-none text-black"
+                  className="w-full px-3 py-2  focus:outline-none text-black"
                   placeholder="New Password"
                 />
                 {showPassword ? (
                   <FaEye
-                    className="absolute right-12 text-gray-600 cursor-pointer"
+                    className="absolute right-6  cursor-pointer"
                     onClick={() => setShowPassword(!showPassword)}
                   />
                 ) : (
                   <FaEyeSlash
-                    className="absolute right-12 text-gray-600 cursor-pointer"
+                    className="absolute right-6 cursor-pointer"
                     onClick={() => setShowPassword(!showPassword)}
                   />
                 )}
@@ -66,8 +66,8 @@ const ResetPassword = () => {
             </label>
           </div>
           <div className="mb-4">
-            <label className="block text-white">
-              <div className="flex items-center rounded-full mt-1 relative">
+            <label className="block">
+              <div className="flex items-center rounded-lg border-2 border-gray-200 mt-1 relative">
                 <span className="px-3">
                   <FaLock />
                 </span>
@@ -82,12 +82,12 @@ const ResetPassword = () => {
                 />
                 {showConfirmPassword ? (
                   <FaEye
-                    className="absolute right-12 text-gray-600 cursor-pointer"
+                    className="absolute right-6  cursor-pointer"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   />
                 ) : (
                   <FaEyeSlash
-                    className="absolute right-12 text-gray-600 cursor-pointer"
+                    className="absolute right-6  cursor-pointer"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   />
                 )}
@@ -98,9 +98,9 @@ const ResetPassword = () => {
             <button
               type="submit"
               className="bg-blue-600 w-full text-white px-4 py-2 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
-              disabled={isLoading}
+              disabled={resetLoading}
             >
-              {isLoading ? "Updating..." : "Update Password"}
+              {resetLoading ? "Updating..." : "Update Password"}
             </button>
             <button
               type="button"
