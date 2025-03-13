@@ -1,13 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import { motion } from 'framer-motion';
-import { toast } from 'react-hot-toast';
-import { 
-  DocumentCheckIcon, 
-  PencilSquareIcon, 
-  ArrowLeftIcon, 
-  PlusCircleIcon, 
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
+import { motion } from "framer-motion";
+import { toast } from "react-hot-toast";
+import {
+  DocumentCheckIcon,
+  PencilSquareIcon,
+  ArrowLeftIcon,
+  PlusCircleIcon,
   CheckIcon,
   TrashIcon,
   PhotoIcon,
@@ -18,25 +18,25 @@ import {
   GlobeAsiaAustraliaIcon,
   MapPinIcon,
   IdentificationIcon,
-  CreditCardIcon
-} from '@heroicons/react/24/outline';
-import { useSelector } from 'react-redux';
-import { 
-  useGetUserAddressesQuery, 
-  useCreateAddressMutation, 
-  useUpdateAddressMutation, 
-  useDeleteAddressMutation
-} from '../../redux/services/addressSlice';
-import { usePlaceOrderMutation } from '../../redux/services/billingSlice';
+  CreditCardIcon,
+} from "@heroicons/react/24/outline";
+import { useSelector } from "react-redux";
+import {
+  useGetUserAddressesQuery,
+  useCreateAddressMutation,
+  useUpdateAddressMutation,
+  useDeleteAddressMutation,
+} from "../../redux/services/addressSlice";
+import { usePlaceOrderMutation } from "../../redux/services/billingSlice";
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1
-    }
-  }
+      staggerChildren: 0.1,
+    },
+  },
 };
 
 const itemVariants = {
@@ -45,9 +45,9 @@ const itemVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.4
-    }
-  }
+      duration: 0.4,
+    },
+  },
 };
 
 const Checkout = ({ cart = [], setProgressStep }) => {
@@ -56,18 +56,22 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [orderId, setOrderId] = useState('');
-  
+  const [errorMessage, setErrorMessage] = useState("");
+  const [orderId, setOrderId] = useState("");
+
   // Address management state
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [isNewAddress, setIsNewAddress] = useState(true);
   const [isLoadingSaveAddress, setIsLoadingSaveAddress] = useState(false);
-  
+
   // Redux hooks for address management
   const userId = useSelector((state) => state.auth.userInfo?.id);
-  const { data: userAddresses, isLoading: isLoadingAddresses, refetch: refetchAddresses } = useGetUserAddressesQuery(userId, {
+  const {
+    data: userAddresses,
+    isLoading: isLoadingAddresses,
+    refetch: refetchAddresses,
+  } = useGetUserAddressesQuery(userId, {
     skip: !userId,
   });
   const [createAddress] = useCreateAddressMutation();
@@ -76,45 +80,48 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   const [placeOrder] = usePlaceOrderMutation();
 
   const [billingDetails, setBillingDetails] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zipcode: '',
-    proof_type: '',
-    proof_id: '',
-    proof_document: null
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zipcode: "",
+    proof_type: "",
+    proof_id: "",
+    proof_document: null,
   });
-  
+
   const [errors, setErrors] = useState({});
 
   const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 5000000) {
-        setErrors({...errors, proof_document: 'File size should be less than 5MB'});
+        setErrors({
+          ...errors,
+          proof_document: "File size should be less than 5MB",
+        });
         return;
       }
-      setBillingDetails({...billingDetails, proof_document: file});
-      setErrors({...errors, proof_document: null});
+      setBillingDetails({ ...billingDetails, proof_document: file });
+      setErrors({ ...errors, proof_document: null });
     }
   };
 
   // Populate the billing details form with an address
   const populateAddressForm = useCallback((address) => {
     setBillingDetails({
-      name: address.name || '',
-      email: address.email || '',
-      phone: address.phone || '',
-      address: address.address || '',
-      city: address.city || '',
-      state: address.state || '',
-      zipcode: address.zipcode || '',
-      proof_type: address.proof_type || '',
-      proof_id: address.proof_id || '',
-      proof_document: address.proof_document || null
+      name: address.name || "",
+      email: address.email || "",
+      phone: address.phone || "",
+      address: address.address || "",
+      city: address.city || "",
+      state: address.state || "",
+      zipcode: address.zipcode || "",
+      proof_type: address.proof_type || "",
+      proof_id: address.proof_id || "",
+      proof_document: address.proof_document || null,
     });
     setBillingEditable(true);
   }, []);
@@ -122,12 +129,14 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   useEffect(() => {
     try {
       // Load saved billing details only once on component mount
-      const savedBillingDetails = JSON.parse(localStorage.getItem('billingDetails'));
+      const savedBillingDetails = JSON.parse(
+        localStorage.getItem("billingDetails")
+      );
       if (savedBillingDetails) {
         setBillingDetails(savedBillingDetails);
       }
     } catch (error) {
-      console.error('Error loading saved data:', error);
+      console.error("Error loading saved data:", error);
     }
   }, []);
 
@@ -135,7 +144,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   useEffect(() => {
     // If we have addresses and no address is selected, select the default one
     if (userAddresses && userAddresses.length > 0 && !selectedAddressId) {
-      const defaultAddress = userAddresses.find(addr => addr.isDefault);
+      const defaultAddress = userAddresses.find((addr) => addr.isDefault);
       if (defaultAddress) {
         setSelectedAddressId(defaultAddress._id);
         // Don't call populateAddressForm here to avoid re-render loop
@@ -146,7 +155,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   // Effect to populate form when editing an address
   useEffect(() => {
     if (selectedAddressId && !isNewAddress) {
-      const selectedAddress = userAddresses.find(addr => addr._id === selectedAddressId);
+      const selectedAddress = userAddresses.find(
+        (addr) => addr._id === selectedAddressId
+      );
       if (selectedAddress) {
         populateAddressForm(selectedAddress);
         setBillingEditable(false);
@@ -155,7 +166,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   }, [selectedAddressId, isNewAddress, userAddresses, populateAddressForm]);
 
   useEffect(() => {
-    localStorage.setItem('billingDetails', JSON.stringify(billingDetails));
+    localStorage.setItem("billingDetails", JSON.stringify(billingDetails));
   }, [billingDetails]);
 
   // Calculate total price
@@ -168,51 +179,51 @@ const Checkout = ({ cart = [], setProgressStep }) => {
     const newErrors = {};
 
     if (!billingDetails.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = "Name is required";
     }
 
     if (!billingDetails.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(billingDetails.email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = "Email is invalid";
     }
 
     if (!billingDetails.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-    } else if (!/^\d{10}$/.test(billingDetails.phone.replace(/\D/g, ''))) {
-      newErrors.phone = 'Phone number must be 10 digits';
+      newErrors.phone = "Phone number is required";
+    } else if (!/^\d{10}$/.test(billingDetails.phone.replace(/\D/g, ""))) {
+      newErrors.phone = "Phone number must be 10 digits";
     }
 
     if (!billingDetails.address.trim()) {
-      newErrors.address = 'Address is required';
+      newErrors.address = "Address is required";
     }
 
     if (!billingDetails.city.trim()) {
-      newErrors.city = 'City is required';
+      newErrors.city = "City is required";
     }
 
     if (!billingDetails.state.trim()) {
-      newErrors.state = 'State is required';
+      newErrors.state = "State is required";
     }
 
     if (!billingDetails.zipcode.trim()) {
-      newErrors.zipcode = 'ZIP code is required';
-    } else if (!/^\d{6}$/.test(billingDetails.zipcode.replace(/\D/g, ''))) {
-      newErrors.zipcode = 'ZIP code must be 6 digits';
+      newErrors.zipcode = "ZIP code is required";
+    } else if (!/^\d{6}$/.test(billingDetails.zipcode.replace(/\D/g, ""))) {
+      newErrors.zipcode = "ZIP code must be 6 digits";
     }
 
     // Proof validation is optional when selecting an existing address
     if (!selectedAddressId) {
       if (!billingDetails.proof_type) {
-        newErrors.proof_type = 'Please select a proof type';
+        newErrors.proof_type = "Please select a proof type";
       }
 
       if (!billingDetails.proof_id) {
-        newErrors.proof_id = 'Proof ID is required';
+        newErrors.proof_id = "Proof ID is required";
       }
 
       if (!billingDetails.proof_document) {
-        newErrors.proof_document = 'Please upload a proof document';
+        newErrors.proof_document = "Please upload a proof document";
       }
     }
 
@@ -241,7 +252,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   // Save address (create new or update existing)
   const saveAddress = async () => {
     if (!validateBillingDetails()) {
-      toast.error('Please complete all required fields');
+      toast.error("Please complete all required fields");
       return;
     }
 
@@ -250,31 +261,34 @@ const Checkout = ({ cart = [], setProgressStep }) => {
     try {
       // Prepare address data
       const formData = new FormData();
-      formData.append('user', userId);
-      formData.append('name', billingDetails.name);
-      formData.append('email', billingDetails.email);
-      formData.append('phone', billingDetails.phone);
-      formData.append('address', billingDetails.address);
-      formData.append('city', billingDetails.city);
-      formData.append('state', billingDetails.state);
-      formData.append('zipcode', billingDetails.zipcode);
-      formData.append('proof_type', billingDetails.proof_type);
-      formData.append('proof_id', billingDetails.proof_id);
+      formData.append("user", userId);
+      formData.append("name", billingDetails.name);
+      formData.append("email", billingDetails.email);
+      formData.append("phone", billingDetails.phone);
+      formData.append("address", billingDetails.address);
+      formData.append("city", billingDetails.city);
+      formData.append("state", billingDetails.state);
+      formData.append("zipcode", billingDetails.zipcode);
+      formData.append("proof_type", billingDetails.proof_type);
+      formData.append("proof_id", billingDetails.proof_id);
 
       // Only append the file if it's a File object (not a string URL from existing record)
-      if (billingDetails.proof_document && billingDetails.proof_document instanceof File) {
-        formData.append('proof_document', billingDetails.proof_document);
+      if (
+        billingDetails.proof_document &&
+        billingDetails.proof_document instanceof File
+      ) {
+        formData.append("proof_document", billingDetails.proof_document);
       }
 
       let result;
-      const toastId = isNewAddress ? 'createAddress' : 'updateAddress';
+      const toastId = isNewAddress ? "createAddress" : "updateAddress";
 
       if (isNewAddress) {
         // Create new address
-        toast.loading('Creating address...', { id: toastId });
+        toast.loading("Creating address...", { id: toastId });
         result = await createAddress(formData).unwrap();
         toast.dismiss(toastId);
-        toast.success('Address added successfully');
+        toast.success("Address added successfully");
 
         // Set as selected address
         if (result && result._id) {
@@ -282,13 +296,13 @@ const Checkout = ({ cart = [], setProgressStep }) => {
         }
       } else {
         // Update existing address
-        toast.loading('Updating address...', { id: toastId });
-        result = await updateAddress({ 
+        toast.loading("Updating address...", { id: toastId });
+        result = await updateAddress({
           addressId: selectedAddressId,
-          data: formData 
+          data: formData,
         }).unwrap();
         toast.dismiss(toastId);
-        toast.success('Address updated successfully');
+        toast.success("Address updated successfully");
       }
 
       // Refresh addresses list to show the updated list
@@ -297,20 +311,25 @@ const Checkout = ({ cart = [], setProgressStep }) => {
       // Hide form after saving
       setShowAddressForm(false);
       setBillingEditable(false);
-
     } catch (error) {
       toast.dismiss();
-      console.error('Error saving address:', error);
+      console.error("Error saving address:", error);
 
       // Provide more specific error messages based on the error response
       if (error.status === 400) {
-        toast.error('Invalid address information. Please check your details and try again.');
+        toast.error(
+          "Invalid address information. Please check your details and try again."
+        );
       } else if (error.status === 401) {
-        toast.error('You must be logged in to save addresses.');
+        toast.error("You must be logged in to save addresses.");
       } else if (error.status === 413) {
-        toast.error('The uploaded file is too large. Please use a smaller image file.');
+        toast.error(
+          "The uploaded file is too large. Please use a smaller image file."
+        );
       } else {
-        toast.error(error.data?.message || 'Failed to save address. Please try again.');
+        toast.error(
+          error.data?.message || "Failed to save address. Please try again."
+        );
       }
     } finally {
       setIsLoadingSaveAddress(false);
@@ -321,9 +340,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   const saveBillingDetails = () => {
     if (validateBillingDetails()) {
       setBillingEditable(false);
-      toast.success('Billing details saved');
+      toast.success("Billing details saved");
     } else {
-      toast.error('Please complete all required fields');
+      toast.error("Please complete all required fields");
     }
   };
 
@@ -345,7 +364,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
     if (!userAddresses || userAddresses.length === 0) {
       return (
         <div className="mb-6 text-center py-8">
-          <p className="text-gray-600 mb-4">You don&apos;t have any saved addresses yet.</p>
+          <p className="text-gray-600 mb-4">
+            You don&apos;t have any saved addresses yet.
+          </p>
           <button
             type="button"
             onClick={addNewAddress}
@@ -379,8 +400,8 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               onClick={() => selectAddress(address)}
               className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
                 selectedAddressId === address._id
-                  ? 'border-indigo-500 bg-indigo-50'
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? "border-indigo-500 bg-indigo-50"
+                  : "border-gray-200 hover:border-gray-300"
               }`}
             >
               <div className="flex items-start mb-2">
@@ -403,7 +424,11 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (window.confirm('Are you sure you want to delete this address?')) {
+                      if (
+                        window.confirm(
+                          "Are you sure you want to delete this address?"
+                        )
+                      ) {
                         deleteAddress(address._id);
                         if (selectedAddressId === address._id) {
                           setSelectedAddressId(null);
@@ -429,33 +454,36 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   // Reset address form for new address
   const resetAddressForm = () => {
     setBillingDetails({
-      name: '',
-      email: '',
-      phone: '',
-      address: '',
-      city: '',
-      state: '',
-      zipcode: '',
-      proof_type: '',
-      proof_id: '',
-      proof_document: null
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      state: "",
+      zipcode: "",
+      proof_type: "",
+      proof_id: "",
+      proof_document: null,
     });
   };
 
   const renderBillingDetailsForm = () => {
     return (
-      <motion.div 
+      <motion.div
         variants={itemVariants}
         initial="hidden"
         animate="visible"
         className="backdrop-blur-sm bg-white/90 rounded-xl shadow-lg p-8 mb-6 border border-white/20"
       >
-        <motion.div variants={itemVariants} className="flex justify-between items-center mb-6">
+        <motion.div
+          variants={itemVariants}
+          className="flex justify-between items-center mb-6"
+        >
           <h2 className="text-2xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
             Address Details
           </h2>
           {!billingEditable && !showAddressForm ? (
-            <motion.button 
+            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => {
@@ -467,69 +495,108 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               <PencilSquareIcon className="w-5 h-5 mr-1" /> Edit
             </motion.button>
           ) : showAddressForm ? (
-            <motion.button 
+            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={saveAddress}
               className={`flex items-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300 ${
-                isLoadingSaveAddress ? 'cursor-not-allowed opacity-50' : ''
+                isLoadingSaveAddress ? "cursor-not-allowed opacity-50" : ""
               }`}
               disabled={isLoadingSaveAddress}
             >
               {isLoadingSaveAddress ? (
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
               ) : (
                 <DocumentCheckIcon className="w-5 h-5 mr-2" />
               )}
-              {isLoadingSaveAddress ? 'Saving...' : 'Save Address'}
+              {isLoadingSaveAddress ? "Saving..." : "Save Address"}
             </motion.button>
           ) : (
-            <motion.button 
+            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={saveBillingDetails}
               className={`flex items-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300 ${
-                isLoadingSaveAddress ? 'cursor-not-allowed opacity-50' : ''
+                isLoadingSaveAddress ? "cursor-not-allowed opacity-50" : ""
               }`}
               disabled={isLoadingSaveAddress}
             >
               {isLoadingSaveAddress ? (
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
               ) : (
                 <DocumentCheckIcon className="w-5 h-5 mr-2" />
               )}
-              {isLoadingSaveAddress ? 'Saving...' : 'Save'}
+              {isLoadingSaveAddress ? "Saving..." : "Save"}
             </motion.button>
           )}
         </motion.div>
 
         {/* Saved Addresses Section (only show if user is logged in and has addresses) */}
-        {userId && userAddresses && userAddresses.length > 0 && !showAddressForm && (
-          renderSavedAddresses()
-        )}
+        {userId &&
+          userAddresses &&
+          userAddresses.length > 0 &&
+          !showAddressForm &&
+          renderSavedAddresses()}
 
         {/* Add New Address Button (if user is logged in but has no addresses) */}
-        {userId && (!userAddresses || userAddresses.length === 0) && !showAddressForm && (
-          <motion.div variants={itemVariants} className="mb-6">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={addNewAddress}
-              className="w-full py-3 flex items-center justify-center border-2 border-dashed border-indigo-300 rounded-lg text-indigo-600 hover:bg-indigo-50 transition-colors"
-            >
-              <PlusCircleIcon className="w-5 h-5 mr-2" /> Add a New Address
-            </motion.button>
-          </motion.div>
-        )}
+        {userId &&
+          (!userAddresses || userAddresses.length === 0) &&
+          !showAddressForm && (
+            <motion.div variants={itemVariants} className="mb-6">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={addNewAddress}
+                className="w-full py-3 flex items-center justify-center border-2 border-dashed border-indigo-300 rounded-lg text-indigo-600 hover:bg-indigo-50 transition-colors"
+              >
+                <PlusCircleIcon className="w-5 h-5 mr-2" /> Add a New Address
+              </motion.button>
+            </motion.div>
+          )}
 
         {/* Address Form (shown when adding/editing an address or when no addresses exist) */}
-        {(showAddressForm || !userId || (!userAddresses || userAddresses.length === 0)) && (
+        {(showAddressForm ||
+          !userId ||
+          !userAddresses ||
+          userAddresses.length === 0) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <motion.div variants={itemVariants} className="space-y-1">
               <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
@@ -539,11 +606,17 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               <input
                 type="text"
                 value={billingDetails.name}
-                onChange={(e) => setBillingDetails({...billingDetails, name: e.target.value})}
+                onChange={(e) =>
+                  setBillingDetails({ ...billingDetails, name: e.target.value })
+                }
                 disabled={!billingEditable}
-                className={`w-full p-3 border rounded-lg ${errors.name ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
+                className={`w-full p-3 border rounded-lg ${
+                  errors.name ? "border-red-500" : "border-gray-300"
+                } focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
               />
-              {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+              )}
             </motion.div>
 
             <motion.div variants={itemVariants} className="space-y-1">
@@ -554,11 +627,20 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               <input
                 type="email"
                 value={billingDetails.email}
-                onChange={(e) => setBillingDetails({...billingDetails, email: e.target.value})}
+                onChange={(e) =>
+                  setBillingDetails({
+                    ...billingDetails,
+                    email: e.target.value,
+                  })
+                }
                 disabled={!billingEditable}
-                className={`w-full p-3 border rounded-lg ${errors.email ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
+                className={`w-full p-3 border rounded-lg ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                } focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
               />
-              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
             </motion.div>
 
             <motion.div variants={itemVariants} className="space-y-1">
@@ -569,11 +651,20 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               <input
                 type="tel"
                 value={billingDetails.phone}
-                onChange={(e) => setBillingDetails({...billingDetails, phone: e.target.value})}
+                onChange={(e) =>
+                  setBillingDetails({
+                    ...billingDetails,
+                    phone: e.target.value,
+                  })
+                }
                 disabled={!billingEditable}
-                className={`w-full p-3 border rounded-lg ${errors.phone ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
+                className={`w-full p-3 border rounded-lg ${
+                  errors.phone ? "border-red-500" : "border-gray-300"
+                } focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
               />
-              {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+              {errors.phone && (
+                <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+              )}
             </motion.div>
 
             <motion.div variants={itemVariants} className="space-y-1">
@@ -584,11 +675,20 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               <input
                 type="text"
                 value={billingDetails.address}
-                onChange={(e) => setBillingDetails({...billingDetails, address: e.target.value})}
+                onChange={(e) =>
+                  setBillingDetails({
+                    ...billingDetails,
+                    address: e.target.value,
+                  })
+                }
                 disabled={!billingEditable}
-                className={`w-full p-3 border rounded-lg ${errors.address ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
+                className={`w-full p-3 border rounded-lg ${
+                  errors.address ? "border-red-500" : "border-gray-300"
+                } focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
               />
-              {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
+              {errors.address && (
+                <p className="text-red-500 text-xs mt-1">{errors.address}</p>
+              )}
             </motion.div>
 
             <motion.div variants={itemVariants} className="space-y-1">
@@ -599,11 +699,17 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               <input
                 type="text"
                 value={billingDetails.city}
-                onChange={(e) => setBillingDetails({...billingDetails, city: e.target.value})}
+                onChange={(e) =>
+                  setBillingDetails({ ...billingDetails, city: e.target.value })
+                }
                 disabled={!billingEditable}
-                className={`w-full p-3 border rounded-lg ${errors.city ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
+                className={`w-full p-3 border rounded-lg ${
+                  errors.city ? "border-red-500" : "border-gray-300"
+                } focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
               />
-              {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
+              {errors.city && (
+                <p className="text-red-500 text-xs mt-1">{errors.city}</p>
+              )}
             </motion.div>
 
             <motion.div variants={itemVariants} className="space-y-1">
@@ -614,11 +720,20 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               <input
                 type="text"
                 value={billingDetails.state}
-                onChange={(e) => setBillingDetails({...billingDetails, state: e.target.value})}
+                onChange={(e) =>
+                  setBillingDetails({
+                    ...billingDetails,
+                    state: e.target.value,
+                  })
+                }
                 disabled={!billingEditable}
-                className={`w-full p-3 border rounded-lg ${errors.state ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
+                className={`w-full p-3 border rounded-lg ${
+                  errors.state ? "border-red-500" : "border-gray-300"
+                } focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
               />
-              {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state}</p>}
+              {errors.state && (
+                <p className="text-red-500 text-xs mt-1">{errors.state}</p>
+              )}
             </motion.div>
 
             <motion.div variants={itemVariants} className="space-y-1">
@@ -629,11 +744,20 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               <input
                 type="text"
                 value={billingDetails.zipcode}
-                onChange={(e) => setBillingDetails({...billingDetails, zipcode: e.target.value})}
+                onChange={(e) =>
+                  setBillingDetails({
+                    ...billingDetails,
+                    zipcode: e.target.value,
+                  })
+                }
                 disabled={!billingEditable}
-                className={`w-full p-3 border rounded-lg ${errors.zipcode ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
+                className={`w-full p-3 border rounded-lg ${
+                  errors.zipcode ? "border-red-500" : "border-gray-300"
+                } focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
               />
-              {errors.zipcode && <p className="text-red-500 text-xs mt-1">{errors.zipcode}</p>}
+              {errors.zipcode && (
+                <p className="text-red-500 text-xs mt-1">{errors.zipcode}</p>
+              )}
             </motion.div>
 
             {/* Proof fields - only show when adding a new address */}
@@ -646,16 +770,27 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                   </label>
                   <select
                     value={billingDetails.proof_type}
-                    onChange={(e) => setBillingDetails({...billingDetails, proof_type: e.target.value})}
+                    onChange={(e) =>
+                      setBillingDetails({
+                        ...billingDetails,
+                        proof_type: e.target.value,
+                      })
+                    }
                     disabled={!billingEditable}
-                    className={`w-full p-3 border rounded-lg ${errors.proof_type ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
+                    className={`w-full p-3 border rounded-lg ${
+                      errors.proof_type ? "border-red-500" : "border-gray-300"
+                    } focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
                   >
                     <option value="">Select Proof Type</option>
                     <option value="passport">Passport</option>
                     <option value="driving_license">Driving License</option>
                     <option value="national_id">National ID</option>
                   </select>
-                  {errors.proof_type && <p className="text-red-500 text-xs mt-1">{errors.proof_type}</p>}
+                  {errors.proof_type && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.proof_type}
+                    </p>
+                  )}
                 </motion.div>
 
                 <motion.div variants={itemVariants} className="space-y-1">
@@ -666,14 +801,28 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                   <input
                     type="text"
                     value={billingDetails.proof_id}
-                    onChange={(e) => setBillingDetails({...billingDetails, proof_id: e.target.value})}
+                    onChange={(e) =>
+                      setBillingDetails({
+                        ...billingDetails,
+                        proof_id: e.target.value,
+                      })
+                    }
                     disabled={!billingEditable}
-                    className={`w-full p-3 border rounded-lg ${errors.proof_id ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
+                    className={`w-full p-3 border rounded-lg ${
+                      errors.proof_id ? "border-red-500" : "border-gray-300"
+                    } focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
                   />
-                  {errors.proof_id && <p className="text-red-500 text-xs mt-1">{errors.proof_id}</p>}
+                  {errors.proof_id && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.proof_id}
+                    </p>
+                  )}
                 </motion.div>
 
-                <motion.div variants={itemVariants} className="md:col-span-2 space-y-1">
+                <motion.div
+                  variants={itemVariants}
+                  className="md:col-span-2 space-y-1"
+                >
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
                     <PhotoIcon className="w-5 h-5 mr-2 text-gray-500" />
                     Upload Proof Document
@@ -683,21 +832,35 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                     accept="image/*"
                     onChange={handlePhotoUpload}
                     disabled={!billingEditable}
-                    className={`w-full p-3 border rounded-lg ${errors.proof_document ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
+                    className={`w-full p-3 border rounded-lg ${
+                      errors.proof_document
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    } focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all backdrop-blur-sm bg-white/50`}
                   />
-                  {errors.proof_document && <p className="text-red-500 text-xs mt-1">{errors.proof_document}</p>}
-                  {billingDetails.proof_document && typeof billingDetails.proof_document === 'string' && (
-                    <div className="mt-2">
-                      <p className="text-sm text-green-600">Proof Document already uploaded</p>
-                    </div>
+                  {errors.proof_document && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.proof_document}
+                    </p>
                   )}
+                  {billingDetails.proof_document &&
+                    typeof billingDetails.proof_document === "string" && (
+                      <div className="mt-2">
+                        <p className="text-sm text-green-600">
+                          Proof Document already uploaded
+                        </p>
+                      </div>
+                    )}
                 </motion.div>
               </>
             )}
-            
+
             {/* Cancel button when adding/editing */}
             {showAddressForm && (
-              <motion.div variants={itemVariants} className="md:col-span-2 flex justify-end">
+              <motion.div
+                variants={itemVariants}
+                className="md:col-span-2 flex justify-end"
+              >
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -705,7 +868,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                     setShowAddressForm(false);
                     if (selectedAddressId) {
                       // Revert to the selected address
-                      const address = userAddresses.find(addr => addr._id === selectedAddressId);
+                      const address = userAddresses.find(
+                        (addr) => addr._id === selectedAddressId
+                      );
                       if (address) populateAddressForm(address);
                     }
                   }}
@@ -724,60 +889,59 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   // Place order function
   const handlePlaceOrder = async () => {
     if (!userId) {
-      toast.error('You must be logged in to place an order');
+      toast.error("You must be logged in to place an order");
       return;
     }
-    
+
     if (!selectedAddressId) {
-      toast.error('Please select or add an address');
+      toast.error("Please select or add an address");
       return;
     }
-    
+
     if (!cart || cart.length === 0) {
-      toast.error('Cart is empty');
+      toast.error("Cart is empty");
       return;
     }
-    
+
     setIsProcessing(true);
-    
+
     try {
       // Collect all cartIds from the cart items
-      const cartItemIds = cart.map(item => item._id);
-      
+      const cartItemIds = cart.map((item) => item._id);
+
       const orderData = {
         user: userId,
         addressId: selectedAddressId,
         cartIds: cartItemIds, // Send array of cart item IDs
       };
-      
+
       console.log("Placing order with data:", orderData);
-      
-      toast.loading('Processing your order...', { id: 'placeOrder' });
-      
+
+      toast.loading("Processing your order...", { id: "placeOrder" });
+
       const response = await placeOrder(orderData).unwrap();
-      
-      toast.dismiss('placeOrder');
-      toast.success('Order placed successfully!');
-      
+
+      toast.dismiss("placeOrder");
+      toast.success("Order placed successfully!");
+
       // Set order ID and show success modal
       if (response && response._id) {
         setOrderId(response._id);
       }
       setShowSuccessModal(true);
-      
     } catch (error) {
-      toast.dismiss('placeOrder');
-      console.error('Error placing order:', error);
-      
-      let message = 'Failed to place order. Please try again.';
+      toast.dismiss("placeOrder");
+      console.error("Error placing order:", error);
+
+      let message = "Failed to place order. Please try again.";
       if (error.status === 400) {
-        message = 'Invalid order information. Please check your details.';
+        message = "Invalid order information. Please check your details.";
       } else if (error.status === 401) {
-        message = 'You must be logged in to place an order.';
+        message = "You must be logged in to place an order.";
       } else if (error.data?.message) {
         message = error.data.message;
       }
-      
+
       setErrorMessage(message);
       setShowErrorModal(true);
       toast.error(message);
@@ -788,28 +952,31 @@ const Checkout = ({ cart = [], setProgressStep }) => {
 
   const renderOrderSummary = () => {
     return (
-      <motion.div 
+      <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
         className="backdrop-blur-sm bg-white/90 rounded-xl shadow-lg p-8 border border-white/20"
       >
-        <motion.h2 
+        <motion.h2
           variants={itemVariants}
           className="text-2xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6"
         >
           Order Summary
         </motion.h2>
-        
+
         <motion.div variants={itemVariants} className="space-y-4 mb-6">
           {cart.map((item) => (
-            <div key={item._id} className="flex justify-between items-center py-3 border-b border-gray-100">
+            <div
+              key={item._id}
+              className="flex justify-between items-center py-3 border-b border-gray-100"
+            >
               <div className="flex items-center">
                 <div className="h-16 w-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                   {item.product?.images && item.product.images.length > 0 ? (
-                    <img 
-                      src={item.product.images[0]?.url} 
-                      alt={item.product.name} 
+                    <img
+                      src={item.product.images[0]?.url}
+                      alt={item.product.name}
                       className="h-full w-full object-cover"
                     />
                   ) : (
@@ -819,26 +986,36 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                   )}
                 </div>
                 <div className="ml-4">
-                  <h3 className="font-medium text-gray-900">{item.product?.name}</h3>
+                  <h3 className="font-medium text-gray-900">
+                    {item.product?.name}
+                  </h3>
                   <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                   <p className="text-xs text-gray-400">
-                    {new Date(item.start_time).toLocaleDateString()} - {new Date(item.end_time).toLocaleDateString()}
+                    {new Date(item.start_time).toLocaleDateString()} -{" "}
+                    {new Date(item.end_time).toLocaleDateString()}
                   </p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-medium text-gray-900">£{item.total_price.toFixed(2)}</p>
+                <p className="font-medium text-gray-900">
+                  £{item.total_price.toFixed(2)}
+                </p>
               </div>
             </div>
           ))}
         </motion.div>
-        
-        <motion.div variants={itemVariants} className="mt-8 pt-6 border-t border-gray-200">
+
+        <motion.div
+          variants={itemVariants}
+          className="mt-8 pt-6 border-t border-gray-200"
+        >
           <div className="flex justify-between font-bold text-lg">
             <span className="text-gray-900">Total</span>
-            <span className="text-indigo-600">£{calculateTotalPrice().toFixed(2)}</span>
+            <span className="text-indigo-600">
+              £{calculateTotalPrice().toFixed(2)}
+            </span>
           </div>
-          
+
           <motion.button
             variants={itemVariants}
             whileHover={{ scale: 1.02 }}
@@ -847,15 +1024,31 @@ const Checkout = ({ cart = [], setProgressStep }) => {
             disabled={isProcessing || !selectedAddressId || cart.length === 0}
             className={`w-full mt-6 py-4 rounded-lg font-medium flex items-center justify-center transition-all duration-300 ${
               isProcessing || !selectedAddressId || cart.length === 0
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-lg'
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-lg"
             }`}
           >
             {isProcessing ? (
               <>
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 Processing...
               </>
@@ -866,7 +1059,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               </>
             )}
           </motion.button>
-          
+
           <p className="text-center text-sm text-gray-500 mt-4">
             By placing your order, you agree to our Terms and Conditions.
           </p>
@@ -879,7 +1072,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-6 min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="mb-8 flex items-center"
@@ -896,13 +1089,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
       </motion.div>
 
       <div className="flex flex-col lg:flex-row gap-8">
-        <div className="w-full lg:w-2/3">
-          {renderBillingDetailsForm()}
-        </div>
+        <div className="w-full lg:w-2/3">{renderBillingDetailsForm()}</div>
 
-        <div className="w-full lg:w-1/3">
-          {renderOrderSummary()}
-        </div>
+        <div className="w-full lg:w-1/3">{renderOrderSummary()}</div>
       </div>
 
       {/* Success Modal */}
@@ -913,44 +1102,78 @@ const Checkout = ({ cart = [], setProgressStep }) => {
             animate={{ scale: 1, opacity: 1 }}
             className="bg-white rounded-lg p-8 max-w-md w-full mx-4 relative"
           >
-            <button 
+            <button
               onClick={() => setShowSuccessModal(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
-            
+
             <div className="text-center">
               <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 text-green-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
               </div>
-              
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h3>
+
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Order Placed Successfully!
+              </h3>
               <p className="text-gray-600 mb-6">
-                Thank you for your order. We have received your order and will process it shortly.
-                {orderId && <span className="block mt-2">Order ID: <span className="font-medium">{orderId}</span></span>}
+                Thank you for your order. We have received your order and will
+                process it shortly.
+                {orderId && (
+                  <span className="block mt-2">
+                    Order ID: <span className="font-medium">{orderId}</span>
+                  </span>
+                )}
               </p>
-              
+
               {/* Order Summary in Success Modal */}
               <div className="bg-gray-50 p-4 rounded-lg mb-6">
-                <h4 className="font-semibold text-gray-800 mb-3">Order Summary</h4>
+                <h4 className="font-semibold text-gray-800 mb-3">
+                  Order Summary
+                </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Total:</span>
-                    <span className="font-medium">£{calculateTotalPrice().toFixed(2)}</span>
+                    <span className="font-medium">
+                      £{calculateTotalPrice().toFixed(2)}
+                    </span>
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
                   onClick={() => {
                     setShowSuccessModal(false);
-                    navigate('/orders');
+                    navigate("/myorders");
+                    window.location.reload();
                   }}
                   className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
@@ -959,7 +1182,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                 <button
                   onClick={() => {
                     setShowSuccessModal(false);
-                    navigate('/');
+                    navigate("/");
                   }}
                   className="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
@@ -970,7 +1193,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
           </motion.div>
         </div>
       )}
-      
+
       {/* Error Modal */}
       {showErrorModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -979,27 +1202,52 @@ const Checkout = ({ cart = [], setProgressStep }) => {
             animate={{ scale: 1, opacity: 1 }}
             className="bg-white rounded-lg p-8 max-w-md w-full mx-4 relative"
           >
-            <button 
+            <button
               onClick={() => setShowErrorModal(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
-            
+
             <div className="text-center">
               <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 text-red-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
                 </svg>
               </div>
-              
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Order Failed</h3>
+
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Order Failed
+              </h3>
               <p className="text-gray-600 mb-6">
-                {errorMessage || 'There was an error processing your order. Please try again.'}
+                {errorMessage ||
+                  "There was an error processing your order. Please try again."}
               </p>
-              
+
               <div className="flex justify-center">
                 <button
                   onClick={() => setShowErrorModal(false)}
@@ -1018,7 +1266,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
 
 Checkout.propTypes = {
   cart: PropTypes.array,
-  setProgressStep: PropTypes.func.isRequired
+  setProgressStep: PropTypes.func.isRequired,
 };
 
 export default Checkout;
