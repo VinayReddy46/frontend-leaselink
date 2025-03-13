@@ -168,7 +168,7 @@ const AddProduct = () => {
     // Update predefined insurance plans with API data when available
     if (
       insuranceData?.insurancePlans &&
-      insuranceData.insurancePlans.length > 0
+      insuranceData?.insurancePlans.length > 0
     ) {
       const apiPlans = insuranceData.insurancePlans.map((plan) => ({
         id: plan.plan_id,

@@ -22,11 +22,14 @@ const Login = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      const res=await login({email,password});
+      const res = await login({ email, password });
+      console.log("res", res)
+      console.log("dasdjsdghadgfasgdf")
       if(res.data.success){
-        toast.success( res?.data?.message ||"Login successful.");
-        console.log(res.data.data)
-        const user = res.data.data;
+        toast.success( res?.data?.message ||"Login successful.d");
+        console.log(res.data)
+
+        const user = res.data;
         dispatch(setCredentials(user));
         navigate("/");
       }

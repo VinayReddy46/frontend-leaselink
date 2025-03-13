@@ -50,6 +50,7 @@ import LenderDashboard from "./compoments/ordercomponents/LenderDashboard";
 import RenterDashboard from "./compoments/ordercomponents/RenterDashboard";
 import WithdrawRequest from "./compoments/admin/WithdrawRequest";
 import Transactions from "./compoments/admin/Transactions";
+import CheckoutPage from "./pages/CheckoutPage";
 import ResetPassword from "./pages/ResetPassword";
 
 
@@ -119,7 +120,7 @@ function App() {
               <Route path="/wishlist" element={<WishlistPage />} />
               {/* <Route path="/myorders" element={<MyOrders />} />
               <Route path="/myrentedproducts" element={<Myrentedproducts />} /> */}
-              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="*" element={<Error />} />
               <Route path="/Helpdesk" element={<HelpDesk />} />
               <Route path="/help-topic/:topicId" element={<HelpTopic />} />
