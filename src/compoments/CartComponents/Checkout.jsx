@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
@@ -53,6 +54,10 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   // State for billing details
   const [billingEditable, setBillingEditable] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [orderId, setOrderId] = useState('');
   
   // Address management state
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -153,18 +158,10 @@ const Checkout = ({ cart = [], setProgressStep }) => {
     localStorage.setItem('billingDetails', JSON.stringify(billingDetails));
   }, [billingDetails]);
 
-  const calculateSubtotal = () => {
-    return cart.reduce((total, item) => {
-      return total + ((item.rentalAmount + (item.insurance?.price || 0)) * (item.quantity || 1));
-    }, 0);
-  };
-
-  const calculateTax = () => {
-    return calculateSubtotal() * 0.10;
-  };
-
-  const calculateTotal = () => {
-    return calculateSubtotal() + calculateTax();
+  // Calculate total price
+  const calculateTotalPrice = () => {
+    if (!cart || cart.length === 0) return 0;
+    return cart.reduce((total, item) => total + (item.total_price || 0), 0);
   };
 
   const validateBillingDetails = () => {
@@ -750,32 +747,40 @@ const Checkout = ({ cart = [], setProgressStep }) => {
       const orderData = {
         user: userId,
         addressId: selectedAddressId,
-        cartIds: cartItemIds // Send array of cart item IDs
+        cartIds: cartItemIds, // Send array of cart item IDs
       };
       
       console.log("Placing order with data:", orderData);
       
       toast.loading('Processing your order...', { id: 'placeOrder' });
       
-      await placeOrder(orderData).unwrap();
+      const response = await placeOrder(orderData).unwrap();
       
       toast.dismiss('placeOrder');
       toast.success('Order placed successfully!');
       
-      // Redirect to order confirmation or orders page
-      // You can implement this based on your application flow
+      // Set order ID and show success modal
+      if (response && response._id) {
+        setOrderId(response._id);
+      }
+      setShowSuccessModal(true);
       
     } catch (error) {
       toast.dismiss('placeOrder');
       console.error('Error placing order:', error);
       
+      let message = 'Failed to place order. Please try again.';
       if (error.status === 400) {
-        toast.error('Invalid order information. Please check your details.');
+        message = 'Invalid order information. Please check your details.';
       } else if (error.status === 401) {
-        toast.error('You must be logged in to place an order.');
-      } else {
-        toast.error(error.data?.message || 'Failed to place order. Please try again.');
+        message = 'You must be logged in to place an order.';
+      } else if (error.data?.message) {
+        message = error.data.message;
       }
+      
+      setErrorMessage(message);
+      setShowErrorModal(true);
+      toast.error(message);
     } finally {
       setIsProcessing(false);
     }
@@ -822,7 +827,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-medium text-gray-900">₹{item.total_price.toFixed(2)}</p>
+                <p className="font-medium text-gray-900">£{item.total_price.toFixed(2)}</p>
               </div>
             </div>
           ))}
@@ -831,7 +836,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
         <motion.div variants={itemVariants} className="mt-8 pt-6 border-t border-gray-200">
           <div className="flex justify-between font-bold text-lg">
             <span className="text-gray-900">Total</span>
-            <span className="text-indigo-600">₹{calculateTotal().toFixed(2)}</span>
+            <span className="text-indigo-600">£{calculateTotalPrice().toFixed(2)}</span>
           </div>
           
           <motion.button
@@ -870,6 +875,8 @@ const Checkout = ({ cart = [], setProgressStep }) => {
     );
   };
 
+  const navigate = useNavigate();
+
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-6 min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
       <motion.div 
@@ -897,6 +904,114 @@ const Checkout = ({ cart = [], setProgressStep }) => {
           {renderOrderSummary()}
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-lg p-8 max-w-md w-full mx-4 relative"
+          >
+            <button 
+              onClick={() => setShowSuccessModal(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h3>
+              <p className="text-gray-600 mb-6">
+                Thank you for your order. We have received your order and will process it shortly.
+                {orderId && <span className="block mt-2">Order ID: <span className="font-medium">{orderId}</span></span>}
+              </p>
+              
+              {/* Order Summary in Success Modal */}
+              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <h4 className="font-semibold text-gray-800 mb-3">Order Summary</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Total:</span>
+                    <span className="font-medium">£{calculateTotalPrice().toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    navigate('/orders');
+                  }}
+                  className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  View Orders
+                </button>
+                <button
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    navigate('/');
+                  }}
+                  className="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  Continue Shopping
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+      
+      {/* Error Modal */}
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-lg p-8 max-w-md w-full mx-4 relative"
+          >
+            <button 
+              onClick={() => setShowErrorModal(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Order Failed</h3>
+              <p className="text-gray-600 mb-6">
+                {errorMessage || 'There was an error processing your order. Please try again.'}
+              </p>
+              
+              <div className="flex justify-center">
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };
