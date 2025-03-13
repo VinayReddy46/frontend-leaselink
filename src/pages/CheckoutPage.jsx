@@ -7,9 +7,7 @@ import { toast } from 'react-hot-toast';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
-  const [progressStep, setProgressStep] = useState('checkout');
   const [cartItems, setCartItems] = useState([]);
-  const [cartId, setCartId] = useState('');
   
   // Get user info from Redux store
   const userInfo = useSelector((state) => state.auth.userInfo);
@@ -28,11 +26,10 @@ const CheckoutPage = () => {
       return;
     }
     
-    // If cart data is available, set cart items and cart ID
+    // If cart data is available, set cart items
     if (cartData) {
+      console.log("cartData", cartData);
       setCartItems(cartData.cartItems || []);
-      // The cart ID should be available in the response
-      setCartId(cartData._id || '');
     }
     
     // Handle cart data from localStorage for cases where RTK Query hasn't loaded yet
@@ -53,8 +50,6 @@ const CheckoutPage = () => {
   const handleProgressStep = (step) => {
     if (step === 'cart') {
       navigate('/cart');
-    } else {
-      setProgressStep(step);
     }
   };
   
@@ -98,12 +93,24 @@ const CheckoutPage = () => {
   }
   
   return (
-    <div className={`checkout-page ${progressStep === 'payment' ? 'payment-step' : 'address-step'}`}>
-      <Checkout 
-        cart={cartItems} 
-        setProgressStep={handleProgressStep} 
-        cartId={cartId}
-      />
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8 text-center">Checkout</h1>
+      
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      ) : error ? (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Error!</strong>
+          <span className="block sm:inline"> {error?.data?.message || 'Failed to load cart data'}</span>
+        </div>
+      ) : (
+        <Checkout 
+          cart={cartItems} 
+          setProgressStep={handleProgressStep} 
+        />
+      )}
     </div>
   );
 };

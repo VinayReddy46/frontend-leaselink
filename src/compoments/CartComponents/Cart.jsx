@@ -84,7 +84,10 @@ const Cart = () => {
   const handleProceedToCheckout = () => {
     // Save cart data to localStorage before navigating
     localStorage.setItem('cartData', JSON.stringify({
-      items: cartItemsData,
+      items: cartItemsData.map(item => ({
+        ...item,
+        _id: item._id // Ensure each item has its _id
+      })),
       total: calculateTotal()
     }));
     

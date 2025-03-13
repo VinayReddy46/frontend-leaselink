@@ -49,7 +49,7 @@ const itemVariants = {
   }
 };
 
-const Checkout = ({ cart = [], setProgressStep, cartId }) => {
+const Checkout = ({ cart = [], setProgressStep }) => {
   // State for billing details
   const [billingEditable, setBillingEditable] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -736,19 +736,24 @@ const Checkout = ({ cart = [], setProgressStep, cartId }) => {
       return;
     }
     
-    if (!cartId) {
-      toast.error('Cart information is missing');
+    if (!cart || cart.length === 0) {
+      toast.error('Cart is empty');
       return;
     }
     
     setIsProcessing(true);
     
     try {
+      // Collect all cartIds from the cart items
+      const cartItemIds = cart.map(item => item._id);
+      
       const orderData = {
         user: userId,
         addressId: selectedAddressId,
-        cartId: cartId
+        cartIds: cartItemIds // Send array of cart item IDs
       };
+      
+      console.log("Placing order with data:", orderData);
       
       toast.loading('Processing your order...', { id: 'placeOrder' });
       
@@ -898,8 +903,7 @@ const Checkout = ({ cart = [], setProgressStep, cartId }) => {
 
 Checkout.propTypes = {
   cart: PropTypes.array,
-  setProgressStep: PropTypes.func.isRequired,
-  cartId: PropTypes.string.isRequired
+  setProgressStep: PropTypes.func.isRequired
 };
 
 export default Checkout;
