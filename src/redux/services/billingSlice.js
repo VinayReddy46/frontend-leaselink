@@ -9,7 +9,7 @@ export const billingApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: orderData,
       }),
-      invalidatesTags: ["Orders"],
+      invalidatesTags: ["Orders", "Addresses", "Cart", "Count"],
     }),
   }),
 });

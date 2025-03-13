@@ -494,7 +494,7 @@ const AddProduct = () => {
 
       // Get user information from redux state
       if (userInfo && userInfo.id) {
-        formData.append("userId", userInfo.id);
+        formData.append("user", userInfo.id);
         console.log("Added userId to form data:", userInfo.id);
       }
 
