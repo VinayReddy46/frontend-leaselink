@@ -1,45 +1,10 @@
 import { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { FaQuestion } from "react-icons/fa6";
+import { useGetFaqsQuery } from '../../../redux/services/FAQsSlice';
 const FAQSection = () => {
   const [openIndex, setOpenIndex] = useState(null);
-   // const [faqs, setfaqs] = useState([]);
-  // const [loading, setLoading] = useState(true)
-
-  // useEffect(() => {
-  //   axios
-  //     .get("http://localhost:5000/faqs") // Replace with your API URL
-  //     .then((response) => {
-  //       setfaqs(response.data);
-  //       setLoading(false);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching data:", error);
-  //       setLoading(false);
-  //     });
-  // }, []);
-  // if (loading) {
-  //   return <p>Loading faqs...</p>;
-  // }
-
-  const faqs = [
-    {
-      question: "How Long Does A Car Rent Take ?",
-      answer: "We denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire. Ante odio dignissim quam, vitae pulvinar turpis erat ac elit eu orci id odio facilisis pharetra."
-    },
-    {
-      question: "How Can I Become A Member ?",
-      answer: "We denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire. Ante odio dignissim quam, vitae pulvinar turpis erat ac elit eu orci id odio facilisis pharetra."
-    },
-    {
-      question: "What Payment Gateway You Support ?",
-      answer: "We denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire. Ante odio dignissim quam, vitae pulvinar turpis erat ac elit eu orci id odio facilisis pharetra."
-    },
-    {
-      question: "How Can I Cancel My Request ?",
-      answer: "We denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire. Ante odio dignissim quam, vitae pulvinar turpis erat ac elit eu orci id odio facilisis pharetra."
-    }
-  ];
+const { data: faqs = [] } = useGetFaqsQuery();
 
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -76,7 +41,7 @@ const FAQSection = () => {
 
       
         <div className="space-y-4">
-          {faqs.map((faq, index) => (
+          {faqs?.map((faq, index) => (
             <div 
               key={index}
               className="bg-gray-50  rounded-xl shadow-sm transition-all duration-300 hover:shadow-md"
@@ -84,7 +49,7 @@ const FAQSection = () => {
                
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full flex items-center justify-between p-5 text-left"
+                className="w-full flex items-center justify-between p-3 text-left"
                 aria-expanded={openIndex === index}
               >
                 <div className='bg-indigo-600 text-white p-3 rounded-lg'><FaQuestion size={16}/></div>

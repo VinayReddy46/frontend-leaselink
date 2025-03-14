@@ -2,13 +2,22 @@ import { apiSlice } from './apiSlice';
 
 export const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getUsers: builder.query({
-      query: () => 'users',
+    updateProfile: builder.mutation({
+      query: (credentials) => ({
+        url: `user/update-profile`,
+        method: "PUT",
+        body: credentials,
+      }),
     }),
-    getUserById: builder.query({
-      query: (id) => `users/${id}`,
+
+    updatePassord: builder.mutation({
+      query: (credentials) => ({
+        url: `user/update-password`,
+        method: "PUT",
+        body: credentials,
+      }),
     }),
   }),
 });
 
-export const { useGetUsersQuery, useGetUserByIdQuery } = userApi;
+export const {useUpdateProfileMutation,useUpdatePassordMutation, } = userApi;

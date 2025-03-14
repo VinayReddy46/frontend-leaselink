@@ -15,7 +15,7 @@ import {
 } from "react-icons/fi";
 import { FaHome ,FaFileInvoice } from "react-icons/fa";
 import { CiBank } from "react-icons/ci";
-
+import { LiaFileInvoiceDollarSolid } from "react-icons/lia";
 
 
 
@@ -42,7 +42,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       icon: <FiMessageSquare />,
       path: "customer-service",
     },
-    { name: "Trancsactions", icon: <FaFileInvoice />, path: "transactions" },
+    { name: "Trancsactions", icon: <LiaFileInvoiceDollarSolid />, path: "transactions" },
     { name: "Withdraw request", icon: <CiBank /> , path: "withdrawrequest" },
     { name: "Settings", icon: <FiSettings />, path: "settings" },
   ];
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
           isSidebarOpen ? "ml-64" : "ml-16"
         }`}
       >
-        <div className="p-6 h-full">
+        <div className="p-2 md:p-6 h-full">
           <div className="w-full min-h-full bg-white rounded-lg shadow p-4">
             <Outlet />
           </div>

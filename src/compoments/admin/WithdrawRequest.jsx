@@ -1,23 +1,14 @@
 import React, { useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
+import { useGetWithdrawRequestsQuery } from "../../redux/services/adminSlice";
+import { useNavigate } from "react-router-dom";
 
 const WithdrawRequest = () => {
-  const [bankData, setBankData] = useState([
-    { id: 1, bankName: "HDFC Bank", accountHolder: "Rajesh Kumar", accountNumber: "123456789012", bankAddress: "MG Road, Bengaluru",amount:"500" },
-    { id: 2, bankName: "ICICI Bank", accountHolder: "Priya Sharma", accountNumber: "234567890123", bankAddress: "Connaught Place, Delhi",amount:"1500" },
-    { id: 3, bankName: "SBI Bank", accountHolder: "Amit Verma", accountNumber: "345678901234", bankAddress: "Park Street, Kolkata" ,amount:"2200"},
-    { id: 4, bankName: "Axis Bank", accountHolder: "Sneha Patel", accountNumber: "456789012345", bankAddress: "Bandra, Mumbai" ,amount:"2000"},
-    { id: 5, bankName: "Kotak Mahindra", accountHolder: "Manish Singh", accountNumber: "567890123456", bankAddress: "JP Nagar, Bengaluru",amount:"3000" },
-    { id: 6, bankName: "PNB Bank", accountHolder: "Rakesh Gupta", accountNumber: "678901234567", bankAddress: "Civil Lines, Jaipur",amount:"4000" },
-    { id: 7, bankName: "Canara Bank", accountHolder: "Anjali Nair", accountNumber: "789012345678", bankAddress: "Anna Salai, Chennai",amount:"3200" },
-    { id: 8, bankName: "Bank of Baroda", accountHolder: "Surya Teja", accountNumber: "890123456789", bankAddress: "Abids, Hyderabad" ,amount:"4600"},
-    { id: 9, bankName: "Indian Bank", accountHolder: "Kavita Mehta", accountNumber: "901234567890", bankAddress: "Koregaon Park, Pune" ,amount:"6000"},
-    { id: 10, bankName: "UCO Bank", accountHolder: "Tarun Malhotra", accountNumber: "012345678901", bankAddress: "Hazratganj, Lucknow",amount:"7000" },
-  ]);
-  
-
+  const { data: requestsData, refetch, isLoading } = useGetWithdrawRequestsQuery();
+  const requests = requestsData?.requests || [];
   const [openDropdown, setOpenDropdown] = useState(null);
+  const navigate = useNavigate();
 
   // Toggle dropdown visibility
   const toggleDropdown = (id) => {
@@ -26,7 +17,7 @@ const WithdrawRequest = () => {
 
   // Delete function
   const handleDelete = (id) => {
-    setBankData(bankData.filter((bank) => bank.id !== id));
+    // Implement delete functionality here
   };
 
   const handlePayment = (id) => {
@@ -53,23 +44,22 @@ const WithdrawRequest = () => {
             </tr>
           </thead>
           <tbody>
-            {bankData.map((bank) => (
-              <React.Fragment key={bank.id}>
+            {requests.map((request) => (
+              <React.Fragment key={request._id}>
                 <tr className="hover:bg-gray-50 transition">
-                  <td className="p-3 border border-gray-300">{bank.id}</td>
+                  <td className="p-3 border border-gray-300">{request._id}</td>
                   <td className="p-3 border border-gray-300">
-                    {bank.accountHolder}
+                    {request.userId.name}
                   </td>
                   <td className="p-3 border border-gray-300">
-                    {bank.bankName}
+                    {request.bankDetails.bankName}
                   </td>
-                  
                   <td className="p-3 border border-gray-300">
                     <button
-                      onClick={() => toggleDropdown(bank.id)}
+                      onClick={() => toggleDropdown(request._id)}
                       className="flex items-center gap-2 text-blue-500 hover:text-blue-700"
                     >
-                      {openDropdown === bank.id ? (
+                      {openDropdown === request._id ? (
                         <MdKeyboardArrowUp size={18} />
                       ) : (
                         <MdKeyboardArrowDown size={18} />
@@ -78,11 +68,11 @@ const WithdrawRequest = () => {
                     </button>
                   </td>
                   <td className="p-3 border border-gray-300">
-                    {bank.amount}
+                    {request.amount}
                   </td>
                   <td className="p-3 border border-gray-300">
                     <button
-                      onClick={() => handlePayment(bank.id)}
+                      onClick={() => handlePayment(request._id)}
                       className="bg-green-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-green-600 transition text-sm sm:text-base"
                     >
                       Click Here to Pay
@@ -90,7 +80,7 @@ const WithdrawRequest = () => {
                   </td>
                   <td className="p-3 border border-gray-300">
                     <button
-                      onClick={() => handleDelete(bank.id)}
+                      onClick={() => handleDelete(request._id)}
                       className="flex items-center gap-2 bg-red-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg shadow-md hover:bg-red-700 transition duration-300 ease-in-out text-sm sm:text-base"
                     >
                       <FaTrashAlt size={16} />
@@ -99,17 +89,17 @@ const WithdrawRequest = () => {
                   </td>
                 </tr>
 
-                {openDropdown === bank.id && (
+                {openDropdown === request._id && (
                   <tr>
                     <td
-                      colSpan="6"
+                      colSpan="7"
                       className="p-4 border border-gray-300 bg-gray-50"
                     >
                       <p>
-                        <strong>Account Number:</strong> {bank.accountNumber}
+                        <strong>Account Number:</strong> {request.bankDetails.accountNumber}
                       </p>
                       <p>
-                        <strong>Bank Address:</strong> {bank.bankAddress}
+                        <strong>Bank Address:</strong> {request.bankDetails.bankAddress}
                       </p>
                     </td>
                   </tr>

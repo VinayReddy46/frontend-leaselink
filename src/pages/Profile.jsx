@@ -1,20 +1,30 @@
-import React, { useState,useEffect } from 'react';
-import {FaRegUser, FaRegSave } from 'react-icons/fa';
+import React, { useState, useEffect, use } from 'react';
+import { FaRegUser, FaRegSave, FaPhoneAlt, FaCalendar, FaRegCalendarAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { MdOutlineEmail, MdOutlineLock } from "react-icons/md";
-import { IoMdClose } from 'react-icons/io';
+import { IoMdClose, IoMdPhonePortrait } from 'react-icons/io';
+import { useSelector, useDispatch } from 'react-redux';
+import { useUpdatePassordMutation, useUpdateProfileMutation } from '../redux/services/userSlice';
+import { setCredentials } from '../redux/features/authSlice';
 
 const Profile = () => {
+  const { userInfo } = useSelector((state) => state.auth);
+  console.log(userInfo);
+  const dispatch = useDispatch();
+  const [updateProfile] = useUpdateProfileMutation();
+  const [updatePassword, { isLoading: isUpdatingPassword }] = useUpdatePassordMutation();
+
   const [formData, setFormData] = useState({
-    profileName: 'Raju',
-    email: 'raju@samplegmail.com',
+    name: userInfo.name || "",
+    phone_number: userInfo.phone_number || "",
+    avatar: userInfo.avatar || "",
+    dateOfBirth: userInfo.dateOfBirth || "",
     password: '',
     confirmPassword: '',
     oldPassword: '',
   });
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState('');
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState(userInfo.avatar || '');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -28,30 +38,33 @@ const Profile = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    setError('');
-    setIsSuccess(false);
-
-    if (!formData.profileName.trim()) {
-      setError('Profile name is required');
-      toast.error('Profile name is required');
-      return;
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result);
+        setFormData((prevData) => ({
+          ...prevData,
+          avatar: reader.result,
+        }));
+      };
+      reader.readAsDataURL(file);
     }
-
-    if (!formData.email || !formData.email.includes('@')) {
-      setError('Please enter a valid email address');
-      toast.error('Please enter a valid email address');
-      return;
-    }
-
-    setIsSuccess(true);
-    toast.success('Your settings have been updated successfully!');
-    console.log('Form submitted:', formData);
   };
 
-  const handlePasswordChange = (e) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await updateProfile(formData).unwrap();
+      toast.success("Profile updated successfully");
+      dispatch(setCredentials(res.data));
+    } catch (error) {
+      toast.error("Failed to update profile");
+    }
+  };
+
+  const handlePasswordChange = async (e) => {
     e.preventDefault();
 
     if (formData.password.length < 6) {
@@ -64,9 +77,13 @@ const Profile = () => {
       return;
     }
 
-    toast.success('Password updated successfully!');
-    setIsPasswordModalOpen(false);
-    console.log('Password updated:', formData);
+    try {
+      await updatePassword({ oldPassword: formData.oldPassword, password: formData.password }).unwrap();
+      setIsPasswordModalOpen(false);
+      toast.success('Password updated successfully');
+    } catch (error) {
+      toast.error('Failed to update password');
+    }
   };
 
   return (
@@ -83,11 +100,31 @@ const Profile = () => {
 
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-lg overflow-hidden border-2 border-gray-200 transition-all duration-300">
-            <div className=" px-6 pt-4">
+            <div className="px-6 pt-4">
               <h2 className="text-xl sm:text-2xl font-semibold text-indigo-700">Personal Information</h2>
             </div>
 
             <form className="p-4 sm:p-8" onSubmit={handleSubmit}>
+              <div className="flex flex-col items-center mb-6">
+                <img
+                  src={avatarPreview}
+                  alt="Avatar"
+                  className="w-24 h-24 rounded-full mb-4"
+                />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                  id="avatarInput"
+                />
+                <label
+                  htmlFor="avatarInput"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-full cursor-pointer hover:bg-blue-700"
+                >
+                  Change Avatar
+                </label>
+              </div>
               <div className="space-y-6">
                 <div className="space-y-2">
                   <div className="relative rounded-lg border-2 border-gray-200">
@@ -95,10 +132,10 @@ const Profile = () => {
                       <FaRegUser className="h-5 w-5" />
                     </div>
                     <input
-                      id="profileName"
-                      name="profileName"
+                      id="name"
+                      name="name"
                       type="text"
-                      value={formData.profileName}
+                      value={formData.name}
                       onChange={handleChange}
                       className="w-full p-3 ps-10 border rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300 hover:border-indigo-300"
                       placeholder="Profile Name"
@@ -109,22 +146,39 @@ const Profile = () => {
                 <div className="space-y-2">
                   <div className="relative rounded-lg border-2 border-gray-200">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-indigo-900 transition-colors duration-300">
-                      <MdOutlineEmail className="h-5 w-5" />
+                      <IoMdPhonePortrait className="h-5 w-5" />
                     </div>
                     <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
+                      id="phone_number"
+                      name="phone_number"
+                      type="text"
+                      value={formData.phone_number}
                       onChange={handleChange}
                       className="w-full p-3 ps-10 border rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300 hover:border-indigo-300"
-                      placeholder="Email Address"
+                      placeholder="Phone Number"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="relative rounded-lg border-2 border-gray-200">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-indigo-900 transition-colors duration-300">
+                      <FaRegCalendarAlt className="h-5 w-5" />
+                    </div>
+                    <input
+                      id="dateOfBirth"
+                      name="dateOfBirth"
+                      type="date"
+                      value={formData.dateOfBirth}
+                      onChange={handleChange}
+                      className="w-full p-3 ps-10 border rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300 hover:border-indigo-300"
+                      placeholder="Date of Birth"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="mt-10 flex justify-end space-y-4 sm:space-y-0 sm:space-x-4">
+              <div className="mt-10 flex-column md:flex justify-center space-y-4 sm:space-y-0 sm:space-x-4 ">
                 <button
                   type="button"
                   onClick={() => setIsPasswordModalOpen(true)}
@@ -136,7 +190,7 @@ const Profile = () => {
 
                 <button
                   type="submit"
-                  className=" flex items-center justify-center px-4 py-2 bg-green-500 text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                  className="flex items-center justify-center px-4 py-2 bg-green-500 text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300"
                 >
                   <FaRegSave className="mr-2 h-4 w-4" />
                   Save Changes
@@ -144,7 +198,6 @@ const Profile = () => {
               </div>
             </form>
           </div>
-
         </div>
       </div>
 
