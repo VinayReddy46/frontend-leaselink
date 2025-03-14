@@ -10,13 +10,13 @@ export const blogsApi = apiSlice.injectEndpoints({
     }),
     createBlog: builder.mutation({
       query: (newBlog) => ({
-        url: "blogs",
+        url: "blogs/add-blog",
         method: "POST",
         body: newBlog,
       }),
     }),
     updateBlog: builder.mutation({
-      query: ({ id, ...updatedBlog }) => ({
+      query: ({ id, updatedBlog }) => ({
         url: `blogs/${id}`,
         method: "PUT",
         body: updatedBlog,

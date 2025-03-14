@@ -1,41 +1,21 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { InputText } from "primereact/inputtext";
+import { useGetFaqsQuery, useCreateFaqMutation, useUpdateFaqMutation, useDeleteFaqMutation } from "../../../redux/services/FAQsSlice";
+import Swal from 'sweetalert2';
+import { toast } from "react-toastify";
 
 const FAQManager = () => {
-  const initialFaqs = [
-    {
-      id: 1,
-      question: "How Long Does A Car Rent Take?",
-      answer: "We denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire. Ante odio dignissim quam, vitae pulvinar turpis erat ac elit eu orci id odio facilisis pharetra.",
-    },
-    {
-      id: 2,
-      question: "How Can I Become A Member?",
-      answer: "We denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire. Ante odio dignissim quam, vitae pulvinar turpis erat ac elit eu orci id odio facilisis pharetra.",
-    },
-    {
-      id: 3,
-      question: "What Payment Gateway You Support?",
-      answer: "We denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire. Ante odio dignissim quam, vitae pulvinar turpis erat ac elit eu orci id odio facilisis pharetra.",
-    },
-    {
-      id: 4,
-      question: "How Can I Cancel My Request?",
-      answer: "We denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire. Ante odio dignissim quam, vitae pulvinar turpis erat ac elit eu orci id odio facilisis pharetra.",
-    },
-  ];
+  const { data: faqs = [], refetch } = useGetFaqsQuery();
+  const [createFaq] = useCreateFaqMutation();
+  const [updateFaq] = useUpdateFaqMutation();
+  const [deleteFaq] = useDeleteFaqMutation();
 
-  const [faqs, setFaqs] = useState(initialFaqs);
-  const [activeIndex, setActiveIndex] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [currentFaq, setCurrentFaq] = useState({ id: null, question: "", answer: "" });
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
 
-  const toggleFaq = (index) => {
-    setActiveIndex(activeIndex === index ? null : index);
-  };
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -55,9 +35,27 @@ const FAQManager = () => {
   };
 
   const handleDeleteFaq = (id) => {
-    if (window.confirm("Are you sure you want to delete this FAQ?")) {
-      setFaqs(faqs.filter((faq) => faq.id !== id));
-    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteFaq(id).unwrap()
+          .then(() => {
+            toast.success("FAQ deleted successfully");
+            refetch();
+          })
+          .catch(() => {
+            toast.error("Failed to delete FAQ");
+          });
+      
+      }
+    });
   };
 
   const handleSaveFaq = (e) => {
@@ -68,12 +66,15 @@ const FAQManager = () => {
       return;
     }
 
-    if (editMode) {
-      setFaqs(faqs.map((faq) => (faq.id === currentFaq.id ? { ...currentFaq } : faq)));
-    } else {
-      const newId = Math.max(...faqs.map((faq) => faq.id), 0) + 1;
-      setFaqs([...faqs, { ...currentFaq, id: newId }]);
-    }
+    const action = editMode ? updateFaq : createFaq;
+    action(editMode ? {id:currentFaq._id,updatedData:currentFaq}:currentFaq).unwrap()
+      .then(() => {
+        toast.success(`FAQ ${editMode ? "updated" : "created"} successfully`);
+        refetch();
+      })
+      .catch(() => {
+        toast.error(`Failed to ${editMode ? "update" : "create"} FAQ`);
+      });
 
     setCurrentFaq({ id: null, question: "", answer: "" });
     setEditMode(false);
@@ -102,17 +103,12 @@ const FAQManager = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div className="relative w-full md:w-2/3">
             <span className="p-input-icon-left w-full">
-              
               <InputText
                 placeholder="Search FAQs..."
                 className="w-full p-2 rounded-lg backdrop-blur-sm bg-white/70 border-2 border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300"
-                
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                
               />
-             
-              
             </span>
           </div>
           <button
@@ -141,12 +137,14 @@ const FAQManager = () => {
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2 text-gray-700">Answer</label>
-                <InputText
+                <textarea
                   name="answer"
+                  rows={3}
                   value={currentFaq.answer}
                   onChange={handleInputChange}
                   className="w-full p-3 border rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300"
                   placeholder="Enter FAQ answer"
+                  autoFocus
                 />
               </div>
               <div className="flex justify-end gap-2">
@@ -172,7 +170,7 @@ const FAQManager = () => {
           {filteredFaqs.length > 0 ? (
             filteredFaqs.map((faq, index) => (
               <div
-                key={faq.id}
+                key={faq._id}
                 className=" border-2 border-gray-200  rounded-lg overflow-hidden  transform transition-all duration-300"
               >
                 <div
@@ -193,24 +191,19 @@ const FAQManager = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDeleteFaq(faq.id);
+                        handleDeleteFaq(faq._id);
                       }}
                       className="flex items-center bg-red-600 text-white px-3 py-1 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                     >
                       <i className="pi pi-trash mr-1"></i> Delete
                     </button>
-                    <i
-                      className={`pi pi-chevron-down transition-transform duration-200 ${
-                        activeIndex === index ? "transform rotate-180" : ""
-                      }`}
-                    ></i>
                   </div>
                 </div>
-                {activeIndex === index && (
-                  <div className="p-4 bg-white">
+                
+                  <div className="py-4 px-2 bg-white">
                     <p className="text-gray-700">{faq.answer}</p>
                   </div>
-                )}
+                
               </div>
             ))
           ) : (

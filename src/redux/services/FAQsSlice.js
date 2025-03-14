@@ -9,17 +9,17 @@ export const faqsApi = apiSlice.injectEndpoints({
       query: (id) => `faqs/${id}`,
     }),
     createFaq: builder.mutation({
-      query: (newCategory) => ({
+      query: (newData) => ({
         url: "faqs",
         method: "POST",
-        body: newCategory,
+        body: newData,
       }),
     }),
     updateFaq: builder.mutation({
-      query: ({ id, updatedCategory }) => ({
+      query: ({ id, updatedData}) => ({
         url: `faqs/${id}`,
         method: "PUT",
-        body: updatedCategory,
+        body: updatedData,
       }),
     }),
     deleteFaq: builder.mutation({

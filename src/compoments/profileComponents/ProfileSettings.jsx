@@ -1,21 +1,14 @@
 import React, { useState } from 'react';
-import { FaBell, FaRegUser, FaRegSave } from 'react-icons/fa';
+import { FaBell, FaRegSave } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import { MdOutlineEmail, MdOutlineLock } from "react-icons/md";
-import { IoMdClose } from 'react-icons/io';
-
+import { useSelector } from 'react-redux';
 const ProfileSettings = () => {
+const {userInfo} = useSelector((state) => state.auth);
+console.log(userInfo)
   const [formData, setFormData] = useState({
-    profileName: 'Raju',
-    email: 'raju@samplegmail.com',
-    password: '',
-    confirmPassword: '',
-    oldPassword: '',
     enableNotifications: false,
   });
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState('');
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -27,44 +20,11 @@ const ProfileSettings = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    setError('');
-    setIsSuccess(false);
-
-    if (!formData.profileName.trim()) {
-      setError('Profile name is required');
-      toast.error('Profile name is required');
-      return;
-    }
-
-    if (!formData.email || !formData.email.includes('@')) {
-      setError('Please enter a valid email address');
-      toast.error('Please enter a valid email address');
-      return;
-    }
-
-    setIsSuccess(true);
     toast.success('Your settings have been updated successfully!');
     console.log('Form submitted:', formData);
   };
 
-  const handlePasswordChange = (e) => {
-    e.preventDefault();
 
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
-
-    toast.success('Password updated successfully!');
-    setIsPasswordModalOpen(false);
-    console.log('Password updated:', formData);
-  };
 
   return (
     <div className="min-h-screen transition-all duration-300 mt-24">
@@ -127,97 +87,6 @@ const ProfileSettings = () => {
           </div>
         </div>
       </div>
-
-      {isPasswordModalOpen && (
-        <div className="fixed inset-0 bg-white-900/50 backdrop-blur-md flex items-center justify-center z-50 transition-all duration-300 p-4">
-          <div className="bg-white rounded-lg overflow-hidden border-2 border-gray-200 w-full max-w-md transition-all duration-300">
-            <div className=" px-6 pt-5  transition-colors duration-300">
-              <h2 className="text-xl sm:text-2xl font-semibold text-indigo-700">Update Password</h2>
-            </div>
-            <form className="p-6 sm:p-8" onSubmit={handlePasswordChange}>
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <label htmlFor="oldPassword" className="block text-sm font-medium text-indigo-700 transition-colors duration-300">
-                    Current Password
-                  </label>
-                  <div className="relative rounded-lg border-2 border-gray-200">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-indigo-700 transition-colors duration-300">
-                      <MdOutlineLock className="h-5 w-5" />
-                    </div>
-                    <input
-                      id="oldPassword"
-                      name="oldPassword"
-                      type="password"
-                      value={formData.oldPassword}
-                      onChange={handleChange}
-                      className="pl-10 py-3 block w-full rounded-lg border-gray-200 focus:ring-2 focus:ring-indigo-500  focus:outline-none text-base transition-all duration-300 hover:border-indigo-300"
-                      placeholder="Enter your current password"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="password" className="block text-sm font-medium text-indigo-700  transition-colors duration-300">
-                    New Password
-                  </label>
-                  <div className="relative rounded-lg border-2 border-gray-200">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-indigo-700 transition-colors duration-300">
-                      <MdOutlineLock className="h-5 w-5" />
-                    </div>
-                    <input
-                      id="password"
-                      name="password"
-                      type="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      className="pl-10 py-3 block w-full rounded-lg border-gray-200 focus:ring-2  focus:ring-indigo-500 focus:outline-none text-base transition-all duration-300 hover:border-indigo-300"
-                      placeholder="Enter your new password"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-indigo-700 transition-colors duration-300">
-                    Confirm New Password
-                  </label>
-                  <div className="relative rounded-lg border-2 border-gray-200">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-indigo-600  transition-colors duration-300">
-                      <MdOutlineLock className="h-5 w-5" />
-                    </div>
-                    <input
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type="password"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      className="pl-10 py-3 block w-full rounded-lg border-gray-200 focus:ring-2  focus:ring-indigo-500 focus:outline-none text-base transition-all duration-300 hover:border-indigo-300"
-                      placeholder="Confirm your new password"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-10 flex justify-end space-y-4 sm:space-y-0 sm:space-x-4">
-                <button
-                  type="button"
-                  onClick={() => setIsPasswordModalOpen(false)}
-                  className="flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300"
-                >
-                  <IoMdClose className="mr-2 h-4 w-4"/>
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className=" flex items-center justify-center px-4 py-2 rounded-lg bg-green-500 text-white font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300"
-                >
-                  <FaRegSave className="mr-2 h-4 w-4" />
-                  Save 
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

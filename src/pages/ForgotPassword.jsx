@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useForgotPasswordMutation } from "../redux/services/authSlice";
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -15,7 +15,6 @@ const ForgotPassword = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
 
     console.log("email", email);
     await forgot({email});
@@ -23,7 +22,6 @@ const ForgotPassword = () => {
     // Simulating API call
     setTimeout(() => {
       toast.success("Password reset link sent to your email!");
-      setIsLoading(false);
     }, 2000);
   };
 
