@@ -901,16 +901,16 @@ const Checkout = ({ cart = [], setProgressStep, onOrderSuccess }) => {
         setOrderId(response._id);
       }
       setShowSuccessModal(true);
-      
+
       // Notify parent component that order was successful
       if (onOrderSuccess) {
         onOrderSuccess(true);
       }
-      
+
       // Auto-navigate after 3 seconds
       setTimeout(() => {
         setShowSuccessModal(false);
-        navigate("/myorders");
+        navigate("/myorders", { state: { orderSuccess: true } });
       }, 3000);
     } catch (error) {
       toast.dismiss("placeOrder");
@@ -1065,7 +1065,7 @@ const Checkout = ({ cart = [], setProgressStep, onOrderSuccess }) => {
         });
       }, 1000);
     }
-    
+
     return () => {
       if (timer) clearInterval(timer);
     };
@@ -1178,7 +1178,7 @@ const Checkout = ({ cart = [], setProgressStep, onOrderSuccess }) => {
                 <button
                   onClick={() => {
                     setShowSuccessModal(false);
-                    navigate("/myorders");
+                    navigate("/myorders", { state: { orderSuccess: true } });
                   }}
                   className={`w-full sm:w-auto px-6 py-3 ${
                     countdown > 0
@@ -1188,6 +1188,20 @@ const Checkout = ({ cart = [], setProgressStep, onOrderSuccess }) => {
                   disabled={countdown > 0}
                 >
                   View Orders
+                </button>
+                <button
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    navigate("/cart", { state: { orderSuccess: true } });
+                  }}
+                  className={`w-full sm:w-auto px-6 py-3 ${
+                    countdown > 0
+                      ? "bg-gray-100 cursor-wait"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  } text-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500`}
+                  disabled={countdown > 0}
+                >
+                  Return to Cart
                 </button>
                 <button
                   onClick={() => {

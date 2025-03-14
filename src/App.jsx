@@ -18,6 +18,7 @@ import Footer from "./pages/Footer";
 import Signup from "./pages/Signup";
 import ProductDetails from "./compoments/CartComponents/ProductDetails";
 import Cart from "./compoments/CartComponents/Cart";
+import CartPage from "./pages/CartPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import AddProduct from "./pages/AddProduct";
 import Chatbot from "./pages/Chatbot";
@@ -103,7 +104,7 @@ function App() {
               <Route path="/rental" element={<Rental />} />
               <Route path="/rental/:category" element={<Rental />} />
               <Route path="/chat" element={<Chatbot />} />
-              <Route path="/cart" element={<Cart />} />
+              <Route path="/cart" element={<CartPage />} />
               <Route path="/aboutus" element={<AboutUs />} />
               <Route path="/notification/:id" element={<NotificationDetails />} />
               {/* added */}

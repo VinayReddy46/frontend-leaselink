@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useGetCartItemsByUserIdQuery } from '../redux/services/cartApiSlice';
 import Checkout from '../compoments/CartComponents/Checkout';
 import { toast } from 'react-hot-toast';
+import { apiSlice } from '../redux/services/apiSlice';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [cartItems, setCartItems] = useState([]);
   const [orderSuccessful, setOrderSuccessful] = useState(false);
   
@@ -15,7 +17,7 @@ const CheckoutPage = () => {
   const userId = userInfo?.id;
   
   // Fetch cart data using RTK Query
-  const { data: cartData, isLoading, error } = useGetCartItemsByUserIdQuery(userId, {
+  const { data: cartData, isLoading, error, refetch } = useGetCartItemsByUserIdQuery(userId, {
     skip: !userId,
   });
   
@@ -57,6 +59,12 @@ const CheckoutPage = () => {
   // Handle order success
   const handleOrderSuccess = (success) => {
     setOrderSuccessful(success);
+    
+    // Force refresh all cart-related queries
+    if (success) {
+      dispatch(apiSlice.util.invalidateTags(["Cart", "Orders", "Addresses", "Count"]));
+      refetch(); // Explicitly refetch cart data
+    }
   };
   
   if (isLoading) {
