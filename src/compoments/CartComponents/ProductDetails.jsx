@@ -146,7 +146,7 @@ const userInfo = useSelector((state) => state.auth.userInfo);
     const endTimeISO = new Date(endDate).toISOString();
 
     // Get user ID from auth state
-    const userId = userInfo?.id;
+    const userId = userInfo?.id ||  userInfo?.user?.id;
     
     if (!userId) {
       toast.error("You must be logged in to add items to cart");
