@@ -48,7 +48,7 @@ const itemVariants = {
   },
 };
 
-const Checkout = ({ cart = [], setProgressStep }) => {
+const Checkout = ({ cart = [], setProgressStep, onOrderSuccess }) => {
   // State for billing details
   const [billingEditable, setBillingEditable] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -56,6 +56,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [orderId, setOrderId] = useState("");
+  const [countdown, setCountdown] = useState(3);
 
   // Address management state
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -96,7 +97,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
     if (file) {
       // Update the billing details with the new file
       setBillingDetails({ ...billingDetails, proof_document: file });
-      
+
       // Validate the file size
       if (file.size > 5000000) {
         setErrors({
@@ -177,7 +178,8 @@ const Checkout = ({ cart = [], setProgressStep }) => {
         } else if (!/^\d{10}$/.test(value.replace(/\D/g, ""))) {
           error = "Phone number must be 10 digits";
         } else if (!/^[0-9()\-\s+]+$/.test(value)) {
-          error = "Phone number can only contain digits, spaces, and symbols: ()+-";
+          error =
+            "Phone number can only contain digits, spaces, and symbols: ()+-";
         }
         break;
 
@@ -254,7 +256,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setBillingDetails({ ...billingDetails, [name]: value });
-    
+
     const error = validateField(name, value);
     setErrors({ ...errors, [name]: error });
   };
@@ -262,20 +264,25 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   // Validate all billing details at once
   const validateBillingDetails = () => {
     const newErrors = {};
-    
+
     // Validate each field using the validateField function
-    Object.keys(billingDetails).forEach(field => {
+    Object.keys(billingDetails).forEach((field) => {
       // Skip proof fields validation if an address is selected
-      if ((field === 'proof_type' || field === 'proof_id' || field === 'proof_document') && selectedAddressId) {
+      if (
+        (field === "proof_type" ||
+          field === "proof_id" ||
+          field === "proof_document") &&
+        selectedAddressId
+      ) {
         return;
       }
-      
+
       const error = validateField(field, billingDetails[field]);
       if (error) {
         newErrors[field] = error;
       }
     });
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -404,9 +411,12 @@ const Checkout = ({ cart = [], setProgressStep }) => {
             <div className="bg-indigo-100 p-3 rounded-full mb-4">
               <HomeIcon className="h-8 w-8 text-indigo-600" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Saved Addresses</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No Saved Addresses
+            </h3>
             <p className="text-gray-600 mb-4">
-              You don&apos;t have any saved addresses yet. Please create a new address to continue with checkout.
+              You don&apos;t have any saved addresses yet. Please create a new
+              address to continue with checkout.
             </p>
             <button
               type="button"
@@ -559,14 +569,20 @@ const Checkout = ({ cart = [], setProgressStep }) => {
         {userId &&
           (!userAddresses || userAddresses.length === 0) &&
           !showAddressForm && (
-            <motion.div variants={itemVariants} className="mb-6 text-center py-8 bg-indigo-50 rounded-lg p-6">
+            <motion.div
+              variants={itemVariants}
+              className="mb-6 text-center py-8 bg-indigo-50 rounded-lg p-6"
+            >
               <div className="flex flex-col items-center">
                 <div className="bg-indigo-100 p-3 rounded-full mb-4">
                   <HomeIcon className="h-8 w-8 text-indigo-600" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Saved Addresses</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  No Saved Addresses
+                </h3>
                 <p className="text-gray-600 mb-4">
-                  You don&apos;t have any saved addresses yet. Please create a new address to continue with checkout.
+                  You don&apos;t have any saved addresses yet. Please create a
+                  new address to continue with checkout.
                 </p>
                 <button
                   type="button"
@@ -885,6 +901,17 @@ const Checkout = ({ cart = [], setProgressStep }) => {
         setOrderId(response._id);
       }
       setShowSuccessModal(true);
+      
+      // Notify parent component that order was successful
+      if (onOrderSuccess) {
+        onOrderSuccess(true);
+      }
+      
+      // Auto-navigate after 3 seconds
+      setTimeout(() => {
+        setShowSuccessModal(false);
+        navigate("/myorders");
+      }, 3000);
     } catch (error) {
       toast.dismiss("placeOrder");
       console.error("Error placing order:", error);
@@ -1024,6 +1051,26 @@ const Checkout = ({ cart = [], setProgressStep }) => {
     );
   };
 
+  useEffect(() => {
+    let timer;
+    if (showSuccessModal) {
+      setCountdown(3);
+      timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [showSuccessModal]);
+
   const navigate = useNavigate();
 
   return (
@@ -1107,6 +1154,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                     Order ID: <span className="font-medium">{orderId}</span>
                   </span>
                 )}
+                <span className="block mt-2 text-blue-600 font-medium">
+                  Redirecting to My Orders in {countdown} seconds...
+                </span>
               </p>
 
               {/* Order Summary in Success Modal */}
@@ -1130,7 +1180,12 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                     setShowSuccessModal(false);
                     navigate("/myorders");
                   }}
-                  className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`w-full sm:w-auto px-6 py-3 ${
+                    countdown > 0
+                      ? "bg-blue-400 cursor-wait"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  } text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  disabled={countdown > 0}
                 >
                   View Orders
                 </button>
@@ -1139,7 +1194,12 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                     setShowSuccessModal(false);
                     navigate("/");
                   }}
-                  className="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className={`w-full sm:w-auto px-6 py-3 ${
+                    countdown > 0
+                      ? "bg-gray-100 cursor-wait"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  } text-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500`}
+                  disabled={countdown > 0}
                 >
                   Continue Shopping
                 </button>
@@ -1222,6 +1282,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
 Checkout.propTypes = {
   cart: PropTypes.array,
   setProgressStep: PropTypes.func.isRequired,
+  onOrderSuccess: PropTypes.func,
 };
 
 export default Checkout;
