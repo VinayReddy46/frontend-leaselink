@@ -66,7 +66,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   const [isLoadingSaveAddress, setIsLoadingSaveAddress] = useState(false);
 
   // Redux hooks for address management
-  const userId = useSelector((state) => state.auth.userInfo?.id);
+  const userId = useSelector((state) => state.auth.userInfo?.id || state.auth.userInfo?.user?.id);
   const {
     data: userAddresses,
     isLoading: isLoadingAddresses,

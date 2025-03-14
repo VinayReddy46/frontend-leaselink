@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 const Cart = () => {
   const navigate = useNavigate();
   const userInfo = useSelector((state) => state.auth.userInfo);
-  const userId = userInfo?.id;
+  const userId = userInfo?.id || userInfo?.user?.id;
   const { data, isLoading: isCartLoading, refetch } = useGetCartItemsByUserIdQuery(userId);
   const cartItemsData = data?.cartItems || [];
   const totalCartPrice = data?.totalCartPrice || 0;

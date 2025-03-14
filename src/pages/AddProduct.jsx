@@ -117,7 +117,7 @@ const InsurancePlanTable = ({ plans, onEdit, onDelete }) => (
 const AddProduct = () => {
   const [images, setImages] = useState(Array(4).fill(null));
   const userInfo = useSelector((state) => state.auth.userInfo);
-  const userId = userInfo?.id;
+  const userId = userInfo?.id ||  userInfo?.user?.id;
   const [product, setProduct] = useState({
     name: "",
     brand: "",
@@ -493,9 +493,9 @@ const AddProduct = () => {
       });
 
       // Get user information from redux state
-      if (userInfo && userInfo.id) {
-        formData.append("user", userInfo.id);
-        console.log("Added userId to form data:", userInfo.id);
+      if (userInfo && (userInfo.id ||  userInfo?.user?.id)) {
+        formData.append("user", (userInfo.id ||  userInfo?.user?.id));
+        console.log("Added userId to form data:", (userInfo.id ||  userInfo?.user?.id));
       }
 
       // Send product data to API

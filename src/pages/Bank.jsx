@@ -32,7 +32,7 @@ function Bank() {
   });
   const [editingId, setEditingId] = useState(null);
 
-  const { data: bankDetails = [], refetch } = useGetBanksQuery(userInfo.id);
+  const { data: bankDetails = [], refetch } = useGetBanksQuery(userInfo.id ||  userInfo?.user?.id);
   const [createBank] = useCreateBankMutation();
   const [updateBank] = useUpdateBankMutation();
   const [deleteBank] = useDeleteBankMutation();
@@ -53,7 +53,7 @@ function Bank() {
         await updateBank({ id: editingId, ...formData }).unwrap();
         toast.success("Bank details updated successfully");
       } else {
-        await createBank({ userId: userInfo.id, ...formData }).unwrap();
+        await createBank({ userId: (userInfo.id || userInfo?.user?.id), ...formData }).unwrap();
         toast.success("Bank details added successfully");
       }
 

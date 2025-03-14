@@ -15,16 +15,16 @@ const Profile = () => {
   const [updatePassword, { isLoading: isUpdatingPassword }] = useUpdatePassordMutation();
 
   const [formData, setFormData] = useState({
-    name: userInfo.name || "",
-    phone_number: userInfo.phone_number || "",
-    avatar: userInfo.avatar || "",
-    dateOfBirth: userInfo.dateOfBirth || "",
+    name: userInfo.name ||  userInfo?.user?.name || "",
+    phone_number: userInfo.phone_number ||  userInfo?.user?.phone_number || "",
+    avatar: userInfo.avatar ||  userInfo?.user?.avatar || "",
+    dateOfBirth: userInfo.dateOfBirth ||  userInfo?.user?.dateOfBirth || "",
     password: '',
     confirmPassword: '',
     oldPassword: '',
   });
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [avatarPreview, setAvatarPreview] = useState(userInfo.avatar || '');
+  const [avatarPreview, setAvatarPreview] = useState(userInfo.avatar ||  userInfo?.user?.avatar || '');
 
   useEffect(() => {
     window.scrollTo(0, 0);
