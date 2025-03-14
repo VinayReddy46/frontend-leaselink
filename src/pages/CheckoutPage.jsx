@@ -8,6 +8,7 @@ import { toast } from 'react-hot-toast';
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
+  const [orderSuccessful, setOrderSuccessful] = useState(false);
   
   // Get user info from Redux store
   const userInfo = useSelector((state) => state.auth.userInfo);
@@ -53,6 +54,11 @@ const CheckoutPage = () => {
     }
   };
   
+  // Handle order success
+  const handleOrderSuccess = (success) => {
+    setOrderSuccessful(success);
+  };
+  
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -62,7 +68,7 @@ const CheckoutPage = () => {
     );
   }
   
-  if (error) {
+  if (error && !orderSuccessful) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-12 text-center">
         <h2 className="text-2xl font-bold text-red-600 mb-4">Error loading checkout</h2>
@@ -77,7 +83,7 @@ const CheckoutPage = () => {
     );
   }
   
-  if (cartItems.length === 0) {
+  if (cartItems.length === 0 && !orderSuccessful) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-12 text-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Your cart is empty</h2>
@@ -100,7 +106,7 @@ const CheckoutPage = () => {
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
-      ) : error ? (
+      ) : error && !orderSuccessful ? (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
           <strong className="font-bold">Error!</strong>
           <span className="block sm:inline"> {error?.data?.message || 'Failed to load cart data'}</span>
@@ -108,7 +114,8 @@ const CheckoutPage = () => {
       ) : (
         <Checkout 
           cart={cartItems} 
-          setProgressStep={handleProgressStep} 
+          setProgressStep={handleProgressStep}
+          onOrderSuccess={handleOrderSuccess}
         />
       )}
     </div>
