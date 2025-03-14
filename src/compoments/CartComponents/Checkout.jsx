@@ -9,7 +9,6 @@ import {
   ArrowLeftIcon,
   PlusCircleIcon,
   CheckIcon,
-  TrashIcon,
   PhotoIcon,
   EnvelopeIcon,
   PhoneIcon,
@@ -25,7 +24,6 @@ import {
   useGetUserAddressesQuery,
   useCreateAddressMutation,
   useUpdateAddressMutation,
-  useDeleteAddressMutation,
 } from "../../redux/services/addressSlice";
 import { usePlaceOrderMutation } from "../../redux/services/billingSlice";
 
@@ -76,7 +74,6 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   });
   const [createAddress] = useCreateAddressMutation();
   const [updateAddress] = useUpdateAddressMutation();
-  const [deleteAddress] = useDeleteAddressMutation();
   const [placeOrder] = usePlaceOrderMutation();
 
   const [billingDetails, setBillingDetails] = useState({
@@ -97,15 +94,19 @@ const Checkout = ({ cart = [], setProgressStep }) => {
   const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Update the billing details with the new file
+      setBillingDetails({ ...billingDetails, proof_document: file });
+      
+      // Validate the file size
       if (file.size > 5000000) {
         setErrors({
           ...errors,
           proof_document: "File size should be less than 5MB",
         });
-        return;
+      } else {
+        // Clear any previous errors for this field
+        setErrors({ ...errors, proof_document: null });
       }
-      setBillingDetails({ ...billingDetails, proof_document: file });
-      setErrors({ ...errors, proof_document: null });
     }
   };
 
@@ -123,51 +124,21 @@ const Checkout = ({ cart = [], setProgressStep }) => {
       proof_id: address.proof_id || "",
       proof_document: address.proof_document || null,
     });
-    setBillingEditable(true);
-  }, []);
-
-  useEffect(() => {
-    try {
-      // Load saved billing details only once on component mount
-      const savedBillingDetails = JSON.parse(
-        localStorage.getItem("billingDetails")
-      );
-      if (savedBillingDetails) {
-        setBillingDetails(savedBillingDetails);
-      }
-    } catch (error) {
-      console.error("Error loading saved data:", error);
-    }
   }, []);
 
   // Separate useEffect for address selection to prevent re-render loops
   useEffect(() => {
     // If we have addresses and no address is selected, select the default one
     if (userAddresses && userAddresses.length > 0 && !selectedAddressId) {
-      const defaultAddress = userAddresses.find((addr) => addr.isDefault);
+      const defaultAddress = userAddresses[0]; // Just select the first address as default
       if (defaultAddress) {
         setSelectedAddressId(defaultAddress._id);
-        // Don't call populateAddressForm here to avoid re-render loop
+        populateAddressForm(defaultAddress);
+        // Hide the form when we have addresses
+        setShowAddressForm(false);
       }
     }
-  }, [userAddresses, selectedAddressId]);
-
-  // Effect to populate form when editing an address
-  useEffect(() => {
-    if (selectedAddressId && !isNewAddress) {
-      const selectedAddress = userAddresses.find(
-        (addr) => addr._id === selectedAddressId
-      );
-      if (selectedAddress) {
-        populateAddressForm(selectedAddress);
-        setBillingEditable(false);
-      }
-    }
-  }, [selectedAddressId, isNewAddress, userAddresses, populateAddressForm]);
-
-  useEffect(() => {
-    localStorage.setItem("billingDetails", JSON.stringify(billingDetails));
-  }, [billingDetails]);
+  }, [userAddresses, selectedAddressId, populateAddressForm]);
 
   // Calculate total price
   const calculateTotalPrice = () => {
@@ -175,58 +146,136 @@ const Checkout = ({ cart = [], setProgressStep }) => {
     return cart.reduce((total, item) => total + (item.total_price || 0), 0);
   };
 
+  // Validation handlers for real-time feedback
+  const validateField = (name, value) => {
+    let error = null;
+
+    switch (name) {
+      case "name":
+        if (!value.trim()) {
+          error = "Name is required";
+        } else if (value.trim().length < 3) {
+          error = "Name must be at least 3 characters";
+        } else if (value.trim().length > 50) {
+          error = "Name cannot exceed 50 characters";
+        } else if (!/^[a-zA-Z\s]+$/.test(value.trim())) {
+          error = "Name can only contain letters and spaces";
+        }
+        break;
+
+      case "email":
+        if (!value.trim()) {
+          error = "Email is required";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
+          error = "Please enter a valid email address";
+        }
+        break;
+
+      case "phone":
+        if (!value.trim()) {
+          error = "Phone number is required";
+        } else if (!/^\d{10}$/.test(value.replace(/\D/g, ""))) {
+          error = "Phone number must be 10 digits";
+        } else if (!/^[0-9()\-\s+]+$/.test(value)) {
+          error = "Phone number can only contain digits, spaces, and symbols: ()+-";
+        }
+        break;
+
+      case "address":
+        if (!value.trim()) {
+          error = "Address is required";
+        } else if (value.trim().length < 5) {
+          error = "Address must be at least 5 characters";
+        } else if (value.trim().length > 100) {
+          error = "Address cannot exceed 100 characters";
+        }
+        break;
+
+      case "city":
+        if (!value.trim()) {
+          error = "City is required";
+        } else if (value.trim().length < 2) {
+          error = "City must be at least 2 characters";
+        } else if (!/^[a-zA-Z\s]+$/.test(value.trim())) {
+          error = "City can only contain letters and spaces";
+        }
+        break;
+
+      case "state":
+        if (!value.trim()) {
+          error = "State is required";
+        } else if (value.trim().length < 2) {
+          error = "State must be at least 2 characters";
+        } else if (!/^[a-zA-Z\s]+$/.test(value.trim())) {
+          error = "State can only contain letters and spaces";
+        }
+        break;
+
+      case "zipcode":
+        if (!value.trim()) {
+          error = "ZIP code is required";
+        } else if (!/^\d{6}$/.test(value.replace(/\D/g, ""))) {
+          error = "ZIP code must be 6 digits";
+        }
+        break;
+
+      case "proof_type":
+        if (!value) {
+          error = "Please select a proof type";
+        }
+        break;
+
+      case "proof_id":
+        if (!value.trim()) {
+          error = "Proof ID is required";
+        } else if (value.trim().length < 4) {
+          error = "Proof ID must be at least 4 characters";
+        } else if (value.trim().length > 20) {
+          error = "Proof ID cannot exceed 20 characters";
+        }
+        break;
+
+      case "proof_document":
+        if (!value) {
+          error = "Please upload a proof document";
+        } else if (value instanceof File && value.size > 5000000) {
+          error = "File size should be less than 5MB";
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    return error;
+  };
+
+  // Handle input change with validation
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setBillingDetails({ ...billingDetails, [name]: value });
+    
+    const error = validateField(name, value);
+    setErrors({ ...errors, [name]: error });
+  };
+
+  // Validate all billing details at once
   const validateBillingDetails = () => {
     const newErrors = {};
-
-    if (!billingDetails.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-
-    if (!billingDetails.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(billingDetails.email)) {
-      newErrors.email = "Email is invalid";
-    }
-
-    if (!billingDetails.phone.trim()) {
-      newErrors.phone = "Phone number is required";
-    } else if (!/^\d{10}$/.test(billingDetails.phone.replace(/\D/g, ""))) {
-      newErrors.phone = "Phone number must be 10 digits";
-    }
-
-    if (!billingDetails.address.trim()) {
-      newErrors.address = "Address is required";
-    }
-
-    if (!billingDetails.city.trim()) {
-      newErrors.city = "City is required";
-    }
-
-    if (!billingDetails.state.trim()) {
-      newErrors.state = "State is required";
-    }
-
-    if (!billingDetails.zipcode.trim()) {
-      newErrors.zipcode = "ZIP code is required";
-    } else if (!/^\d{6}$/.test(billingDetails.zipcode.replace(/\D/g, ""))) {
-      newErrors.zipcode = "ZIP code must be 6 digits";
-    }
-
-    // Proof validation is optional when selecting an existing address
-    if (!selectedAddressId) {
-      if (!billingDetails.proof_type) {
-        newErrors.proof_type = "Please select a proof type";
+    
+    // Validate each field using the validateField function
+    Object.keys(billingDetails).forEach(field => {
+      // Skip proof fields validation if an address is selected
+      if ((field === 'proof_type' || field === 'proof_id' || field === 'proof_document') && selectedAddressId) {
+        return;
       }
-
-      if (!billingDetails.proof_id) {
-        newErrors.proof_id = "Proof ID is required";
+      
+      const error = validateField(field, billingDetails[field]);
+      if (error) {
+        newErrors[field] = error;
       }
-
-      if (!billingDetails.proof_document) {
-        newErrors.proof_document = "Please upload a proof document";
-      }
-    }
-
+    });
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -249,7 +298,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
     setBillingEditable(true);
   };
 
-  // Save address (create new or update existing)
+  // Save address (create new)
   const saveAddress = async () => {
     if (!validateBillingDetails()) {
       toast.error("Please complete all required fields");
@@ -280,29 +329,16 @@ const Checkout = ({ cart = [], setProgressStep }) => {
         formData.append("proof_document", billingDetails.proof_document);
       }
 
-      let result;
-      const toastId = isNewAddress ? "createAddress" : "updateAddress";
+      // Create new address
+      const toastId = "createAddress";
+      toast.loading("Creating address...", { id: toastId });
+      const result = await createAddress(formData).unwrap();
+      toast.dismiss(toastId);
+      toast.success("Address added successfully");
 
-      if (isNewAddress) {
-        // Create new address
-        toast.loading("Creating address...", { id: toastId });
-        result = await createAddress(formData).unwrap();
-        toast.dismiss(toastId);
-        toast.success("Address added successfully");
-
-        // Set as selected address
-        if (result && result._id) {
-          setSelectedAddressId(result._id);
-        }
-      } else {
-        // Update existing address
-        toast.loading("Updating address...", { id: toastId });
-        result = await updateAddress({
-          addressId: selectedAddressId,
-          data: formData,
-        }).unwrap();
-        toast.dismiss(toastId);
-        toast.success("Address updated successfully");
+      // Set as selected address
+      if (result && result._id) {
+        setSelectedAddressId(result._id);
       }
 
       // Refresh addresses list to show the updated list
@@ -336,7 +372,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
     }
   };
 
-  // Save billing details (also saves address if user is logged in)
+  // Save billing details
   const saveBillingDetails = () => {
     if (validateBillingDetails()) {
       setBillingEditable(false);
@@ -363,18 +399,24 @@ const Checkout = ({ cart = [], setProgressStep }) => {
 
     if (!userAddresses || userAddresses.length === 0) {
       return (
-        <div className="mb-6 text-center py-8">
-          <p className="text-gray-600 mb-4">
-            You don&apos;t have any saved addresses yet.
-          </p>
-          <button
-            type="button"
-            onClick={addNewAddress}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            <PlusCircleIcon className="h-5 w-5 mr-2" />
-            Add New Address
-          </button>
+        <div className="mb-6 text-center py-8 bg-indigo-50 rounded-lg p-6">
+          <div className="flex flex-col items-center">
+            <div className="bg-indigo-100 p-3 rounded-full mb-4">
+              <HomeIcon className="h-8 w-8 text-indigo-600" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Saved Addresses</h3>
+            <p className="text-gray-600 mb-4">
+              You don&apos;t have any saved addresses yet. Please create a new address to continue with checkout.
+            </p>
+            <button
+              type="button"
+              onClick={addNewAddress}
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              <PlusCircleIcon className="h-5 w-5 mr-2" />
+              Create New Address
+            </button>
+          </div>
         </div>
       );
     }
@@ -417,33 +459,6 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                   <p className="text-sm text-gray-600">{address.phone}</p>
                 </div>
               </div>
-
-              {selectedAddressId === address._id && (
-                <div className="mt-3 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (
-                        window.confirm(
-                          "Are you sure you want to delete this address?"
-                        )
-                      ) {
-                        deleteAddress(address._id);
-                        if (selectedAddressId === address._id) {
-                          setSelectedAddressId(null);
-                          resetAddressForm();
-                        }
-                        refetchAddresses();
-                      }
-                    }}
-                    className="text-sm font-medium text-red-600 hover:text-red-800"
-                  >
-                    <TrashIcon className="h-4 w-4 inline mr-1" />
-                    Delete
-                  </button>
-                </div>
-              )}
             </div>
           ))}
         </div>
@@ -482,7 +497,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
           <h2 className="text-2xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
             Address Details
           </h2>
-          {!billingEditable && !showAddressForm ? (
+          {!showAddressForm ? (
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -492,9 +507,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               }}
               className="flex items-center text-indigo-600 hover:text-indigo-800 transition-colors"
             >
-              <PencilSquareIcon className="w-5 h-5 mr-1" /> Edit
+              <ArrowLeftIcon className="w-5 h-5 mr-1" /> Back to Cart
             </motion.button>
-          ) : showAddressForm ? (
+          ) : (
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -530,42 +545,6 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               )}
               {isLoadingSaveAddress ? "Saving..." : "Save Address"}
             </motion.button>
-          ) : (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={saveBillingDetails}
-              className={`flex items-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300 ${
-                isLoadingSaveAddress ? "cursor-not-allowed opacity-50" : ""
-              }`}
-              disabled={isLoadingSaveAddress}
-            >
-              {isLoadingSaveAddress ? (
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-              ) : (
-                <DocumentCheckIcon className="w-5 h-5 mr-2" />
-              )}
-              {isLoadingSaveAddress ? "Saving..." : "Save"}
-            </motion.button>
           )}
         </motion.div>
 
@@ -576,27 +555,33 @@ const Checkout = ({ cart = [], setProgressStep }) => {
           !showAddressForm &&
           renderSavedAddresses()}
 
-        {/* Add New Address Button (if user is logged in but has no addresses) */}
+        {/* No Addresses Message (if user is logged in but has no addresses) */}
         {userId &&
           (!userAddresses || userAddresses.length === 0) &&
           !showAddressForm && (
-            <motion.div variants={itemVariants} className="mb-6">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={addNewAddress}
-                className="w-full py-3 flex items-center justify-center border-2 border-dashed border-indigo-300 rounded-lg text-indigo-600 hover:bg-indigo-50 transition-colors"
-              >
-                <PlusCircleIcon className="w-5 h-5 mr-2" /> Add a New Address
-              </motion.button>
+            <motion.div variants={itemVariants} className="mb-6 text-center py-8 bg-indigo-50 rounded-lg p-6">
+              <div className="flex flex-col items-center">
+                <div className="bg-indigo-100 p-3 rounded-full mb-4">
+                  <HomeIcon className="h-8 w-8 text-indigo-600" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No Saved Addresses</h3>
+                <p className="text-gray-600 mb-4">
+                  You don&apos;t have any saved addresses yet. Please create a new address to continue with checkout.
+                </p>
+                <button
+                  type="button"
+                  onClick={addNewAddress}
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  <PlusCircleIcon className="h-5 w-5 mr-2" />
+                  Create New Address
+                </button>
+              </div>
             </motion.div>
           )}
 
-        {/* Address Form (shown when adding/editing an address or when no addresses exist) */}
-        {(showAddressForm ||
-          !userId ||
-          !userAddresses ||
-          userAddresses.length === 0) && (
+        {/* Address Form (shown only when explicitly adding a new address) */}
+        {showAddressForm && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <motion.div variants={itemVariants} className="space-y-1">
               <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
@@ -605,10 +590,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               </label>
               <input
                 type="text"
+                name="name"
                 value={billingDetails.name}
-                onChange={(e) =>
-                  setBillingDetails({ ...billingDetails, name: e.target.value })
-                }
+                onChange={handleInputChange}
                 disabled={!billingEditable}
                 className={`w-full p-3 border rounded-lg ${
                   errors.name ? "border-red-500" : "border-gray-300"
@@ -626,13 +610,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               </label>
               <input
                 type="email"
+                name="email"
                 value={billingDetails.email}
-                onChange={(e) =>
-                  setBillingDetails({
-                    ...billingDetails,
-                    email: e.target.value,
-                  })
-                }
+                onChange={handleInputChange}
                 disabled={!billingEditable}
                 className={`w-full p-3 border rounded-lg ${
                   errors.email ? "border-red-500" : "border-gray-300"
@@ -650,13 +630,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               </label>
               <input
                 type="tel"
+                name="phone"
                 value={billingDetails.phone}
-                onChange={(e) =>
-                  setBillingDetails({
-                    ...billingDetails,
-                    phone: e.target.value,
-                  })
-                }
+                onChange={handleInputChange}
                 disabled={!billingEditable}
                 className={`w-full p-3 border rounded-lg ${
                   errors.phone ? "border-red-500" : "border-gray-300"
@@ -674,13 +650,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               </label>
               <input
                 type="text"
+                name="address"
                 value={billingDetails.address}
-                onChange={(e) =>
-                  setBillingDetails({
-                    ...billingDetails,
-                    address: e.target.value,
-                  })
-                }
+                onChange={handleInputChange}
                 disabled={!billingEditable}
                 className={`w-full p-3 border rounded-lg ${
                   errors.address ? "border-red-500" : "border-gray-300"
@@ -698,10 +670,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               </label>
               <input
                 type="text"
+                name="city"
                 value={billingDetails.city}
-                onChange={(e) =>
-                  setBillingDetails({ ...billingDetails, city: e.target.value })
-                }
+                onChange={handleInputChange}
                 disabled={!billingEditable}
                 className={`w-full p-3 border rounded-lg ${
                   errors.city ? "border-red-500" : "border-gray-300"
@@ -719,13 +690,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               </label>
               <input
                 type="text"
+                name="state"
                 value={billingDetails.state}
-                onChange={(e) =>
-                  setBillingDetails({
-                    ...billingDetails,
-                    state: e.target.value,
-                  })
-                }
+                onChange={handleInputChange}
                 disabled={!billingEditable}
                 className={`w-full p-3 border rounded-lg ${
                   errors.state ? "border-red-500" : "border-gray-300"
@@ -743,13 +710,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
               </label>
               <input
                 type="text"
+                name="zipcode"
                 value={billingDetails.zipcode}
-                onChange={(e) =>
-                  setBillingDetails({
-                    ...billingDetails,
-                    zipcode: e.target.value,
-                  })
-                }
+                onChange={handleInputChange}
                 disabled={!billingEditable}
                 className={`w-full p-3 border rounded-lg ${
                   errors.zipcode ? "border-red-500" : "border-gray-300"
@@ -769,13 +732,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                     Proof Type
                   </label>
                   <select
+                    name="proof_type"
                     value={billingDetails.proof_type}
-                    onChange={(e) =>
-                      setBillingDetails({
-                        ...billingDetails,
-                        proof_type: e.target.value,
-                      })
-                    }
+                    onChange={handleInputChange}
                     disabled={!billingEditable}
                     className={`w-full p-3 border rounded-lg ${
                       errors.proof_type ? "border-red-500" : "border-gray-300"
@@ -800,13 +759,9 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                   </label>
                   <input
                     type="text"
+                    name="proof_id"
                     value={billingDetails.proof_id}
-                    onChange={(e) =>
-                      setBillingDetails({
-                        ...billingDetails,
-                        proof_id: e.target.value,
-                      })
-                    }
+                    onChange={handleInputChange}
                     disabled={!billingEditable}
                     className={`w-full p-3 border rounded-lg ${
                       errors.proof_id ? "border-red-500" : "border-gray-300"
@@ -829,6 +784,7 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                   </label>
                   <input
                     type="file"
+                    name="proof_document"
                     accept="image/*"
                     onChange={handlePhotoUpload}
                     disabled={!billingEditable}
@@ -1173,7 +1129,6 @@ const Checkout = ({ cart = [], setProgressStep }) => {
                   onClick={() => {
                     setShowSuccessModal(false);
                     navigate("/myorders");
-                    window.location.reload();
                   }}
                   className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
