@@ -4,10 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaCalendarAlt, FaShieldAlt } from "react-icons/fa";
 import { useGetCartItemsByUserIdQuery, useRemoveFromCartMutation, useUpdateCartItemQuantityMutation } from "../../redux/services/cartApiSlice";
 import { toast } from "react-toastify";
+import { useEffect } from "react";
+import PropTypes from 'prop-types';
 
-const Cart = () => {
+const Cart = ({ forceRefetch = false }) => {
   const navigate = useNavigate();
- const userInfo = useSelector((state) => state.auth.userInfo);
+  const userInfo = useSelector((state) => state.auth.userInfo);
   const userId = userInfo?.id;
   const { data, isLoading: isCartLoading, refetch } = useGetCartItemsByUserIdQuery(userId, {
     refetchOnMountOrArgChange: true,
@@ -97,6 +99,20 @@ const Cart = () => {
     
     navigate('/checkout');
   };
+
+  // Effect to refetch cart data when forceRefetch prop changes
+  useEffect(() => {
+    if (forceRefetch) {
+      console.log("Force refetching cart data");
+      refetch();
+    }
+  }, [forceRefetch, refetch]);
+
+  // Refetch cart data when component mounts
+  useEffect(() => {
+    console.log("Cart component mounted, refetching data");
+    refetch();
+  }, [refetch]);
 
   // Display loading state
   if (isCartLoading) {
@@ -262,6 +278,7 @@ const Cart = () => {
     </div>
   );
 };
+
 Cart.propTypes = {
   forceRefetch: PropTypes.bool
 };
