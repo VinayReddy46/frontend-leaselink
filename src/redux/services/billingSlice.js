@@ -11,9 +11,13 @@ export const billingApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Orders", "Addresses", "Cart", "Count"],
     }),
+    getOrders: builder.query({
+      query: (id) => `billingroute/${id}`,
+    }),
   }),
 });
 
 export const {
   usePlaceOrderMutation,
+  useGetOrdersQuery,
 } = billingApiSlice;
