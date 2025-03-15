@@ -67,11 +67,11 @@ function OrderCard({
     }
   };
 
-  const handleVerifyOtpSubmit = (cartId, type) => {
+  const handleVerifyOtpSubmit = (cartId, productId, type) => {
     if (type === "delivery") {
-      onVerifyDeliveryOtp(cartId);
+      onVerifyDeliveryOtp(cartId, productId);
     } else if (type === "return") {
-      onVerifyReturnOtp(cartId);
+      onVerifyReturnOtp(cartId, productId);
     }
     setOtpInput("");
   };
@@ -86,6 +86,7 @@ function OrderCard({
         const remainingTime = remainingTimes[cart._id] || 0;
         const isCompleted = cart.status === "completed";
         const product = cart.productId;
+        const productId = product?._id;
         const userInfo = viewType === "lender" ? order.user : product?.user;
 
         return (
@@ -201,14 +202,14 @@ function OrderCard({
                         {cart.status === "pending" && (
                           <div className="flex space-x-2">
                             <button
-                              onClick={() => onAccept(cart._id)}
+                              onClick={() => onAccept(cart._id, productId)}
                               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition flex items-center"
                             >
                               <FaCheckCircle className="mr-2" />
                               Accept
                             </button>
                             <button
-                              onClick={() => onDecline(cart._id)}
+                              onClick={() => onDecline(cart._id, productId)}
                               className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition flex items-center"
                             >
                               <FaTimesCircle className="mr-2" />
@@ -219,7 +220,7 @@ function OrderCard({
 
                         {cart.status === "accepted" && !cart.deliveryOtp && (
                           <button
-                            onClick={() => onGenerateOtp(cart._id)}
+                            onClick={() => onGenerateOtp(cart._id, productId)}
                             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition flex items-center"
                           >
                             <FaKey className="mr-2" />
@@ -264,7 +265,11 @@ function OrderCard({
                                 />
                                 <button
                                   onClick={() =>
-                                    handleVerifyOtpSubmit(cart._id, "return")
+                                    handleVerifyOtpSubmit(
+                                      cart._id,
+                                      productId,
+                                      "return"
+                                    )
                                   }
                                   className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
                                   disabled={otpInput !== cart.returnOtp}
@@ -282,7 +287,7 @@ function OrderCard({
                       <>
                         {cart.status === "pending" && !cart.paymentStatus && (
                           <button
-                            onClick={() => onPayment(cart._id)}
+                            onClick={() => onPayment(cart._id, productId)}
                             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition flex items-center"
                           >
                             <FaMoneyBillWave className="mr-2" />
@@ -307,7 +312,11 @@ function OrderCard({
                                 />
                                 <button
                                   onClick={() =>
-                                    handleVerifyOtpSubmit(cart._id, "delivery")
+                                    handleVerifyOtpSubmit(
+                                      cart._id,
+                                      productId,
+                                      "delivery"
+                                    )
                                   }
                                   className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
                                 >
@@ -319,7 +328,7 @@ function OrderCard({
 
                         {cart.status === "completed" && (
                           <button
-                            onClick={() => onRate(cart._id)}
+                            onClick={() => onRate(cart._id, productId)}
                             className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition flex items-center"
                           >
                             <FaStar className="mr-2" />

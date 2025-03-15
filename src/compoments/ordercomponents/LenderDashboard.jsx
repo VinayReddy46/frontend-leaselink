@@ -11,7 +11,7 @@ function LenderDashboard() {
   const [filter, setFilter] = useState("all");
   const { userInfo } = useSelector((state) => state.auth);
   const userId = userInfo?.id || userInfo?.user?.id;
-
+  console.log("logged in user id", userId);
   const {
     data: rentedProductsData,
     isLoading,
@@ -21,11 +21,15 @@ function LenderDashboard() {
 
   const [updateStatus] = useUpdateStatusMutation();
 
-  const handleAcceptOrder = async (orderId) => {
+  const handleAcceptOrder = async (cartId, productId) => {
     try {
       await updateStatus({
-        id: orderId,
-        status: "accepted",
+        id: productId,
+        body: {
+          status: "accepted",
+          userId: userId,
+          cartId: cartId,
+        },
       });
       refetch();
     } catch (error) {
@@ -33,11 +37,15 @@ function LenderDashboard() {
     }
   };
 
-  const handleDeclineOrder = async (orderId) => {
+  const handleDeclineOrder = async (cartId, productId) => {
     try {
       await updateStatus({
-        id: orderId,
-        status: "declined",
+        id: productId,
+        body: {
+          status: "declined",
+          userId: userId,
+          cartId: cartId,
+        },
       });
       refetch();
     } catch (error) {
@@ -45,12 +53,17 @@ function LenderDashboard() {
     }
   };
 
-  const handleGenerateOtp = async (orderId) => {
+  const handleGenerateOtp = async (cartId, productId) => {
     try {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       await updateStatus({
-        id: orderId,
-        deliveryOtp: otp,
+        id: productId,
+        body: {
+          status: "accepted",
+          deliveryOtp: otp,
+          userId: userId,
+          cartId: cartId,
+        },
       });
       refetch();
     } catch (error) {
@@ -58,14 +71,19 @@ function LenderDashboard() {
     }
   };
 
-  const handleVerifyDeliveryOtp = async (orderId) => {
+  const handleVerifyDeliveryOtp = async (cartId, productId) => {
     try {
       const returnOtp = Math.floor(100000 + Math.random() * 900000).toString();
       await updateStatus({
-        id: orderId,
-        deliveryStatus: "delivered",
-        rentStartTime: new Date().toISOString(),
-        returnOtp,
+        id: productId,
+        body: {
+          status: "inProgress",
+          deliveryStatus: "delivered",
+          rentStartTime: new Date().toISOString(),
+          returnOtp: returnOtp,
+          userId: userId,
+          cartId: cartId,
+        },
       });
       refetch();
     } catch (error) {
@@ -73,14 +91,18 @@ function LenderDashboard() {
     }
   };
 
-  const handleVerifyReturnOtp = async (orderId) => {
+  const handleVerifyReturnOtp = async (cartId, productId) => {
     try {
       await updateStatus({
-        id: orderId,
-        returnStatus: "returned",
-        rentEndTime: new Date().toISOString(),
-        deliveryStatus: "returned",
-        orderStatus: "completed",
+        id: productId,
+        body: {
+          status: "completed",
+          returnStatus: "returned",
+          rentEndTime: new Date().toISOString(),
+          deliveryStatus: "returned",
+          userId: userId,
+          cartId: cartId,
+        },
       });
       refetch();
     } catch (error) {

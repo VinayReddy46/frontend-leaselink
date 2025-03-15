@@ -24,11 +24,16 @@ function RenterDashboard() {
 
   const [updateStatus] = useUpdateStatusMutation();
 
-  const handlePayment = async (orderId) => {
+  const handlePayment = async (cartId, productId) => {
     try {
       await updateStatus({
-        id: orderId,
-        paymentStatus: "success",
+        id: productId,
+        body: {
+          status: "accepted", // Assuming payment makes it accepted
+          paymentStatus: "success",
+          userId: userId,
+          cartId: cartId,
+        },
       });
       refetch();
     } catch (error) {
@@ -36,8 +41,12 @@ function RenterDashboard() {
     }
   };
 
-  const handleOpenRating = (order) => {
-    setSelectedOrderForRating(order);
+  const handleOpenRating = (order, cartId, productId) => {
+    setSelectedOrderForRating({
+      order,
+      cartId,
+      productId,
+    });
   };
 
   const handleCloseRating = () => {
@@ -47,9 +56,14 @@ function RenterDashboard() {
   const handleSubmitRating = async (rating, review) => {
     try {
       await updateStatus({
-        id: selectedOrderForRating._id,
-        rating,
-        review,
+        id: selectedOrderForRating.productId,
+        body: {
+          status: "completed", // Not changing the status, just adding rating
+          rating: rating,
+          review: review,
+          userId: userId,
+          cartId: selectedOrderForRating.cartId,
+        },
       });
       refetch();
       setSelectedOrderForRating(null);
@@ -220,14 +234,24 @@ function RenterDashboard() {
                 order={order}
                 viewType="renter"
                 onPayment={handlePayment}
-                onRate={() => handleOpenRating(order)}
+                onRate={(cartId, productId) =>
+                  handleOpenRating(order, cartId, productId)
+                }
               />
               {order.cartIds.some(
                 (cart) => cart.status === "completed" && !cart.rating
               ) && (
                 <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-b-xl border-t border-yellow-100">
                   <button
-                    onClick={() => handleOpenRating(order)}
+                    onClick={() => {
+                      // Find the first completed cart without rating
+                      const cart = order.cartIds.find(
+                        (c) => c.status === "completed" && !c.rating
+                      );
+                      if (cart) {
+                        handleOpenRating(order, cart._id, cart.productId._id);
+                      }
+                    }}
                     className="w-full bg-yellow-500 text-white py-3 px-6 rounded-lg hover:bg-yellow-600 transition-colors duration-200 flex items-center justify-center gap-2 font-medium"
                   >
                     <svg
@@ -248,7 +272,7 @@ function RenterDashboard() {
 
       {selectedOrderForRating && (
         <OrderRating
-          order={selectedOrderForRating}
+          order={selectedOrderForRating.order}
           onClose={handleCloseRating}
           onSubmit={handleSubmitRating}
         />

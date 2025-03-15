@@ -1,4 +1,4 @@
-import { apiSlice } from './apiSlice';
+import { apiSlice } from "./apiSlice";
 
 export const billingApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -21,7 +21,12 @@ export const billingApiSlice = apiSlice.injectEndpoints({
       query: (id) => `billingroute/${id}`,
     }),
     updateStatus: builder.mutation({
-      query: (id) => `billingroute/${id}`,
+      query: (data) => ({
+        url: `billingroute/${data.id}`,
+        method: "PUT",
+        body: data.body,
+      }),
+      invalidatesTags: ["Orders"],
     }),
   }),
 });
