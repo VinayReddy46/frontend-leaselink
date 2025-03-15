@@ -1,392 +1,622 @@
-import { format, formatDistanceToNow } from 'date-fns';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { 
-  FaClock, 
-  FaMoneyBillWave, 
-  FaShieldAlt, 
-  FaBarcode, 
-  FaIdCard,
+import { format } from "date-fns";
+import { useState, useEffect } from "react";
+import {
+  FaClock,
+  FaMoneyBillWave,
   FaCheckCircle,
   FaTimesCircle,
+  FaStar,
   FaKey,
-  FaHeadset
-} from 'react-icons/fa';
+  FaSpinner,
+} from "react-icons/fa";
+import PropTypes from "prop-types";
+import { useCreatePaymentSessionMutation } from "../../redux/services/paymentSlice";
+import { Modal } from "@mui/material";
+import { useLocation, useParams } from "react-router-dom";
+import PaymentSuccessModal from "./PaymentSuccessPage";
+import PaymentSuccessPage from "./PaymentSuccessPage";
+import queryString from "query-string";
 
-function OrderCard({ 
-  order, 
-  viewType, 
-  onAccept, 
-  onDecline, 
-  onGenerateOtp, 
+function OrderCard({
+  order,
+  viewType,
+  onAccept,
+  onDecline,
   onPayment,
+  onGenerateOtp,
   onVerifyDeliveryOtp,
-  onVerifyReturnOtp 
+  onVerifyReturnOtp,
+  onRate,
 }) {
-  const [deliveryOtpInput, setDeliveryOtpInput] = useState('');
-  const [returnOtpInput, setReturnOtpInput] = useState('');
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const [remainingTimes, setRemainingTimes] = useState({});
+  const [otpInput, setOtpInput] = useState("");
+  const [loadingStates, setLoadingStates] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [createPaymentSession] = useCreatePaymentSessionMutation();
+  const [confirmModal, setConfirmModal] = useState({
+    show: false,
+    type: null,
+    cartId: null,
+    productId: null,
+  });
 
-  const {
-    orderId,
-    product,
-    orderStatus,
-    paymentStatus,
-    deliveryOtp,
-    returnOtp,
-    deliveryStatus,
-    renter,
-    rental,
-    rentStartTime,
-    rentEndTime
-  } = order;
+  useEffect(() => {
+    if (!order?.cartIds) return;
 
-  const handleDeliveryOtpSubmit = () => {
-    if (deliveryOtpInput === deliveryOtp) {
-      onVerifyDeliveryOtp(orderId);
-      setError('');
-    } else {
-      setError('Invalid OTP');
+    const intervals = order.cartIds
+      .map((cart) => {
+        if (cart?.end_time) {
+          const endTime = new Date(cart.end_time);
+          if (!isNaN(endTime.getTime())) {
+            const interval = setInterval(() => {
+              const now = new Date();
+              const diff = Math.max(0, endTime - now);
+              setRemainingTimes((prev) => ({
+                ...prev,
+                [cart._id]: diff,
+              }));
+              if (diff === 0) clearInterval(interval);
+            }, 1000);
+
+            return interval;
+          }
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    return () => intervals.forEach((interval) => clearInterval(interval));
+  }, [order]);
+
+  const formatTime = (ms) => {
+    const hours = Math.floor(ms / (1000 * 60 * 60));
+    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+    return `${hours}h ${minutes}m ${seconds}s`;
+  };
+
+  const formatDate = (dateString) => {
+    try {
+      return format(new Date(dateString), "PPpp");
+    } catch {
+      return "Invalid date";
     }
   };
 
-  const handleReturnOtpSubmit = () => {
-    if (returnOtpInput === returnOtp) {
-      onVerifyReturnOtp(orderId);
-      setError('');
-    } else {
-      setError('Invalid OTP');
+  const openConfirmModal = (type, cartId, productId) => {
+    setConfirmModal({
+      show: true,
+      type,
+      cartId,
+      productId,
+    });
+  };
+
+  const closeConfirmModal = () => {
+    setConfirmModal({
+      show: false,
+      type: null,
+      cartId: null,
+      productId: null,
+    });
+  };
+
+  const handleConfirmAction = async () => {
+    const { type, cartId, productId } = confirmModal;
+
+    setLoadingStates((prev) => ({
+      ...prev,
+      [`${type}_${cartId}`]: true,
+    }));
+
+    try {
+      if (type === "accept") {
+        await onAccept(cartId, productId);
+      } else if (type === "decline") {
+        await onDecline(cartId, productId);
+      }
+    } finally {
+      setLoadingStates((prev) => ({
+        ...prev,
+        [`${type}_${cartId}`]: false,
+      }));
+      closeConfirmModal();
     }
   };
 
-  const calculateRefund = () => {
-    if (orderStatus === 'completed' && rentEndTime) {
-      const actualEndTime = new Date(rentEndTime);
-      const plannedEndTime = new Date(rental.endDate);
-      const hoursLate = Math.max(0, (actualEndTime - plannedEndTime) / (1000 * 60 * 60));
-      const lateFeeAmount = hoursLate * rental.lateFee;
-      const refundAmount = Math.max(0, rental.deposit - lateFeeAmount);
-      return { lateFeeAmount, refundAmount };
+  const handleVerifyOtpSubmit = async (cartId, productId, type) => {
+    setLoadingStates((prev) => ({
+      ...prev,
+      [`verify_${type}_${cartId}`]: true,
+    }));
+
+    try {
+      if (type === "delivery") {
+        await onVerifyDeliveryOtp(cartId, productId);
+      } else if (type === "return") {
+        await onVerifyReturnOtp(cartId, productId);
+      }
+    } finally {
+      setLoadingStates((prev) => ({
+        ...prev,
+        [`verify_${type}_${cartId}`]: false,
+      }));
+      setOtpInput("");
     }
-    return null;
   };
 
-  const calculateEarnings = () => {
-    if (orderStatus === 'completed') {
-      const baseAmount = rental.duration * rental.hourlyRate;
-      const siteCommission = baseAmount * 0.1; // 10% commission
-      return baseAmount - siteCommission;
+  const handleGenerateOtpWithLoading = async (cartId, productId) => {
+    setLoadingStates((prev) => ({
+      ...prev,
+      [`generateOtp_${cartId}`]: true,
+    }));
+
+    try {
+      await onGenerateOtp(cartId, productId);
+    } finally {
+      setLoadingStates((prev) => ({
+        ...prev,
+        [`generateOtp_${cartId}`]: false,
+      }));
     }
-    return rental.duration * rental.hourlyRate;
   };
 
-  const handleSupportClick = () => {
-    navigate(`/helpdesk`);
+  const handlePaymentWithLoading = async (cartId, productId) => {
+    setLoading(true);
+    setModalVisible(true);
+
+    try {
+      const response = await createPaymentSession({ cartId }).unwrap();
+      window.location.href = response.url;
+
+    } catch (error) {
+      console.error("Error creating payment session", error);
+      setLoading(false);
+      // Optionally show an error message to the user here
+    }
   };
 
-  const renderTimer = () => {
-    if (rentStartTime && !rentEndTime) {
-      return (
-        <div className="bg-blue-50 p-4 rounded-md mt-4">
-          <h6 className="font-medium flex items-center">
-            <FaClock className="mr-2" /> Rental Timer
-          </h6>
-          <p className="text-sm mt-2">
-            Started: {formatDistanceToNow(new Date(rentStartTime))} ago
-          </p>
-        </div>
-      );
-    }
-    return null;
+  const handleMakePayment = (cartId, productId) => {
+    console.log(cartId, productId)
+    handlePaymentWithLoading(cartId, productId);
   };
 
-  const renderLenderActions = () => {
-    if (orderStatus === 'pending') {
-      return (
-        <div className="flex space-x-2 mt-4">
-          <button
-            onClick={() => onAccept(orderId)}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center"
-          >
-            <FaCheckCircle className="mr-2" /> Accept
-          </button>
-          <button
-            onClick={() => onDecline(orderId)}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex items-center"
-          >
-            <FaTimesCircle className="mr-2" /> Decline
-          </button>
-        </div>
-      );
-    }
+  const handleRateWithLoading = async (cartId, productId) => {
+    setLoadingStates((prev) => ({
+      ...prev,
+      [`rate_${cartId}`]: true,
+    }));
 
-    if (orderStatus === 'accepted' && paymentStatus === 'success' && !deliveryOtp) {
-      return (
-        <button
-          onClick={() => onGenerateOtp(orderId)}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-4 flex items-center"
-        >
-          <FaKey className="mr-2" /> Generate Delivery OTP
-        </button>
-      );
+    try {
+      await onRate(cartId, productId);
+    } finally {
+      setLoadingStates((prev) => ({
+        ...prev,
+        [`rate_${cartId}`]: false,
+      }));
     }
-
-    if (deliveryOtp && deliveryStatus === 'pending') {
-      return (
-        <div className="mt-4 space-y-2">
-          <input
-            type="text"
-            value={deliveryOtpInput}
-            onChange={(e) => setDeliveryOtpInput(e.target.value)}
-            placeholder="Enter Delivery OTP"
-            className="w-full p-2 border rounded"
-          />
-          <button
-            onClick={handleDeliveryOtpSubmit}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full"
-          >
-            Confirm Delivery
-          </button>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-        </div>
-      );
-    }
-
-    if (deliveryStatus === 'delivered' && !rentEndTime && returnOtp) {
-      return (
-        <div className="mt-4 space-y-2">
-          <input
-            type="text"
-            value={returnOtpInput}
-            onChange={(e) => setReturnOtpInput(e.target.value)}
-            placeholder="Enter Return OTP"
-            className="w-full p-2 border rounded"
-          />
-          <button
-            onClick={handleReturnOtpSubmit}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full"
-          >
-            Confirm Return
-          </button>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-        </div>
-      );
-    }
-
-    return null;
   };
 
-  const renderRenterActions = () => {
-    if (orderStatus === 'accepted' && paymentStatus === 'pending') {
-      return (
-        <button
-          onClick={() => onPayment(orderId)}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-4 flex items-center"
-        >
-          <FaMoneyBillWave className="mr-2" /> Make Payment
-        </button>
-      );
-    }
+  if (!order || !order.cartIds || order.cartIds.length === 0) {
+    return <p>No order information available</p>;
+  }
 
-    if (deliveryOtp && deliveryStatus === 'pending') {
-      return (
-        <div className="mt-4 p-4 bg-green-50 rounded-md">
-          <h6 className="font-medium flex items-center">
-            <FaKey className="mr-2" /> Delivery OTP
-          </h6>
-          <p className="text-green-700 mt-2">{deliveryOtp}</p>
-        </div>
-      );
-    }
-
-    if (deliveryStatus === 'delivered' && !rentEndTime) {
-      return (
-        <div className="mt-4 p-4 bg-green-50 rounded-md">
-          <h6 className="font-medium flex items-center">
-            <FaKey className="mr-2" /> Return OTP
-          </h6>
-          <p className="text-green-700 mt-2">{returnOtp}</p>
-        </div>
-      );
-    }
-
-    return null;
-  };
 
   return (
-    <div className="bg-white shadow rounded-lg overflow-hidden">
-      <div className="p-6">
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Product Image */}
-          <div className="w-full md:w-1/3">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-48 object-cover rounded-lg"
-            />
-          </div>
-
-          {/* Order Details */}
-          <div className="w-full md:w-2/3 space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-xl font-medium text-gray-900">Order #{orderId}</h3>
-              <div className="flex items-center space-x-2">
-                {/* Support Button - Now positioned to the left of status */}
-                <button
-                  onClick={handleSupportClick}
-                  className="bg-blue-100 text-blue-600 p-2 rounded-full hover:bg-blue-200 transition-colors"
-                >
-                  <FaHeadset className="w-5 h-5" />
-                </button>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  orderStatus === 'accepted' ? 'bg-green-100 text-green-800' :
-                  orderStatus === 'declined' ? 'bg-red-100 text-red-800' :
-                  orderStatus === 'completed' ? 'bg-purple-100 text-purple-800' :
-                  'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {orderStatus.charAt(0).toUpperCase() + orderStatus.slice(1)}
-                </span>
-              </div>
-            </div>
-
-            {/* Product Details */}
-            <div>
-              <h4 className="text-lg font-semibold flex items-center">
-                <FaBarcode className="mr-2" />
-                {product.brand} {product.name}
-              </h4>
-              <p className="text-gray-600 mt-1">{product.description}</p>
-              <div className="mt-2 grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-500">Specifications:</p>
-                  <p>{product.specifications}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Condition:</p>
-                  <p>{product.condition}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Serial Number:</p>
-                  <p>{product.serialNumber}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Additional Info:</p>
-                  <p>{product.additionalInfo}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Renter Details */}
-            {viewType === 'lender' && (
-              <div className="border-t pt-4">
-                <h5 className="font-medium mb-3 flex items-center">
-                  <FaIdCard className="mr-2" /> Renter Details
-                </h5>
-                <div className="flex items-start space-x-4">
-                  <img
-                    src={renter.photo}
-                    alt={renter.name}
-                    className="h-12 w-12 rounded-full"
-                  />
-                  <div>
-                    <p className="font-medium">{renter.name}</p>
-                    <p className="text-sm text-gray-500">ID: {renter.document}</p>
-                    <p className="text-sm text-gray-500">{renter.idProofType}: {renter.idProofNumber}</p>
-                  </div>
-                  <img
-                    src={renter.idProofPhoto}
-                    alt="ID Proof"
-                    className="h-20 w-32 object-cover rounded"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Rental Details */}
-            <div className="border-t pt-4">
-              <h5 className="font-medium mb-3 flex items-center">
-                <FaClock className="mr-2" /> Rental Details
-              </h5>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-500">Duration:</p>
-                  <p>{rental.duration} hours</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Start Date:</p>
-                  <p>{format(new Date(rental.startDate), 'PPp')}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">End Date:</p>
-                  <p>{format(new Date(rental.endDate), 'PPp')}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Rate:</p>
-                  <p>${rental.hourlyRate}/hour</p>
-                </div>
-                {viewType === 'renter' && (
+    <div className="space-y-6">
+      {/* Confirmation Modal */}
+      {confirmModal.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-80 md:w-96 shadow-xl">
+            <h3 className="text-xl font-semibold mb-4">
+              {confirmModal.type === "accept"
+                ? "Accept Order"
+                : "Decline Order"}
+            </h3>
+            <p className="text-gray-600 mb-6">
+              {confirmModal.type === "accept"
+                ? "Are you sure you want to accept this order?"
+                : "Are you sure you want to decline this order?"}
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={closeConfirmModal}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmAction}
+                className={`px-4 py-2 rounded text-white flex items-center space-x-2 ${confirmModal.type === "accept"
+                  ? "bg-green-500 hover:bg-green-600"
+                  : "bg-red-500 hover:bg-red-600"
+                  }`}
+                disabled={
+                  loadingStates[`${confirmModal.type}_${confirmModal.cartId}`]
+                }
+              >
+                {loadingStates[
+                  `${confirmModal.type}_${confirmModal.cartId}`
+                ] ? (
                   <>
-                    <div>
-                      <p className="text-gray-500">Late Fee:</p>
-                      <p>${rental.lateFee}/hour</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500">Deposit:</p>
-                      <p>${rental.deposit}</p>
-                    </div>
+                    <FaSpinner className="animate-spin mr-2" />
+                    <span>Processing...</span>
                   </>
+                ) : (
+                  <span>Confirm</span>
                 )}
-              </div>
+              </button>
             </div>
-
-            {/* Payment Details Section */}
-            {viewType === 'renter' && orderStatus === 'completed' && (
-              <div className="mt-4 border-t pt-4">
-                <h5 className="font-medium mb-3">Payment Summary</h5>
-                {calculateRefund() && (
-                  <div className="space-y-2">
-                    <p className="text-red-600">
-                      Late Fee: ${calculateRefund().lateFeeAmount.toFixed(2)}
-                    </p>
-                    <p className="text-green-600">
-                      Deposit Refund: ${calculateRefund().refundAmount.toFixed(2)}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {viewType === 'lender' && (
-              <div className="mt-4 border-t pt-4">
-                <h5 className="font-medium mb-3">Earnings</h5>
-                {orderStatus === 'accepted' && (
-                  <p>Minimum Earnings: ${(rental.hourlyRate * rental.duration * 0.9).toFixed(2)}</p>
-                )}
-                {orderStatus === 'completed' && (
-                  <p>Total Earnings: ${calculateEarnings().toFixed(2)} (after 10% platform fee)</p>
-                )}
-              </div>
-            )}
-
-            {/* Insurance Status */}
-            {order.insurance && (
-              <div className="flex items-center text-green-600 mt-2">
-                <FaShieldAlt className="mr-2" />
-                <span>Insurance Included</span>
-              </div>
-            )}
-
-            {/* Timer */}
-            {renderTimer()}
-
-            {/* Actions */}
-            {viewType === 'lender' ? renderLenderActions() : renderRenterActions()}
           </div>
         </div>
-      </div>
-    </div>
+      )}
+
+      {order.cartIds.map((cart) => {
+        const remainingTime = remainingTimes[cart._id] || 0;
+        const isCompleted = cart.status === "completed";
+        const product = cart.productId;
+        const productId = product?._id;
+        const userInfo = viewType === "lender" ? order.user : product?.user;
+
+        return (
+          <div
+            key={cart._id}
+            className="bg-white shadow rounded-lg overflow-hidden"
+          >
+            <div className="p-6">
+              <div className="flex flex-col md:flex-row gap-6">
+                {/* Product Image */}
+                <div className="w-full md:w-1/3">
+                  {product?.images?.[0]?.url ? (
+                    <img
+                      src={product.images[0].url}
+                      alt={product.name}
+                      className="w-full h-48 object-cover rounded-md"
+                    />
+                  ) : (
+                    <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded-md">
+                      No Image Available
+                    </div>
+                  )}
+                </div>
+
+                {/* Order Details */}
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold">
+                    {product?.name || "Product Name Not Available"}
+                  </h3>
+                  <p className="text-gray-600">
+                    {product?.description || "No description available"}
+                  </p>
+
+                  <div className="mt-2 space-y-1">
+                    <p className="text-gray-800 font-semibold">
+                      Price: ₹{cart?.total_price || "N/A"}
+                    </p>
+                    <p className="text-gray-500">
+                      Start: {formatDate(cart?.start_time)}
+                    </p>
+                    <p className="text-gray-500">
+                      End: {formatDate(cart?.end_time)}
+                    </p>
+
+                    {/* User Info */}
+                    {userInfo && (
+                      <p className="text-gray-700">
+                        {viewType === "lender" ? "Renter" : "Lender"}:{" "}
+                        {userInfo.name} ({userInfo.email})
+                      </p>
+                    )}
+
+                    {/* Remaining Time */}
+                    {remainingTime > 0 ? (
+                      <p className="text-gray-600 flex items-center mt-2">
+                        <FaClock className="mr-2" />
+                        Remaining: {formatTime(remainingTime)}
+                      </p>
+                    ) : (
+                      <p className="text-gray-500 mt-2">
+                        {isCompleted ? "Completed" : "Rental period ended"}
+                      </p>
+                    )}
+
+                    {/* Status Pill */}
+                    <div className="mt-2">
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${cart.status === "pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : cart.status === "accepted"
+                            ? "bg-green-100 text-green-800"
+                            : cart.status === "completed"
+                              ? "bg-blue-100 text-blue-800"
+                              : cart.status === "declined"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-gray-100 text-gray-800"
+                          }`}
+                      >
+                        {cart.status === "pending" && (
+                          <>
+                            <FaClock className="inline-block mr-1" />
+                            Pending
+                          </>
+                        )}
+                        {cart.status === "accepted" && (
+                          <>
+                            <FaCheckCircle className="inline-block mr-1" />
+                            Accepted
+                          </>
+                        )}
+                        {cart.status === "completed" && (
+                          <>
+                            <FaCheckCircle className="inline-block mr-1" />
+                            Completed
+                          </>
+                        )}
+                        {cart.status === "declined" && (
+                          <>
+                            <FaTimesCircle className="inline-block mr-1" />
+                            Declined
+                          </>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons based on role and status */}
+                  <div className="mt-4 space-y-2">
+                    {/* Lender Actions */}
+                    {viewType === "lender" && (
+                      <>
+                        {cart.status === "pending" && (
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() =>
+                                openConfirmModal("accept", cart._id, productId)
+                              }
+                              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition flex items-center"
+                            >
+                              <FaCheckCircle className="mr-2" />
+                              Accept
+                            </button>
+                            <button
+                              onClick={() =>
+                                openConfirmModal("decline", cart._id, productId)
+                              }
+                              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition flex items-center"
+                            >
+                              <FaTimesCircle className="mr-2" />
+                              Decline
+                            </button>
+                          </div>
+                        )}
+
+                        {/* {cart.status === "accepted" && !cart.deliveryOtp && (
+                          <button
+                            onClick={() =>
+                              handleGenerateOtpWithLoading(cart._id, productId)
+                            }
+                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition flex items-center"
+                            disabled={loadingStates[`generateOtp_${cart._id}`]}
+                          >
+                            {loadingStates[`generateOtp_${cart._id}`] ? (
+                              <>
+                                <FaSpinner className="animate-spin mr-2" />
+                                <span>Generating...</span>
+                              </>
+                            ) : (
+                              <>
+                                <FaKey className="mr-2" />
+                                <span>Generate Delivery OTP</span>
+                              </>
+                            )}
+                          </button>
+                        )} */}
+
+                        {cart.status === "accepted" &&
+                          cart.deliveryOtp &&
+                          !cart.deliveryStatus && (
+                            <div className="bg-blue-50 p-3 rounded border border-blue-200">
+                              <p className="font-semibold text-blue-800 mb-2">
+                                Delivery OTP: {cart.deliveryOtp}
+                              </p>
+                              <p className="text-sm text-blue-600">
+                                Share this with the renter when delivering the
+                                item
+                              </p>
+                            </div>
+                          )}
+
+                        {cart.status === "accepted" &&
+                          cart.deliveryStatus === "delivered" &&
+                          cart.returnOtp &&
+                          !cart.returnStatus && (
+                            <div className="bg-purple-50 p-3 rounded border border-purple-200">
+                              <p className="font-semibold text-purple-800 mb-2">
+                                Return OTP: {cart.returnOtp}
+                              </p>
+                              <p className="text-sm text-purple-600">
+                                The renter will provide this OTP when returning
+                                the item
+                              </p>
+
+                              <div className="mt-3 flex space-x-2">
+                                <input
+                                  type="text"
+                                  value={otpInput}
+                                  onChange={(e) => setOtpInput(e.target.value)}
+                                  placeholder="Enter return OTP"
+                                  className="px-3 py-2 border rounded flex-1"
+                                />
+                                <button
+                                  onClick={() =>
+                                    handleVerifyOtpSubmit(
+                                      cart._id,
+                                      productId,
+                                      "return"
+                                    )
+                                  }
+                                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition flex items-center"
+                                  disabled={
+                                    otpInput !== cart.returnOtp ||
+                                    loadingStates[`verify_return_${cart._id}`]
+                                  }
+                                >
+                                  {loadingStates[
+                                    `verify_return_${cart._id}`
+                                  ] ? (
+                                    <>
+                                      <FaSpinner className="animate-spin mr-2" />
+                                      <span>Verifying...</span>
+                                    </>
+                                  ) : (
+                                    <span>Verify</span>
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                      </>
+                    )}
+
+                    {/* Renter Actions */}
+                    {viewType === "renter" && (
+                      <>
+                        {
+                          cart.status === "accepted" && (
+                            <>
+                              {cart.payment === 'pending' && (
+                                <button
+                                  onClick={() => handleMakePayment(cart._id)}
+                                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition flex items-center"
+                                  disabled={loadingStates[`payment_${cart._id}`]}
+                                >
+                                  {!loading ? "Make Payment" : "Processing..."}
+                                </button>
+                              )}
+
+                              {cart.payment === 'completed' && (
+                                <p>Payment Successful</p>
+                              )}
+                            </>
+                          )
+                        }
+
+                        {cart.status === "accepted" &&
+                          cart.deliveryOtp &&
+                          !cart.deliveryStatus && (
+                            <div className="bg-yellow-50 p-3 rounded border border-yellow-200">
+                              <p className="font-semibold text-yellow-800 mb-2">
+                                Enter delivery OTP:
+                              </p>
+                              <div className="flex space-x-2">
+                                <input
+                                  type="text"
+                                  value={otpInput}
+                                  onChange={(e) => setOtpInput(e.target.value)}
+                                  placeholder="Enter delivery OTP"
+                                  className="px-3 py-2 border rounded flex-1"
+                                />
+                                <button
+                                  onClick={() =>
+                                    handleVerifyOtpSubmit(
+                                      cart._id,
+                                      productId,
+                                      "delivery"
+                                    )
+                                  }
+                                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition flex items-center"
+                                  disabled={
+                                    loadingStates[`verify_delivery_${cart._id}`]
+                                  }
+                                >
+                                  {loadingStates[
+                                    `verify_delivery_${cart._id}`
+                                  ] ? (
+                                    <>
+                                      <FaSpinner className="animate-spin mr-2" />
+                                      <span>Verifying...</span>
+                                    </>
+                                  ) : (
+                                    <span>Verify</span>
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                        {cart.status === "completed" && (
+                          <button
+                            onClick={() =>
+                              handleRateWithLoading(cart._id, productId)
+                            }
+                            className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition flex items-center"
+                            disabled={loadingStates[`rate_${cart._id}`]}
+                          >
+                            {loadingStates[`rate_${cart._id}`] ? (
+                              <>
+                                <FaSpinner className="animate-spin mr-2" />
+                                <span>Loading...</span>
+                              </>
+                            ) : (
+                              <>
+                                <FaStar className="mr-2" />
+                                <span>Rate Experience</span>
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+
+    </div >
   );
 }
+
+OrderCard.propTypes = {
+  order: PropTypes.shape({
+    _id: PropTypes.string,
+    user: PropTypes.object,
+    cartIds: PropTypes.arrayOf(
+      PropTypes.shape({
+        _id: PropTypes.string,
+        productId: PropTypes.object,
+        status: PropTypes.string,
+        start_time: PropTypes.string,
+        end_time: PropTypes.string,
+        total_price: PropTypes.number,
+        deliveryOtp: PropTypes.string,
+        returnOtp: PropTypes.string,
+        deliveryStatus: PropTypes.string,
+        returnStatus: PropTypes.string,
+      })
+    ),
+  }),
+  viewType: PropTypes.oneOf(["lender", "renter"]).isRequired,
+  onAccept: PropTypes.func,
+  onDecline: PropTypes.func,
+  onPayment: PropTypes.func,
+  onGenerateOtp: PropTypes.func,
+  onVerifyDeliveryOtp: PropTypes.func,
+  onVerifyReturnOtp: PropTypes.func,
+  onRate: PropTypes.func,
+};
+
+OrderCard.defaultProps = {
+  onAccept: () => { },
+  onDecline: () => { },
+  onPayment: () => { },
+  onGenerateOtp: () => { },
+  onVerifyDeliveryOtp: () => { },
+  onVerifyReturnOtp: () => { },
+  onRate: () => { },
+};
 
 export default OrderCard;
