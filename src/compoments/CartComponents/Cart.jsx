@@ -262,5 +262,8 @@ const Cart = () => {
     </div>
   );
 };
+Cart.propTypes = {
+  forceRefetch: PropTypes.bool
+};
 
 export default Cart;
