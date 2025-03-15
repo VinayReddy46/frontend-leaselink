@@ -7,14 +7,13 @@ import { toast } from "react-toastify";
 
 const Cart = () => {
   const navigate = useNavigate();
-  const userInfo = useSelector((state) => state.auth.userInfo);
+ const userInfo = useSelector((state) => state.auth.userInfo);
   const userId = userInfo?.id;
   const { data, isLoading: isCartLoading, refetch } = useGetCartItemsByUserIdQuery(userId, {
     refetchOnMountOrArgChange: true,
     refetchOnFocus: true,
     refetchOnReconnect: true
   });
-  const { data, isLoading: isCartLoading, refetch } = useGetCartItemsByUserIdQuery(userId);
   const cartItemsData = data?.cartItems || [];
   const totalCartPrice = data?.totalCartPrice || 0;
   const [removeFromCart] = useRemoveFromCartMutation();
