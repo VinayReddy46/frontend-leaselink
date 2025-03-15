@@ -7,6 +7,7 @@ import {
   FaTimesCircle,
   FaStar,
   FaKey,
+  FaSpinner,
 } from "react-icons/fa";
 import PropTypes from "prop-types";
 
@@ -23,6 +24,13 @@ function OrderCard({
 }) {
   const [remainingTimes, setRemainingTimes] = useState({});
   const [otpInput, setOtpInput] = useState("");
+  const [loadingStates, setLoadingStates] = useState({});
+  const [confirmModal, setConfirmModal] = useState({
+    show: false,
+    type: null,
+    cartId: null,
+    productId: null,
+  });
 
   useEffect(() => {
     if (!order?.cartIds) return;
@@ -67,13 +75,116 @@ function OrderCard({
     }
   };
 
-  const handleVerifyOtpSubmit = (cartId, productId, type) => {
-    if (type === "delivery") {
-      onVerifyDeliveryOtp(cartId, productId);
-    } else if (type === "return") {
-      onVerifyReturnOtp(cartId, productId);
+  const openConfirmModal = (type, cartId, productId) => {
+    setConfirmModal({
+      show: true,
+      type,
+      cartId,
+      productId,
+    });
+  };
+
+  const closeConfirmModal = () => {
+    setConfirmModal({
+      show: false,
+      type: null,
+      cartId: null,
+      productId: null,
+    });
+  };
+
+  const handleConfirmAction = async () => {
+    const { type, cartId, productId } = confirmModal;
+
+    // Set loading state for specific action
+    setLoadingStates((prev) => ({
+      ...prev,
+      [`${type}_${cartId}`]: true,
+    }));
+
+    try {
+      if (type === "accept") {
+        await onAccept(cartId, productId);
+      } else if (type === "decline") {
+        await onDecline(cartId, productId);
+      }
+    } finally {
+      // Reset loading state
+      setLoadingStates((prev) => ({
+        ...prev,
+        [`${type}_${cartId}`]: false,
+      }));
+      closeConfirmModal();
     }
-    setOtpInput("");
+  };
+
+  const handleVerifyOtpSubmit = async (cartId, productId, type) => {
+    setLoadingStates((prev) => ({
+      ...prev,
+      [`verify_${type}_${cartId}`]: true,
+    }));
+
+    try {
+      if (type === "delivery") {
+        await onVerifyDeliveryOtp(cartId, productId);
+      } else if (type === "return") {
+        await onVerifyReturnOtp(cartId, productId);
+      }
+    } finally {
+      setLoadingStates((prev) => ({
+        ...prev,
+        [`verify_${type}_${cartId}`]: false,
+      }));
+      setOtpInput("");
+    }
+  };
+
+  const handleGenerateOtpWithLoading = async (cartId, productId) => {
+    setLoadingStates((prev) => ({
+      ...prev,
+      [`generateOtp_${cartId}`]: true,
+    }));
+
+    try {
+      await onGenerateOtp(cartId, productId);
+    } finally {
+      setLoadingStates((prev) => ({
+        ...prev,
+        [`generateOtp_${cartId}`]: false,
+      }));
+    }
+  };
+
+  const handlePaymentWithLoading = async (cartId, productId) => {
+    setLoadingStates((prev) => ({
+      ...prev,
+      [`payment_${cartId}`]: true,
+    }));
+
+    try {
+      await onPayment(cartId, productId);
+    } finally {
+      setLoadingStates((prev) => ({
+        ...prev,
+        [`payment_${cartId}`]: false,
+      }));
+    }
+  };
+
+  const handleRateWithLoading = async (cartId, productId) => {
+    setLoadingStates((prev) => ({
+      ...prev,
+      [`rate_${cartId}`]: true,
+    }));
+
+    try {
+      await onRate(cartId, productId);
+    } finally {
+      setLoadingStates((prev) => ({
+        ...prev,
+        [`rate_${cartId}`]: false,
+      }));
+    }
   };
 
   if (!order || !order.cartIds || order.cartIds.length === 0) {
@@ -82,6 +193,54 @@ function OrderCard({
 
   return (
     <div className="space-y-6">
+      {/* Confirmation Modal */}
+      {confirmModal.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-80 md:w-96 shadow-xl">
+            <h3 className="text-xl font-semibold mb-4">
+              {confirmModal.type === "accept"
+                ? "Accept Order"
+                : "Decline Order"}
+            </h3>
+            <p className="text-gray-600 mb-6">
+              {confirmModal.type === "accept"
+                ? "Are you sure you want to accept this order?"
+                : "Are you sure you want to decline this order?"}
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={closeConfirmModal}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmAction}
+                className={`px-4 py-2 rounded text-white flex items-center space-x-2 ${
+                  confirmModal.type === "accept"
+                    ? "bg-green-500 hover:bg-green-600"
+                    : "bg-red-500 hover:bg-red-600"
+                }`}
+                disabled={
+                  loadingStates[`${confirmModal.type}_${confirmModal.cartId}`]
+                }
+              >
+                {loadingStates[
+                  `${confirmModal.type}_${confirmModal.cartId}`
+                ] ? (
+                  <>
+                    <FaSpinner className="animate-spin mr-2" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <span>Confirm</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {order.cartIds.map((cart) => {
         const remainingTime = remainingTimes[cart._id] || 0;
         const isCompleted = cart.status === "completed";
@@ -202,14 +361,18 @@ function OrderCard({
                         {cart.status === "pending" && (
                           <div className="flex space-x-2">
                             <button
-                              onClick={() => onAccept(cart._id, productId)}
+                              onClick={() =>
+                                openConfirmModal("accept", cart._id, productId)
+                              }
                               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition flex items-center"
                             >
                               <FaCheckCircle className="mr-2" />
                               Accept
                             </button>
                             <button
-                              onClick={() => onDecline(cart._id, productId)}
+                              onClick={() =>
+                                openConfirmModal("decline", cart._id, productId)
+                              }
                               className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition flex items-center"
                             >
                               <FaTimesCircle className="mr-2" />
@@ -220,11 +383,23 @@ function OrderCard({
 
                         {cart.status === "accepted" && !cart.deliveryOtp && (
                           <button
-                            onClick={() => onGenerateOtp(cart._id, productId)}
+                            onClick={() =>
+                              handleGenerateOtpWithLoading(cart._id, productId)
+                            }
                             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition flex items-center"
+                            disabled={loadingStates[`generateOtp_${cart._id}`]}
                           >
-                            <FaKey className="mr-2" />
-                            Generate Delivery OTP
+                            {loadingStates[`generateOtp_${cart._id}`] ? (
+                              <>
+                                <FaSpinner className="animate-spin mr-2" />
+                                <span>Generating...</span>
+                              </>
+                            ) : (
+                              <>
+                                <FaKey className="mr-2" />
+                                <span>Generate Delivery OTP</span>
+                              </>
+                            )}
                           </button>
                         )}
 
@@ -271,10 +446,22 @@ function OrderCard({
                                       "return"
                                     )
                                   }
-                                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
-                                  disabled={otpInput !== cart.returnOtp}
+                                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition flex items-center"
+                                  disabled={
+                                    otpInput !== cart.returnOtp ||
+                                    loadingStates[`verify_return_${cart._id}`]
+                                  }
                                 >
-                                  Verify
+                                  {loadingStates[
+                                    `verify_return_${cart._id}`
+                                  ] ? (
+                                    <>
+                                      <FaSpinner className="animate-spin mr-2" />
+                                      <span>Verifying...</span>
+                                    </>
+                                  ) : (
+                                    <span>Verify</span>
+                                  )}
                                 </button>
                               </div>
                             </div>
@@ -285,13 +472,25 @@ function OrderCard({
                     {/* Renter Actions */}
                     {viewType === "renter" && (
                       <>
-                        {cart.status === "pending" && !cart.paymentStatus && (
+                        {cart.status === "accepted" && !cart.paymentStatus && (
                           <button
-                            onClick={() => onPayment(cart._id, productId)}
+                            onClick={() =>
+                              handlePaymentWithLoading(cart._id, productId)
+                            }
                             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition flex items-center"
+                            disabled={loadingStates[`payment_${cart._id}`]}
                           >
-                            <FaMoneyBillWave className="mr-2" />
-                            Make Payment
+                            {loadingStates[`payment_${cart._id}`] ? (
+                              <>
+                                <FaSpinner className="animate-spin mr-2" />
+                                <span>Processing...</span>
+                              </>
+                            ) : (
+                              <>
+                                <FaMoneyBillWave className="mr-2" />
+                                <span>Make Payment</span>
+                              </>
+                            )}
                           </button>
                         )}
 
@@ -318,9 +517,21 @@ function OrderCard({
                                       "delivery"
                                     )
                                   }
-                                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+                                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition flex items-center"
+                                  disabled={
+                                    loadingStates[`verify_delivery_${cart._id}`]
+                                  }
                                 >
-                                  Verify
+                                  {loadingStates[
+                                    `verify_delivery_${cart._id}`
+                                  ] ? (
+                                    <>
+                                      <FaSpinner className="animate-spin mr-2" />
+                                      <span>Verifying...</span>
+                                    </>
+                                  ) : (
+                                    <span>Verify</span>
+                                  )}
                                 </button>
                               </div>
                             </div>
@@ -328,11 +539,23 @@ function OrderCard({
 
                         {cart.status === "completed" && (
                           <button
-                            onClick={() => onRate(cart._id, productId)}
+                            onClick={() =>
+                              handleRateWithLoading(cart._id, productId)
+                            }
                             className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition flex items-center"
+                            disabled={loadingStates[`rate_${cart._id}`]}
                           >
-                            <FaStar className="mr-2" />
-                            Rate Experience
+                            {loadingStates[`rate_${cart._id}`] ? (
+                              <>
+                                <FaSpinner className="animate-spin mr-2" />
+                                <span>Loading...</span>
+                              </>
+                            ) : (
+                              <>
+                                <FaStar className="mr-2" />
+                                <span>Rate Experience</span>
+                              </>
+                            )}
                           </button>
                         )}
                       </>
