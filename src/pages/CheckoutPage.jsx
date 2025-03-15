@@ -14,7 +14,7 @@ const CheckoutPage = () => {
   
   // Get user info from Redux store
   const userInfo = useSelector((state) => state.auth.userInfo);
-  const userId = userInfo?.id;
+  const userId = userInfo?.id || userInfo?.user?.id;
   
   // Fetch cart data using RTK Query
   const { data: cartData, isLoading, error, refetch } = useGetCartItemsByUserIdQuery(userId, {

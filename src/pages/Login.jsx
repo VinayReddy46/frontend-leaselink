@@ -22,7 +22,7 @@ const Login = () => {
     try {
       const res=await login({email,password});
       console.log(res)
-      if(res.data.success){
+      if(res.data?.success){
         toast.success( res?.data?.message ||"Login successful.");
         const user = res.data.user;
         dispatch(setCredentials(user));

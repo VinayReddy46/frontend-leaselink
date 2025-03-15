@@ -17,7 +17,7 @@ import { useCountCartItemsQuery } from "../redux/services/cartApiSlice";
 
 function Navbar() {
   const { userInfo, isAuthenticated } = useSelector(state => state.auth);
-  const userId = userInfo?.id;
+  const userId = userInfo?.id || userInfo?.user?.id;
   
   // Fetch cart count from API
   const { data: cartCountData } = useCountCartItemsQuery(userId, {

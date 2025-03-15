@@ -7,8 +7,8 @@ import { useSelector } from "react-redux";
 const WalletPage = () => {
   const { userInfo } = useSelector((state) => state.auth);
 
-  const { data, refetch, isLoading } = useGetWalletByIdQuery(userInfo?.id, {
-    skip: !userInfo?.id,
+  const { data, refetch, isLoading } = useGetWalletByIdQuery(userInfo?.id ||  userInfo?.user?.id, {
+    skip: !userInfo?.id ||  !userInfo?.user?.id,
   });
   console.log(data)
 
@@ -39,7 +39,7 @@ const WalletPage = () => {
 
     try {
       await updateWallet({
-        id: userInfo?.id,
+        id: userInfo?.id ||  userInfo?.user?.id,
         ...newTransaction,
       }).unwrap();
 
