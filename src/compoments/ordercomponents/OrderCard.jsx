@@ -10,6 +10,12 @@ import {
   FaSpinner,
 } from "react-icons/fa";
 import PropTypes from "prop-types";
+import { useCreatePaymentSessionMutation } from "../../redux/services/paymentSlice";
+import { Modal } from "@mui/material";
+import { useLocation, useParams } from "react-router-dom";
+import PaymentSuccessModal from "./PaymentSuccessPage";
+import PaymentSuccessPage from "./PaymentSuccessPage";
+import queryString from "query-string";
 
 function OrderCard({
   order,
@@ -25,6 +31,9 @@ function OrderCard({
   const [remainingTimes, setRemainingTimes] = useState({});
   const [otpInput, setOtpInput] = useState("");
   const [loadingStates, setLoadingStates] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [createPaymentSession] = useCreatePaymentSessionMutation();
   const [confirmModal, setConfirmModal] = useState({
     show: false,
     type: null,
@@ -96,7 +105,6 @@ function OrderCard({
   const handleConfirmAction = async () => {
     const { type, cartId, productId } = confirmModal;
 
-    // Set loading state for specific action
     setLoadingStates((prev) => ({
       ...prev,
       [`${type}_${cartId}`]: true,
@@ -109,7 +117,6 @@ function OrderCard({
         await onDecline(cartId, productId);
       }
     } finally {
-      // Reset loading state
       setLoadingStates((prev) => ({
         ...prev,
         [`${type}_${cartId}`]: false,
@@ -156,19 +163,23 @@ function OrderCard({
   };
 
   const handlePaymentWithLoading = async (cartId, productId) => {
-    setLoadingStates((prev) => ({
-      ...prev,
-      [`payment_${cartId}`]: true,
-    }));
+    setLoading(true);
+    setModalVisible(true);
 
     try {
-      await onPayment(cartId, productId);
-    } finally {
-      setLoadingStates((prev) => ({
-        ...prev,
-        [`payment_${cartId}`]: false,
-      }));
+      const response = await createPaymentSession({ cartId }).unwrap();
+      window.location.href = response.url;
+
+    } catch (error) {
+      console.error("Error creating payment session", error);
+      setLoading(false);
+      // Optionally show an error message to the user here
     }
+  };
+
+  const handleMakePayment = (cartId, productId) => {
+    console.log(cartId, productId)
+    handlePaymentWithLoading(cartId, productId);
   };
 
   const handleRateWithLoading = async (cartId, productId) => {
@@ -190,6 +201,7 @@ function OrderCard({
   if (!order || !order.cartIds || order.cartIds.length === 0) {
     return <p>No order information available</p>;
   }
+
 
   return (
     <div className="space-y-6">
@@ -216,11 +228,10 @@ function OrderCard({
               </button>
               <button
                 onClick={handleConfirmAction}
-                className={`px-4 py-2 rounded text-white flex items-center space-x-2 ${
-                  confirmModal.type === "accept"
-                    ? "bg-green-500 hover:bg-green-600"
-                    : "bg-red-500 hover:bg-red-600"
-                }`}
+                className={`px-4 py-2 rounded text-white flex items-center space-x-2 ${confirmModal.type === "accept"
+                  ? "bg-green-500 hover:bg-green-600"
+                  : "bg-red-500 hover:bg-red-600"
+                  }`}
                 disabled={
                   loadingStates[`${confirmModal.type}_${confirmModal.cartId}`]
                 }
@@ -313,17 +324,16 @@ function OrderCard({
                     {/* Status Pill */}
                     <div className="mt-2">
                       <span
-                        className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          cart.status === "pending"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : cart.status === "accepted"
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${cart.status === "pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : cart.status === "accepted"
                             ? "bg-green-100 text-green-800"
                             : cart.status === "completed"
-                            ? "bg-blue-100 text-blue-800"
-                            : cart.status === "declined"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
+                              ? "bg-blue-100 text-blue-800"
+                              : cart.status === "declined"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-gray-100 text-gray-800"
+                          }`}
                       >
                         {cart.status === "pending" && (
                           <>
@@ -381,7 +391,7 @@ function OrderCard({
                           </div>
                         )}
 
-                        {cart.status === "accepted" && !cart.deliveryOtp && (
+                        {/* {cart.status === "accepted" && !cart.deliveryOtp && (
                           <button
                             onClick={() =>
                               handleGenerateOtpWithLoading(cart._id, productId)
@@ -401,7 +411,7 @@ function OrderCard({
                               </>
                             )}
                           </button>
-                        )}
+                        )} */}
 
                         {cart.status === "accepted" &&
                           cart.deliveryOtp &&
@@ -472,27 +482,25 @@ function OrderCard({
                     {/* Renter Actions */}
                     {viewType === "renter" && (
                       <>
-                        {cart.status === "accepted" && !cart.paymentStatus && (
-                          <button
-                            onClick={() =>
-                              handlePaymentWithLoading(cart._id, productId)
-                            }
-                            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition flex items-center"
-                            disabled={loadingStates[`payment_${cart._id}`]}
-                          >
-                            {loadingStates[`payment_${cart._id}`] ? (
-                              <>
-                                <FaSpinner className="animate-spin mr-2" />
-                                <span>Processing...</span>
-                              </>
-                            ) : (
-                              <>
-                                <FaMoneyBillWave className="mr-2" />
-                                <span>Make Payment</span>
-                              </>
-                            )}
-                          </button>
-                        )}
+                        {
+                          cart.status === "accepted" && (
+                            <>
+                              {cart.payment === 'pending' && (
+                                <button
+                                  onClick={() => handleMakePayment(cart._id)}
+                                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition flex items-center"
+                                  disabled={loadingStates[`payment_${cart._id}`]}
+                                >
+                                  {!loading ? "Make Payment" : "Processing..."}
+                                </button>
+                              )}
+
+                              {cart.payment === 'completed' && (
+                                <p>Payment Successful</p>
+                              )}
+                            </>
+                          )
+                        }
 
                         {cart.status === "accepted" &&
                           cart.deliveryOtp &&
@@ -567,7 +575,8 @@ function OrderCard({
           </div>
         );
       })}
-    </div>
+
+    </div >
   );
 }
 
@@ -601,13 +610,13 @@ OrderCard.propTypes = {
 };
 
 OrderCard.defaultProps = {
-  onAccept: () => {},
-  onDecline: () => {},
-  onPayment: () => {},
-  onGenerateOtp: () => {},
-  onVerifyDeliveryOtp: () => {},
-  onVerifyReturnOtp: () => {},
-  onRate: () => {},
+  onAccept: () => { },
+  onDecline: () => { },
+  onPayment: () => { },
+  onGenerateOtp: () => { },
+  onVerifyDeliveryOtp: () => { },
+  onVerifyReturnOtp: () => { },
+  onRate: () => { },
 };
 
 export default OrderCard;

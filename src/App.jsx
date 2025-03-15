@@ -53,7 +53,7 @@ import WithdrawRequest from "./compoments/admin/WithdrawRequest";
 import Transactions from "./compoments/admin/Transactions";
 import CheckoutPage from "./pages/CheckoutPage";
 import ResetPassword from "./pages/ResetPassword";
-
+import PaymentSuccessPage from "./compoments/ordercomponents/PaymentSuccessPage";
 
 const Laptops = () => <h1>Laptops Page</h1>;
 const TVMonitors = () => <h1>TV & Monitors Page</h1>;
@@ -91,76 +91,77 @@ function App() {
   return (
     <SearchProvider>
       <WishlistProvider>
-      <AnimatePresence mode="wait">
-        <div className="flex flex-col min-h-screen">
+        <AnimatePresence mode="wait">
+          <div className="flex flex-col min-h-screen">
 
-          {!isAdminRoute && <Navbar />} {/* Show Navbar only for non-admin routes */}
-          <div className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/verification" element={<Verfication />} />
-              <Route path="/rental" element={<Rental />} />
-              <Route path="/rental/:category" element={<Rental />} />
-              <Route path="/chat" element={<Chatbot />} />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/aboutus" element={<AboutUs />} />
-              <Route path="/notification/:id" element={<NotificationDetails />} />
-              {/* added */}
-              <Route path="/product/:id" element={<ProductDetails />} />
-              <Route path='/forgot-password' element={<ForgotPassword />} />
-              <Route path='/reset-password/:token' element={<ResetPassword />} />
-              {/* <Route path="/payment" element={<PaymentForm/>} /> */}
-              <Route path="/ratings" element={<Ratings />} />
-              <Route path="/messaging" element={<Message />} />
-              <Route path="/insurance" element={<Insurance />} />
-              <Route path="/addproduct" element={<AddProduct />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/settings" element={<ProfileSettings />} />
-              <Route path="/wishlist" element={<WishlistPage />} />
-              {/* <Route path="/myorders" element={<MyOrders />} />
+            {!isAdminRoute && <Navbar />} {/* Show Navbar only for non-admin routes */}
+            <div className="flex-grow">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path='/success' element={<PaymentSuccessPage onClose={() => { }} />} />
+                <Route path="/verification" element={<Verfication />} />
+                <Route path="/rental" element={<Rental />} />
+                <Route path="/rental/:category" element={<Rental />} />
+                <Route path="/chat" element={<Chatbot />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/aboutus" element={<AboutUs />} />
+                <Route path="/notification/:id" element={<NotificationDetails />} />
+                {/* added */}
+                <Route path="/product/:id" element={<ProductDetails />} />
+                <Route path='/forgot-password' element={<ForgotPassword />} />
+                <Route path='/reset-password/:token' element={<ResetPassword />} />
+                {/* <Route path="/payment" element={<PaymentForm/>} /> */}
+                <Route path="/ratings" element={<Ratings />} />
+                <Route path="/messaging" element={<Message />} />
+                <Route path="/insurance" element={<Insurance />} />
+                <Route path="/addproduct" element={<AddProduct />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/settings" element={<ProfileSettings />} />
+                <Route path="/wishlist" element={<WishlistPage />} />
+                {/* <Route path="/myorders" element={<MyOrders />} />
               <Route path="/myrentedproducts" element={<Myrentedproducts />} /> */}
-              <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="*" element={<Error />} />
-              <Route path="/Helpdesk" element={<HelpDesk />} />
-              <Route path="/help-topic/:topicId" element={<HelpTopic />} />
-              <Route path="/article/:articleId" element={<Article />} />
-              <Route path="/contact-support" element={<ContactSupport />} />
-              <Route path="/disputeandfile" element={<DisputaAndFile />} />
-              
-              <Route path="/wallet" element={<WalletPage/>} />
+                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="*" element={<Error />} />
+                <Route path="/Helpdesk" element={<HelpDesk />} />
+                <Route path="/help-topic/:topicId" element={<HelpTopic />} />
+                <Route path="/article/:articleId" element={<Article />} />
+                <Route path="/contact-support" element={<ContactSupport />} />
+                <Route path="/disputeandfile" element={<DisputaAndFile />} />
 
-              <Route path="/laptops" element={<Laptops />} />
-              <Route path="/tv-monitors" element={<TVMonitors />} />
-              <Route path="/air-purifiers" element={<AirPurifiers />} />
-              <Route path="/projectors" element={<Projectors />} />
-              <Route path="/ps5" element={<PS5 />} />
-              <Route path="/tablets" element={<Tablets />} />
-              <Route path="/printers" element={<Printers />} />
-              <Route path="/audio" element={<Audio />} />
-              <Route path="/kitchen" element={<Kitchen />} />
-              <Route path="/video-conference" element={<VideoConference />} />
-              <Route path="/office" element={<Office />} />
-              <Route path="/security" element={<Security />} />
-             
-              {/* <Route path="/Rating" element={<TrustSystem />} /> */}
-              {/* Admin Routes */}
-              <Route path="/admin" element={<AdminDashboard />}>
-                <Route index element={<Dashboard />} />
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="customer-service" element={<CustomerService />} />
-                <Route path="settings" element={<Settings />} />
-                <Route path="faqs" element={<FAQManager />} />
-                <Route path="transactions" element={<Transactions/>} /> 
-                <Route path="withdrawrequest" element={<WithdrawRequest/>} />
-                <Route path="blogs" element={<Blog />} />
-                <Route path="categories" element={<CategoryList />} />
-                <Route path="users-management" element={<UserManagement />} />
-              </Route>
-              
-              <Route 
-                  path="/myrentedproducts" 
+                <Route path="/wallet" element={<WalletPage />} />
+
+                <Route path="/laptops" element={<Laptops />} />
+                <Route path="/tv-monitors" element={<TVMonitors />} />
+                <Route path="/air-purifiers" element={<AirPurifiers />} />
+                <Route path="/projectors" element={<Projectors />} />
+                <Route path="/ps5" element={<PS5 />} />
+                <Route path="/tablets" element={<Tablets />} />
+                <Route path="/printers" element={<Printers />} />
+                <Route path="/audio" element={<Audio />} />
+                <Route path="/kitchen" element={<Kitchen />} />
+                <Route path="/video-conference" element={<VideoConference />} />
+                <Route path="/office" element={<Office />} />
+                <Route path="/security" element={<Security />} />
+
+                {/* <Route path="/Rating" element={<TrustSystem />} /> */}
+                {/* Admin Routes */}
+                <Route path="/admin" element={<AdminDashboard />}>
+                  <Route index element={<Dashboard />} />
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="customer-service" element={<CustomerService />} />
+                  <Route path="settings" element={<Settings />} />
+                  <Route path="faqs" element={<FAQManager />} />
+                  <Route path="transactions" element={<Transactions />} />
+                  <Route path="withdrawrequest" element={<WithdrawRequest />} />
+                  <Route path="blogs" element={<Blog />} />
+                  <Route path="categories" element={<CategoryList />} />
+                  <Route path="users-management" element={<UserManagement />} />
+                </Route>
+
+                <Route
+                  path="/myrentedproducts"
                   element={
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
@@ -168,12 +169,12 @@ function App() {
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <LenderDashboard/>
+                      <LenderDashboard />
                     </motion.div>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/myorders" 
+                <Route
+                  path="/myorders"
                   element={
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
@@ -183,16 +184,15 @@ function App() {
                     >
                       <RenterDashboard />
                     </motion.div>
-                  } 
+                  }
                 />
-              <Route path="/contact" element={<Contact/>} />
-            </Routes>
-          </div>
+                <Route path="/contact" element={<Contact />} />
+              </Routes>
+            </div>
+            {!isAdminRoute && <Footer />} {/* Show Footer only for non-admin routes */}
 
-          {!isAdminRoute && <Footer />} {/* Show Footer only for non-admin routes */}
-          
-          {!isAdminRoute && <HelpdeskBtn/>}
-        </div></AnimatePresence>
+            {!isAdminRoute && <HelpdeskBtn />}
+          </div></AnimatePresence>
       </WishlistProvider>
     </SearchProvider>
   );

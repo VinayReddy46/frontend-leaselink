@@ -19,6 +19,7 @@ function LenderDashboard() {
     refetch,
   } = useGetMyRentedProductsQuery(userId);
 
+
   const [updateStatus] = useUpdateStatusMutation();
 
   const handleAcceptOrder = async (cartId, productId) => {
@@ -169,11 +170,10 @@ function LenderDashboard() {
             <button
               key={filterType}
               onClick={() => setFilter(filterType)}
-              className={`px-4 py-2 rounded-md transition-all duration-200 ${
-                filter === filterType
+              className={`px-4 py-2 rounded-md transition-all duration-200 ${filter === filterType
                   ? "bg-blue-500 text-white shadow-md"
                   : "hover:bg-gray-100 text-gray-600"
-              }`}
+                }`}
             >
               {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
             </button>
