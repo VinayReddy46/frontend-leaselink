@@ -14,10 +14,22 @@ export const billingApiSlice = apiSlice.injectEndpoints({
     getOrders: builder.query({
       query: (id) => `billingroute/${id}`,
     }),
+    getMyRentedProducts: builder.query({
+      query: (id) => `billingroute/myrented/${id}`,
+    }),
+    getMyOrderedProducts: builder.query({
+      query: (id) => `billingroute/${id}`,
+    }),
+    updateStatus: builder.mutation({
+      query: (id) => `billingroute/${id}`,
+    }),
   }),
 });
 
 export const {
   usePlaceOrderMutation,
   useGetOrdersQuery,
+  useGetMyRentedProductsQuery,
+  useGetMyOrderedProductsQuery,
+  useUpdateStatusMutation,
 } = billingApiSlice;
