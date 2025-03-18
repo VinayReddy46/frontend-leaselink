@@ -64,7 +64,7 @@ const Checkout = ({ cart = [], setProgressStep, onOrderSuccess }) => {
   const [isNewAddress, setIsNewAddress] = useState(true);
   const [isLoadingSaveAddress, setIsLoadingSaveAddress] = useState(false);
 
-  // Redux hooks for address management updated
+
   const userId = useSelector((state) => state.auth.userInfo?.id || state.auth.userInfo?.user?.id);
   const {
     data: userAddresses,
