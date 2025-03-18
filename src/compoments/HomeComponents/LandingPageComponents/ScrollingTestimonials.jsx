@@ -36,7 +36,7 @@ const TestimonialsCarousel = () => {
       name: "Sylvia H Green",
       role: "Customer",
       image: img3,
-      text: "There are many variations of passages available but the majority have suffered to the alteration in some injected.",
+      text: "Crystal-clear display with vibrant colors. Perfect for watching movies and gaming,Super fast performance",
       rating: 5,
     },
     {
@@ -44,7 +44,7 @@ const TestimonialsCarousel = () => {
       name: "Gordo Novak",
       role: "Customer",
       image: img4,
-      text: "There are many variations of passages available but the majority have suffered to the alteration in some injected.",
+      text: "The battery life is outstanding! Lasts all day even with heavy usage.Super fast performance",
       rating: 3,
     },
     {
@@ -60,7 +60,7 @@ const TestimonialsCarousel = () => {
       name: "Ram",
       role: "Customer",
       image: img6,
-      text: "There are many variations of passages available but the majority have suffered to the alteration in some injected.",
+      text: "Super fast performance and smooth multitasking. No lag at all,Perfect for watching movies and gaming,Super fast performance ",
       rating: 5,
     },
   ];
