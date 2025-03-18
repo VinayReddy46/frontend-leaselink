@@ -47,7 +47,7 @@ const RentalProcess = () => {
     {
       number: '01',
       title: 'Pick Destination',
-      description: 'Select your pickup location and desired destination for your journey.',
+      description: 'Select the perfect travel destination based on preferences, attractions, and experiences for an unforgettable journey.',
       icon: <FaMapMarkerAlt />
     },
     {
