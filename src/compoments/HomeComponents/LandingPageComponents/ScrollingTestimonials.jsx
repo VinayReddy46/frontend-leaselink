@@ -28,7 +28,7 @@ const TestimonialsCarousel = () => {
       name: "Heruli Nez",
       role: "Customer",
       image: img2,
-      text: "There are many variations of passages available but the majority have suffered to the alteration in some injected.",
+      text: "High-speed processor and excellent cooling system for gaming,Super fast performance and smooth multitasking. No lag at all",
       rating: 2,
     },
     {
@@ -52,7 +52,7 @@ const TestimonialsCarousel = () => {
       name: "Jon Nez",
       role: "Customer",
       image: img5,
-      text: "There are many variations of passages available but the majority have suffered to the alteration in some injected.",
+      text: "Powerful desktop with fast performance and smooth multitasking,Great build quality, runs heavy software without any lag",
       rating: 4,
     },
     {
