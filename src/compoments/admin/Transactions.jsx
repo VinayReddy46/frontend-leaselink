@@ -42,14 +42,14 @@ const Transactions = () => {
     },
     {
       id: 'TX006',
-      from: { name: 'Sophia Thompson', type: 'Borrower' },
+      from: { name: 'Sophia  Sohpie Thompson', type: 'Borrower' },
       to: { name: 'James Anderson', type: 'Lender' },
       amount: 2500,
       date: '03/01/2025',
     },
     {
       id: 'TX007',
-      from: { name: 'David Wilson', type: 'Lender' },
+      from: { name: 'David Warner Wilson', type: 'Lender' },
       to: { name: 'Charlotte White', type: 'Borrower' },
       amount: 700,
       date: '02/28/2025',

@@ -60,7 +60,7 @@ const WalletPage = () => {
 
         <input
           type="number"
-          placeholder="Enter Amount"
+          placeholder="Enter the Amount"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500"

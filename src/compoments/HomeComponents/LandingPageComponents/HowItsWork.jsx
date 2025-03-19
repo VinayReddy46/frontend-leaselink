@@ -47,7 +47,7 @@ const RentalProcess = () => {
     {
       number: '01',
       title: 'Pick Destination',
-      description: 'Select your pickup location and desired destination for your journey.',
+      description: 'Select the perfect travel destination based on preferences, attractions, and experiences for an unforgettable journey.',
       icon: <FaMapMarkerAlt />
     },
     {
@@ -57,13 +57,13 @@ const RentalProcess = () => {
       icon: <FaCar />
     },
     {
-      number: '02',
+      number: '03',
       title: 'Online Payment',
       description: 'Securely complete your reservation with our easy payment system.',
       icon: <FaCreditCard />
     },
     {
-      number: '03',
+      number: '04',
       title: 'Enjoy Your Car Ride',
       description: 'Pick up your vehicle and enjoy the freedom of the open road.',
       icon: <FaCarSide />

@@ -18,7 +18,7 @@ function ResponsiveCarousel() {
       title: "Tech Gadgets",
       highlight: "Innovative",
       subtitle: "Devices",
-      discount: "45% OFF TODAY!",
+      discount: "57% OFF TODAY!",
       description:
         "Explore the latest in cutting-edge technology and smart devices. From smartphones to wearables, we've got everything you need.",
       features: ["Latest models", "Extended warranty", "Free shipping"],
@@ -48,7 +48,7 @@ function ResponsiveCarousel() {
       title: "Workstation Setup",
       highlight: "Efficient",
       subtitle: "Gear",
-      discount: "40% OFF NOW!",
+      discount: "60% OFF NOW!",
       description:
         "Boost productivity with top-tier workplace technology. Ergonomic designs combined with powerful performance for professionals.",
       features: ["Ergonomic designs", "High performance", "Connectivity options"],
@@ -78,7 +78,7 @@ function ResponsiveCarousel() {
       title: "Smart Home",
       highlight: "Connected",
       subtitle: "Living",
-      discount: "30% OFF EVERYTHING!",
+      discount: "49% OFF EVERYTHING!",
       description:
         "Automate your home with cutting-edge smart devices. Control lighting, security, climate, and more from your smartphone.",
       features: ["Voice assistants", "Security systems", "Smart appliances"],
